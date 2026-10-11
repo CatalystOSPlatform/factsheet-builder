@@ -369,7 +369,7 @@ export async function saveDocVersion({ clientId, orgId, versionId, meta, snapsho
   try { const sref = storageMod.ref(storageMod.getStorage(app), path); await storageMod.uploadBytes(sref, new Blob([json], { type: "application/json" }), { contentType: "application/json" }); } catch (e) { console.warn("Storage copy failed (Firestore copy saved)", e); }
   const user = window.CatalystAuth && window.CatalystAuth.user && window.CatalystAuth.user();
   let thumb = meta.thumb || ""; if (thumb.length > 300000) thumb = "";
-  const rec = { ...meta, thumb, snapshotPath: path, clientId: clientId || "", organization_id: org || "", savedBy: user ? (user.email || user.uid || "") : "", createdAt: firestore.serverTimestamp() };
+  const rec = { ...meta, app: FS_APP, thumb, snapshotPath: path, clientId: clientId || "", organization_id: org || "", savedBy: user ? (user.email || user.uid || "") : "", createdAt: firestore.serverTimestamp() };
   await firestore.setDoc(firestore.doc(versionsCol(firestore, db, clientId, org), versionId), rec);
   // Mirror into the agency's library so the agency sees it with or without that client selected.
   if (clientId && org) { try { await firestore.setDoc(firestore.doc(versionsCol(firestore, db, "", org), versionId), { ...rec, mirrorOf: "client" }); } catch (e) { console.warn("Agency mirror failed", e); } }
@@ -390,18 +390,20 @@ export async function shareDocVersion(ref, meta, emails) {
   const m = { ...(meta || {}) }; delete m.createdAt; delete m.sharedWith;
   await firestore.setDoc(d, { ...m, snapshotPath: ref.path || m.snapshotPath || "", clientId: ref.clientId || "", organization_id: ref.orgId || "", sharedWith: to, sharedBy: user ? (user.email || "").toLowerCase() : "", sharedAt: firestore.serverTimestamp() });
 }
+// The Fact Sheet Builder keeps its own list: its saves are marked app "factsheet" and only those are listed here.
+const FS_APP = "factsheet";
 export async function loadDocVersions({ clientId, orgId }) {
   const { db, firestore } = await getDb();
   const org = await ownerOrg(firestore, db, clientId, orgId);
   const rows = [], seen = new Set();
-  const add = (snap, cid) => snap.forEach((d) => { if (seen.has(d.id)) return; const x = d.data(); const rc = cid !== undefined ? cid : (x.clientId || "");
+  const add = (snap, cid) => snap.forEach((d) => { if (seen.has(d.id)) return; const x = d.data(); if (x.app !== FS_APP) return; const rc = cid !== undefined ? cid : (x.clientId || "");
     if (clientId && rc && rc !== clientId) return; seen.add(d.id);
     rows.push({ ...x, ref: { id: d.id, clientId: rc, orgId: org || "", path: x.snapshotPath || "" } }); });
   if (clientId) { try { add(await firestore.getDocs(versionsCol(firestore, db, clientId, org)), clientId); } catch (e) { console.warn("Client versions load failed", e); } }
   if (org) { try { add(await firestore.getDocs(versionsCol(firestore, db, "", org))); } catch (e) { console.warn("Agency versions load failed", e); } }
   const me = window.CatalystAuth && window.CatalystAuth.user && window.CatalystAuth.user(); const em = me && me.email && String(me.email).toLowerCase();
   if (em) { try { const snap = await firestore.getDocs(firestore.query(firestore.collection(db, "catalystos_shared_docVersions"), firestore.where("sharedWith", "array-contains", em)));
-    snap.forEach((d) => { if (seen.has(d.id)) return; seen.add(d.id); const x = d.data(); rows.push({ ...x, sharedFrom: x.sharedBy || "", ref: { id: d.id, clientId: x.clientId || "", orgId: x.organization_id || "", path: x.snapshotPath || "", shared: true } }); });
+    snap.forEach((d) => { if (seen.has(d.id)) return; const x = d.data(); if (x.app !== FS_APP) return; seen.add(d.id); rows.push({ ...x, sharedFrom: x.sharedBy || "", ref: { id: d.id, clientId: x.clientId || "", orgId: x.organization_id || "", path: x.snapshotPath || "", shared: true } }); });
   } catch (e) { console.warn("Shared versions load failed", e); } }
   return rows;
 }
