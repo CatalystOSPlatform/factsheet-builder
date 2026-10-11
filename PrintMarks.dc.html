@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="position:absolute;inset:0;pointer-events:none;font-size:0;color:#111">
+
+  <!-- ===== CROP MARKS (trim corners) ===== -->
+  <!-- top-left -->
+  <div class="crop-mark" style="position:absolute;left:.465in;top:.18in;width:.6px;height:.16in;background:#111"></div>
+  <div class="crop-mark" style="position:absolute;top:.465in;left:.18in;height:.6px;width:.16in;background:#111"></div>
+  <!-- top-right -->
+  <div class="crop-mark" style="position:absolute;right:.465in;top:.18in;width:.6px;height:.16in;background:#111"></div>
+  <div class="crop-mark" style="position:absolute;top:.465in;right:.18in;height:.6px;width:.16in;background:#111"></div>
+  <!-- bottom-left -->
+  <div class="crop-mark" style="position:absolute;left:.465in;bottom:.18in;width:.6px;height:.16in;background:#111"></div>
+  <div class="crop-mark" style="position:absolute;bottom:.465in;left:.18in;height:.6px;width:.16in;background:#111"></div>
+  <!-- bottom-right -->
+  <div class="crop-mark" style="position:absolute;right:.465in;bottom:.18in;width:.6px;height:.16in;background:#111"></div>
+  <div class="crop-mark" style="position:absolute;bottom:.465in;right:.18in;height:.6px;width:.16in;background:#111"></div>
+
+  <!-- ===== REGISTRATION MARKS ===== -->
+  <div class="reg-mark" style="position:absolute;left:50%;top:.115in;transform:translateX(-50%)"><svg width="13" height="13" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4.6" fill="none" stroke="#111" stroke-width="1"/><line x1="10" y1="0" x2="10" y2="20" stroke="#111" stroke-width="1"/><line x1="0" y1="10" x2="20" y2="10" stroke="#111" stroke-width="1"/></svg></div>
+  <div class="reg-mark" style="position:absolute;left:50%;bottom:.115in;transform:translateX(-50%)"><svg width="13" height="13" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4.6" fill="none" stroke="#111" stroke-width="1"/><line x1="10" y1="0" x2="10" y2="20" stroke="#111" stroke-width="1"/><line x1="0" y1="10" x2="20" y2="10" stroke="#111" stroke-width="1"/></svg></div>
+  <div class="reg-mark" style="position:absolute;top:50%;left:.115in;transform:translateY(-50%)"><svg width="13" height="13" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4.6" fill="none" stroke="#111" stroke-width="1"/><line x1="10" y1="0" x2="10" y2="20" stroke="#111" stroke-width="1"/><line x1="0" y1="10" x2="20" y2="10" stroke="#111" stroke-width="1"/></svg></div>
+  <div class="reg-mark" style="position:absolute;top:50%;right:.115in;transform:translateY(-50%)"><svg width="13" height="13" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4.6" fill="none" stroke="#111" stroke-width="1"/><line x1="10" y1="0" x2="10" y2="20" stroke="#111" stroke-width="1"/><line x1="0" y1="10" x2="20" y2="10" stroke="#111" stroke-width="1"/></svg></div>
+
+  <!-- ===== COLOR BAR ===== -->
+  <div class="color-bar" style="position:absolute;bottom:.1in;right:.5in;gap:.5px;border:.5px solid #aaa">
+    <span style="width:.085in;height:.085in;background:#00AEEF"></span>
+    <span style="width:.085in;height:.085in;background:#EC008C"></span>
+    <span style="width:.085in;height:.085in;background:#FFF200"></span>
+    <span style="width:.085in;height:.085in;background:#231F20"></span>
+    <span style="width:.085in;height:.085in;background:#bfbfbf"></span>
+    <span style="width:.085in;height:.085in;background:#808080"></span>
+    <span style="width:.085in;height:.085in;background:#404040"></span>
+  </div>
+
+  <!-- ===== SLUG / PAGE INFO ===== -->
+  <div class="reg-mark" style="position:absolute;top:.135in;left:.5in;font:600 3.6pt 'Hanken Grotesk',sans-serif;letter-spacing:.05em;color:#555;white-space:nowrap">City Birds &nbsp;·&nbsp; {{ label }} &nbsp;·&nbsp; Trim 3.5 × 4.75 in &nbsp;·&nbsp; Bleed 0.125 in</div>
+
+  <!-- ===== BLEED / TRIM / SAFE GUIDES (screen helper) ===== -->
+  <div class="bleed-guide" style="position:absolute;left:calc(var(--slug,0in) + .125in);top:calc(var(--slug,0in) + .125in);right:calc(var(--slug,0in) + .125in);bottom:calc(var(--slug,0in) + .125in);outline:.6px solid rgba(20,176,216,.95)"></div>
+  <div class="bleed-guide" style="position:absolute;left:calc(var(--slug,0in) + .175in);top:calc(var(--slug,0in) + .175in);right:calc(var(--slug,0in) + .175in);bottom:calc(var(--slug,0in) + .25in);outline:.6px dashed rgba(224,85,154,.85)"></div>
+  <div class="bleed-guide" style="position:absolute;left:calc(var(--slug,0in) + .125in);top:calc(var(--slug,0in) - .015in);font:700 3.4pt 'Hanken Grotesk',sans-serif;letter-spacing:.12em;color:rgba(20,150,190,1)">TRIM</div>
+
+  <!-- ===== PAGE-EDGE LINE (turquoise, screen helper) ===== -->
+  <div class="edge-line" style="position:absolute;left:var(--slug,0in);top:var(--slug,0in);right:var(--slug,0in);bottom:var(--slug,0in);outline:.7px solid rgba(0,200,210,.9);outline-offset:-.35px"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:280,&quot;height&quot;:360},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Page&quot;,&quot;tsType&quot;:&quot;string&quot;}}"></script>
+</body>
+</html>

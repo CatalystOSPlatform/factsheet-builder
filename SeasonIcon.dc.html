@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;line-height:0;color:inherit">
+  <sc-if value="{{ isResident }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18.5 12a6.5 6.5 0 0 1-11 4.7"/><path d="M5.5 12a6.5 6.5 0 0 1 11-4.7"/><path d="M16.5 4.2V7.3H13.4"/><path d="M7.5 19.8V16.7H10.6"/></svg></sc-if>
+  <sc-if value="{{ isSummer }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.8" fill="currentColor" fill-opacity="0.16"/><circle cx="12" cy="12" r="3.8"/><path d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg></sc-if>
+  <sc-if value="{{ isWinter }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5v19M3.7 7.25l16.6 9.5M20.3 7.25l-16.6 9.5"/><path d="M12 5.6l2.1 1.2M12 5.6L9.9 6.8M12 18.4l2.1-1.2M12 18.4l-2.1-1.2M5.8 9.2l.1 2.4M18.2 9.2l-.1 2.4M5.8 14.8l.1-2.4M18.2 14.8l-.1-2.4"/></svg></sc-if>
+  <sc-if value="{{ isMigrant }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9h14"/><path d="M13.5 5l4 4-4 4"/><path d="M20.5 15h-14"/><path d="M10.5 19l-4-4 4-4"/></svg></sc-if>
+</span>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:48,&quot;height&quot;:48},&quot;season&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Year-round&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const s = (this.props.season || '').replace(/[–—]/g, '-').toLowerCase().trim();
+    let kind = 'winter';
+    if (s.startsWith('year-round')) kind = 'resident';
+    else if (s === 'spring and fall') kind = 'migrant';
+    else if (s === 'spring-summer' || s === 'spring-fall') kind = 'summer';
+    return {
+      isResident: kind === 'resident',
+      isSummer: kind === 'summer',
+      isWinter: kind === 'winter',
+      isMigrant: kind === 'migrant',
+    };
+  }
+}
+</script>
+</body>
+</html>

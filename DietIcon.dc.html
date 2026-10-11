@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;line-height:0;color:inherit">
+  <sc-if value="{{ isLeaf }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-leaf.png') center/contain no-repeat;mask:url('icons/diet-leaf.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isSeeds }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-seeds.png') center/contain no-repeat;mask:url('icons/diet-seeds.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isBerry }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-fruit.png') center/contain no-repeat;mask:url('icons/diet-fruit.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isFlower }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-flower.png') center/contain no-repeat;mask:url('icons/diet-flower.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isSnail }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-snail.png') center/contain no-repeat;mask:url('icons/diet-snail.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isBug }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-bug.png') center/contain no-repeat;mask:url('icons/diet-bug.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isFish }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="80%" height="80%" fill="currentColor" style="overflow:visible"><path d="M3 12c3-5 9-5 13 0-4 5-10 5-13 0Z"/><path d="M16 12l5-3v6l-5-3Z"/></svg></sc-if>
+  <sc-if value="{{ isSnake }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-frog.png') center/contain no-repeat;mask:url('icons/diet-frog.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isEgg }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-bird.png') center/contain no-repeat;mask:url('icons/diet-bird.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isMouse }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-mouse.png') center/contain no-repeat;mask:url('icons/diet-mouse.png') center/contain no-repeat"></span></sc-if>
+  <sc-if value="{{ isBone }}" hint-placeholder-val="{{ true }}"><span style="display:block;width:100%;height:100%;background:currentColor;-webkit-mask:url('icons/diet-skull.png') center/contain no-repeat;mask:url('icons/diet-skull.png') center/contain no-repeat"></span></sc-if>
+</span>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:48,&quot;height&quot;:48},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Vegetation&quot;,&quot;Seeds&quot;,&quot;Fruits&quot;,&quot;Nectar&quot;,&quot;Aquatic Invertebrates&quot;,&quot;Terrestrial or Flying Invertebrates&quot;,&quot;Aquatic Vertebrates&quot;,&quot;Amphibians and Reptiles&quot;,&quot;Birds and Eggs&quot;,&quot;Mammals&quot;,&quot;Carrion&quot;],&quot;default&quot;:&quot;Vegetation&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const k = (this.props.kind || '').trim();
+    return {
+      isLeaf:   k === 'Vegetation',
+      isSeeds:  k === 'Seeds',
+      isBerry:  k === 'Fruits',
+      isFlower: k === 'Nectar',
+      isSnail:  k === 'Aquatic Invertebrates',
+      isBug:    k === 'Terrestrial or Flying Invertebrates',
+      isFish:   k === 'Aquatic Vertebrates',
+      isSnake:  k === 'Amphibians and Reptiles',
+      isEgg:    k === 'Birds and Eggs',
+      isMouse:  k === 'Mammals',
+      isBone:   k === 'Carrion',
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F5F7FA}
+  *{box-sizing:border-box}
+  a{color:#6818F8;text-decoration:none}
+  a:hover{color:#4b12b8}
+  @media (max-width:1100px){.cos-pw{display:none!important}}
+  @media (max-width:860px){[data-cos="agency-wrap"]{display:none!important}}
+</style>
+<script>(function(){var h=location.hostname;if(!/vercel\.app$/i.test(h)&&!/[?&]auth=1/.test(location.search)){window.COS_AUTH_SKIPPED=true;return;}var s=document.createElement('script');s.src='https://pilot-dash-ten.vercel.app/cos-app-auth.js';['data-require','data-no-back','data-no-button'].forEach(function(a){s.setAttribute(a,'')});s.setAttribute('data-home','https://pilot-dash-ten.vercel.app/COS.dc.html');document.head.appendChild(s);})();</script>
+<script src="./catalyst-context.js"></script>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#F5F7FA;font-family:'Inter',sans-serif;color:#3a4159;">
+<div class="no-print" style="position:relative;display:flex;align-items:center;justify-content:center;gap:11px;padding:12px 20px;background:radial-gradient(120% 180% at 50% -40%, #12296f 0%, #081A53 60%);border-bottom:2px solid;border-image:linear-gradient(90deg,#1921FE,#6818F8,#C1229C,#FD5920,#FDA71A) 1;font-family:'Manrope',sans-serif;">
+  <a href="https://pilot-dash-ten.vercel.app/" data-cos="back" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:4px;font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;color:#FFFFFF;text-decoration:none;background:linear-gradient(180deg,#FF7A45 0%,#E8460F 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,0.35),inset 0 -2px 3px rgba(140,30,0,0.35),0 3px 8px -3px rgba(232,70,15,0.6);border-radius:7px;padding:0 9px;height:22px;box-sizing:border-box;overflow:visible;white-space:nowrap;" style-hover="background:linear-gradient(180deg,#FF8F5F 0%,#FF561F 100%);color:#FFFFFF;"><img src="icons/rocket4.png" alt="" style="width:40px;height:40px;object-fit:contain;transform:scaleX(-1);flex:none;margin:-9px -4px -9px -3px;">Back to Dashboard</a>
+  <span style="width:25px;height:25px;border-radius:8px;background:linear-gradient(135deg,#1921FE,#6818F8 38%,#C1229C 64%,#FD5920 84%,#FDA71A);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#FFFFFF;box-shadow:0 3px 10px rgba(105,24,248,0.5);">OS</span>
+  <span class="cos-pw" style="font-size:10.5px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#8B95C4;">Powered by</span>
+  <span style="font-size:14px;font-weight:700;color:#FFFFFF;">Catalyst<span style="color:#C1229C;">OS</span></span>
+  <span data-cos="agency-wrap" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;white-space:nowrap;"><span style="font-size:10.5px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#8B95C4;">Agency</span><span data-cos="agency" style="font-size:14px;font-weight:800;color:#FFFFFF;"></span></span>
+</div>
+<div style="background:#0E2266;border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 24px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-family:'Manrope',sans-serif;font-size:20px;color:#FFFFFF;user-select:none;">
+  <span style="font-weight:800;">Multi-Page Document Builder:</span>
+  <span data-cos="client" style="font-weight:800;color:#FF7A45;"></span>
+  <div data-cos="account" style="margin-left:auto;display:none;align-items:center;gap:8px;align-self:center;font-family:'Manrope',sans-serif;"><span data-cos="email" style="font-size:12px;font-weight:600;color:#C9CFE8;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span><a data-cos="signout" href="#" style="display:flex;align-items:center;gap:6px;background:#FFFFFF;color:#081A53;font-weight:800;font-size:12px;border-radius:999px;padding:5px 13px 5px 10px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.25);text-decoration:none;" style-hover="background:#FFD23F;color:#081A53;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sign out</a></div>
+</div>
+<div class="no-print" style="background:#F1F2F5;border-bottom:1px solid rgba(8,26,83,0.08);padding:7px 24px;display:flex;align-items:center;justify-content:center;gap:12px;color:#081A53;">
+  <span style="font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#8A93A8;">Client:</span>
+  <div style="position:relative;display:inline-flex;align-items:center;background:#E3E6EC;border:1px solid rgba(8,26,83,0.14);border-radius:10px;height:36px;box-sizing:border-box;">
+    <span data-cos="picker-mount" style="display:flex;height:100%;"></span>
+    <span style="position:absolute;right:0;top:0;bottom:0;width:40px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(8,26,83,0.14);pointer-events:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#081A53" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+  </div>
+</div>
+<div class="no-print" style="background:#FFFFFF;border-bottom:1px solid rgba(8,26,83,0.08);padding:16px 24px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
+  <button onClick="{{ openVersions }}" title="Browse saved documents" style="display:inline-flex;align-items:center;gap:6px;height:40px;box-sizing:border-box;padding:0 16px;border-radius:9px;border:0;background:linear-gradient(135deg,#22C55E 0%,#15803D 100%);color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(21,128,61,0.35);" style-hover="filter:brightness(1.08);box-shadow:0 6px 18px rgba(21,128,61,0.45)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>{{ savedLabel }}<span title="Saved document versions" style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#C2410C;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;gap:4px;"><span>PDF</span><span>{{ nPdf }}</span></span><span title="Word documents" style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#6818F8;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;gap:4px;"><span>Word</span><span>{{ nWord }}</span></span><span title="My Templates" style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#15803D;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;gap:4px;"><span>Templates</span><span>{{ nTpl }}</span></span></button>
+</div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:48px 24px 64px;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
+      <div style="font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.02em;color:#081A53;">What Do You Want to Build?</div>
+    </div>
+    <div style="width:100%;max-width:1180px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
+      <div onClick="{{ openVersions }}" role="button" tabindex="0" style="cursor:pointer;display:flex;flex-direction:column;gap:18px;padding:26px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#15803D;box-shadow:0 10px 30px rgba(21,128,61,.16);color:#1d2340">
+        <div style="height:150px;border-radius:10px;background:#E8F7EE;display:flex;align-items:center;justify-content:center;">
+          <div style="display:grid;grid-template-columns:repeat(2,40px);gap:8px;">
+            <div style="height:52px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.12);padding:7px 6px;display:flex;flex-direction:column;gap:4px;"><div style="height:4px;width:70%;background:#22C55E;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div></div>
+            <div style="height:52px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.12);padding:7px 6px;display:flex;flex-direction:column;gap:4px;"><div style="height:4px;width:60%;background:#15803D;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div><div style="height:12px;background:#c9efd7;border-radius:2px;"></div></div>
+            <div style="height:52px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.12);padding:7px 6px;display:flex;flex-direction:column;gap:4px;"><div style="height:4px;width:80%;background:#15803D;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div></div>
+            <div style="height:52px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.12);padding:7px 6px;display:flex;flex-direction:column;gap:4px;"><div style="height:4px;width:55%;background:#22C55E;border-radius:2px;"></div><div style="height:12px;background:#c9efd7;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#081A53;">Your Saved Projects</div>
+          <div style="font-size:13.5px;line-height:1.5;color:#5a6178;text-wrap:pretty;">Pick up any document or Word file saved in this agency and keep working on it.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#15803D;">Open File <span>→</span></div>
+      </div>
+      <a href="Catalyst Document Builder.dc.html?start=new" style="display:flex;flex-direction:column;gap:18px;padding:26px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:150px;border-radius:10px;background:#F0EAFE;display:flex;align-items:center;justify-content:center;gap:10px;">
+          <div style="width:74px;height:98px;background:#fff;border-radius:3px;box-shadow:0 4px 14px rgba(8,26,83,.14);border:1.5px dashed #b9a2f7;display:flex;align-items:center;justify-content:center;color:#6818F8;font-size:28px;font-weight:300;">+</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#081A53;">Starter Template or Blank Document</div>
+          <div style="font-size:13.5px;line-height:1.5;color:#5a6178;text-wrap:pretty;">Start from a Starter Template or a blank page, built with your text styles, headers, footers and Brand Command.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#6818F8;">Start New <span>→</span></div>
+      </a>
+      <a href="Existing Document Builder.dc.html?new=1" style="display:flex;flex-direction:column;gap:18px;padding:26px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:150px;border-radius:10px;background:#FFF1E9;display:flex;align-items:center;justify-content:center;">
+          <div style="position:relative;width:74px;height:98px;">
+            <div style="position:absolute;left:-14px;top:8px;width:74px;height:98px;background:#fff;border-radius:3px;box-shadow:0 4px 14px rgba(8,26,83,.1);transform:rotate(-6deg);"></div>
+            <div style="position:absolute;inset:0;background:#fff;border-radius:3px;box-shadow:0 4px 14px rgba(8,26,83,.16);padding:12px 10px;display:flex;flex-direction:column;gap:6px;">
+              <div style="height:6px;width:70%;background:#FD5920;border-radius:2px;"></div>
+              <div style="height:3px;background:#d8dbe6;border-radius:2px;"></div>
+              <div style="height:3px;background:#d8dbe6;border-radius:2px;"></div>
+              <div style="height:3px;width:80%;background:#d8dbe6;border-radius:2px;"></div>
+              <div style="height:22px;background:#ffe0cf;border-radius:2px;margin-top:2px;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#081A53;">Upload and Rebuild a Document</div>
+          <div style="font-size:13.5px;line-height:1.5;color:#5a6178;text-wrap:pretty;">Upload a PDF, PowerPoint, Word or text file and rebuild, update or rebrand it.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#FD5920;">Upload Document <span>→</span></div>
+      </a>
+    </div>
+    <sc-if value="{{ hasUserTpls }}" hint-placeholder-val="{{ false }}">
+    <div style="width:100%;max-width:860px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:#081A53;">My Templates</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;">
+        <sc-for list="{{ userTpls }}" as="u" hint-placeholder-count="0">
+          <a href="{{ u.href }}" style="display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;text-decoration:none;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+            <div style="height:96px;border-radius:9px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+              <sc-if value="{{ u.hasThumb }}" hint-placeholder-val="{{ false }}"><div style="height:84px;width:65px;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);background:#fff center/cover no-repeat;background-image:{{ u.thumbBg }};"></div></sc-if>
+              <sc-if value="{{ u.noThumb }}" hint-placeholder-val="{{ true }}"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);"></div></sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-family:'Manrope',sans-serif;font-size:15px;font-weight:800;color:#081A53;">{{ u.name }}</div>
+              <div style="font-size:12px;line-height:1.45;color:#5a6178;">{{ u.desc }}</div>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+    <div style="width:100%;max-width:860px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:#081A53;">Document Templates</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;">
+      <a href="Catalyst Document Builder.dc.html?start=new&amp;tpl=fs-quant" style="display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:96px;border-radius:9px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#1921FE;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:70%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;align-items:flex-end;gap:2px;height:16px;margin-top:2px;"><i style="flex:1;height:40%;background:#1921FE"></i><i style="flex:1;height:70%;background:#1921FE"></i><i style="flex:1;height:55%;background:#1921FE"></i><i style="flex:1;height:90%;background:#1921FE"></i></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:2px;"><div style="height:4px;background:#d6defc;border-radius:1px;"></div><div style="height:4px;background:#d6defc;border-radius:1px;"></div><div style="height:4px;background:#d6defc;border-radius:1px;"></div><div style="height:4px;background:#d6defc;border-radius:1px;"></div><div style="height:4px;background:#d6defc;border-radius:1px;"></div><div style="height:4px;background:#d6defc;border-radius:1px;"></div><div style="height:4px;background:#d6defc;border-radius:1px;"></div><div style="height:4px;background:#d6defc;border-radius:1px;"></div></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1921FE;">Financial Fact Sheet</div>
+          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Quantitative</div>
+          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Returns, growth, holdings and allocation.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#1921FE;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">2 pages</span><span style="white-space:nowrap;">Use template →</span></div>
+      </a>
+      <a href="Catalyst Document Builder.dc.html?start=new&amp;tpl=fs-qual" style="display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:96px;border-radius:9px;background:#F0EAFE;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#6818F8;border-radius:2px;"></div><div style="height:3px;width:95%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:85%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:60%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;gap:3px;margin-top:3px;"><i style="width:12px;height:12px;border-radius:50%;background:#d9cbfd"></i><i style="width:12px;height:12px;border-radius:50%;background:#d9cbfd"></i><i style="width:12px;height:12px;border-radius:50%;background:#d9cbfd"></i></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6818F8;">Financial Fact Sheet</div>
+          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Qualitative</div>
+          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Firm story, philosophy, process and team.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#6818F8;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">2 pages</span><span style="white-space:nowrap;">Use template →</span></div>
+      </a>
+      <a href="Catalyst Document Builder.dc.html?start=new&amp;tpl=sell-sheet" style="display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:96px;border-radius:9px;background:#FFF1E9;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#FD5920;border-radius:2px;"></div><div style="height:22px;background:#ffe0cf;border-radius:2px;"></div><div style="height:3px;width:85%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;gap:3px;"><i style="flex:1;height:8px;background:#ffe0cf"></i><i style="flex:1;height:8px;background:#ffe0cf"></i><i style="flex:1;height:8px;background:#ffe0cf"></i></div><div style="height:6px;width:50%;background:#FD5920;border-radius:3px;margin-top:2px;"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          
+          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Sell Sheet</div>
+          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">One page: hero, benefits, features, call to action.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#FD5920;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">1 page</span><span style="white-space:nowrap;">Use template →</span></div>
+      </a>
+      <a href="Catalyst Document Builder.dc.html?start=new&amp;tpl=case-study" style="display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:96px;border-radius:9px;background:#FFF6E0;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#B86E00;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:70%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;gap:3px;margin-top:2px;"><b style="flex:1;font:800 8px Manrope;color:#B86E00">XX%</b><b style="flex:1;font:800 8px Manrope;color:#B86E00">$XK</b></div><div style="height:3px;width:85%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:60%;background:#d8dbe6;border-radius:2px;"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          
+          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Case Study</div>
+          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Challenge, solution and measurable results.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#B86E00;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">2 pages</span><span style="white-space:nowrap;">Use template →</span></div>
+      </a>
+      <a href="Catalyst Document Builder.dc.html?start=new&amp;tpl=white-paper" style="display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:96px;border-radius:9px;background:#EEF1F6;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#081A53;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:95%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:88%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:92%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:70%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:60%;background:#d8dbe6;border-radius:2px;"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          
+          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">White Paper</div>
+          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Cover, summary, long-form sections and data.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#081A53;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">4 pages</span><span style="white-space:nowrap;">Use template →</span></div>
+      </a>
+      <a href="Catalyst Document Builder.dc.html?start=new&amp;tpl=proposal" style="display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:96px;border-radius:9px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#1921FE;border-radius:2px;"></div><div style="height:3px;width:80%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;flex-direction:column;gap:2px;margin-top:2px;"><i style="height:5px;background:#d6defc"></i><i style="height:5px;background:#eef2ff"></i><i style="height:5px;background:#d6defc"></i></div><div style="height:3px;width:55%;background:#1921FE;border-radius:2px;"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          
+          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Proposal</div>
+          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Objectives, scope, timeline and investment.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#1921FE;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">4 pages</span><span style="white-space:nowrap;">Use template →</span></div>
+      </a>
+      </div>
+    </div>
+  </div>
+</div>
+<sc-if value="{{ versionsOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="no-print" onClick="{{ closeVersions }}" style="position:fixed;inset:0;z-index:200;background:rgba(8,26,83,0.45);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:28px;">
+    <div onClick="{{ stop }}" style="width:min(980px,100%);max-height:calc(100vh - 56px);display:flex;flex-direction:column;background:#f5f6f8;border-radius:14px;box-shadow:0 30px 80px rgba(8,26,83,0.35);overflow:hidden;font-family:'Inter',sans-serif;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 22px;background:#081A53;box-shadow:inset 0 -2px 0 #6818F8;">
+        <div>
+          <div style="font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#FFFFFF;">{{ savedLabel }}</div>
+          
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex:none;"><sc-if value="{{ shCan }}" hint-placeholder-val="{{ false }}"><button onClick="{{ shStart }}" title="Admin: pick documents and share them into an agency's account" style="appearance:none;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.5);background:transparent;color:#FFFFFF;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;">Select to Share</button></sc-if>
+        <sc-if value="{{ shOn }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:#C9CFE8;white-space:nowrap;">{{ shCount }}</span>
+          <button onClick="{{ shAll }}" style="appearance:none;border:0;background:transparent;color:#C9CFE8;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;text-decoration:underline;cursor:pointer;padding:0 4px;">All</button>
+          <select value="{{ shOrg }}" onChange="{{ shOrgChange }}" aria-label="Agency to share with" style="height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.4);background:#FFFFFF;color:#081A53;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:800;padding:0 8px;max-width:220px;"><sc-for list="{{ shOrgs }}" as="o" hint-placeholder-count="1"><option value="{{ o.id }}">{{ o.name }}</option></sc-for></select>
+          <button onClick="{{ shGo }}" style="appearance:none;border:0;height:32px;padding:0 14px;border-radius:8px;background:#FFD23F;color:#081A53;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap;" style-hover="background:#FFFFFF">{{ shGoText }}</button>
+          <button onClick="{{ shCancel }}" style="appearance:none;border:1px solid rgba(255,255,255,0.4);height:32px;padding:0 12px;border-radius:8px;background:transparent;color:#FFFFFF;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Cancel</button>
+        </div></sc-if>
+                <button onClick="{{ closeVersions }}" title="Close" style="appearance:none;border:0;background:rgba(255,255,255,0.1);color:#FFFFFF;width:32px;height:32px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;flex:none;" style-hover="background:rgba(255,255,255,0.2)">✕</button></div>
+      </div>
+      <div style="overflow:auto;padding:20px 22px 24px;display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <sc-for list="{{ vTabs }}" as="tb" hint-placeholder-count="2"><button onClick="{{ tb.pick }}" style="{{ tb.style }}"><span>{{ tb.label }}</span><em style="font-style:normal;min-width:18px;padding:0 5px;border-radius:999px;background:#F1F2F5;color:#081A53;font-size:10px;line-height:17px;text-align:center;">{{ tb.n }}</em></button></sc-for>
+        </div>
+        <sc-if value="{{ wTabOn }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ wEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:40px;text-align:center;font-size:13px;font-weight:500;color:#6b7180;background:#FFFFFF;border:1px dashed #d8d7d3;border-radius:10px;">No Word documents yet. Upload a Word, PowerPoint or text file in Rebuild From an Existing Document, or use Save All Text.</div></sc-if>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">
+            <sc-for list="{{ wDocs }}" as="w" hint-placeholder-count="0">
+              <div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #e0e3ef;border-radius:12px;padding:12px;">
+                <div style="display:flex;align-items:center;gap:8px;"><span style="flex:none;padding:2px 7px;border-radius:4px;background:#1921FE;color:#FFFFFF;font-size:9.5px;font-weight:700;">Word</span><b style="flex:1;min-width:0;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:800;color:#081A53;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ w.title }}</b></div>
+                <p style="margin:0;font-size:10.5px;line-height:1.5;color:#6b7180;max-height:48px;overflow:hidden;">{{ w.snippet }}</p>
+                <span style="font-size:10.5px;font-weight:500;color:#6b7180;">{{ w.meta }}</span>
+                <a href="{{ w.href }}" style="display:flex;align-items:center;justify-content:center;border-radius:7px;padding:7px 10px;background:linear-gradient(135deg,#6818F8 0%,#9B2BE8 100%);color:#FFFFFF;font-size:11.5px;font-weight:800;" style-hover="color:#FFFFFF;filter:brightness(1.08)">Open in Editor</a>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ vLoading }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;font-weight:600;color:#6b7180;">Checking the CatalystOS database for shared versions…</div></sc-if>
+        <sc-if value="{{ vEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:40px;text-align:center;font-size:13px;font-weight:500;color:#6b7180;background:#FFFFFF;border:1px dashed #d8d7d3;border-radius:10px;">No saved documents yet. Use Save Document in either builder to add one.</div></sc-if>
+        <sc-for list="{{ vGroupsShown }}" as="g" hint-placeholder-count="0">
+          <div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#4a5170;margin-bottom:10px;">{{ g.date }}</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">
+              <sc-for list="{{ g.items }}" as="v" hint-placeholder-count="0">
+                <div style="position:relative;display:flex;flex-direction:column;gap:7px;background:#FFFFFF;border:1px solid #e0e3ef;border-radius:12px;padding:10px;">
+                  <sc-if value="{{ v.selecting }}" hint-placeholder-val="{{ false }}"><button onClick="{{ v.toggleSel }}" title="Select for sharing" style="{{ v.selStyle }}"><span style="{{ v.boxStyle }}">{{ v.selMark }}</span></button></sc-if>
+                  <a href="{{ v.href }}" title="Open this version" style="position:relative;display:block;aspect-ratio:8.5/11;border-radius:7px;overflow:hidden;background:#EEF0F5;border:1px solid #e0e3ef;" style-hover="border-color:#6818F8">
+                    <img data-lazy-src="{{ v.thumbUrl }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+                    <span style="{{ v.pathStyle }}">{{ v.pathLabel }}</span>
+                  </a>
+                  <div style="font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:800;color:#081A53;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ v.title }}</div>
+                  <div style="font-size:10.5px;font-weight:500;color:#6b7180;">{{ v.meta }}</div>
+                  <a href="{{ v.href }}" style="display:flex;align-items:center;justify-content:center;border-radius:7px;padding:7px 10px;background:linear-gradient(135deg,#6818F8 0%,#9B2BE8 100%);color:#FFFFFF;font-size:11.5px;font-weight:800;" style-hover="color:#FFFFFF;filter:brightness(1.08)">Open</a>
+                  <button onClick="{{ v.duplicate }}" title="Duplicate this document into this workspace" style="display:flex;align-items:center;justify-content:center;gap:5px;border:1.5px solid #FD5920;border-radius:7px;padding:6px 10px;background:#FFFFFF;color:#FD5920;font-family:'Inter',sans-serif;font-size:11px;font-weight:800;cursor:pointer;" style-hover="background:#FFF3EC"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>{{ v.dupText }}</button>
+                  <button onClick="{{ v.makeTpl }}" title="Make this document a template available across the app" style="display:flex;align-items:center;justify-content:center;gap:5px;border:1.5px solid #6818F8;border-radius:7px;padding:6px 10px;background:#FFFFFF;color:#6818F8;font-family:'Inter',sans-serif;font-size:11px;font-weight:800;cursor:pointer;" style-hover="background:#f3edff"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg>Make Template</button>
+                  <button onClick="{{ v.remove }}" title="Permanently delete this document" style="display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid #F5B5B0;border-radius:7px;padding:6px 10px;background:#FFFFFF;color:#9B1C12;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" style-hover="background:#FDE2E1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>{{ v.delText }}</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { versionsOpen: false, vTab: 'docs', vLoading: false, vTick: 0, vBusy: null };
+  componentDidUpdate() { this.syncLazy(); }
+  syncLazy() { document.querySelectorAll('img[data-lazy-src]').forEach(img => { const u = img.getAttribute('data-lazy-src') || ''; const ok = /^data:image\/[a-z+]+;base64,./.test(u) || /^(https?:|blob:)/.test(u); if (ok && img.getAttribute('src') !== u) img.setAttribute('src', u); if (!ok && img.hasAttribute('src')) img.removeAttribute('src'); img.style.visibility = ok ? 'visible' : 'hidden'; }); }
+  idb(name, store) { return new Promise((res, rej) => { const r = indexedDB.open(name, 1); r.onupgradeneeded = () => r.result.createObjectStore(store); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+  async makeTpl(t) {
+    const v = this.loadV().find(x => x.t === t); if (!v) return;
+    const name = (window.prompt('Name this template. It will appear under My Templates across the app.', v.title || 'My Template') || '').trim(); if (!name) return;
+    const isEx = v.kind === 'existing'; let data = isEx ? (v.ex ? { ex: v.ex } : null) : (v.app ? { app: v.app, photos: v.photos } : null);
+    if (!data && v.exIdb) { try { const db = await this.idb('cbVersionData', 'ex'); const d = await new Promise(res => { const q = db.transaction('ex', 'readonly').objectStore('ex').get(String(v.exIdb === true ? v.t : v.exIdb)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); }); if (d) data = isEx ? { ex: d.ex || d } : d; } catch (e) {} }
+    if (!data && v.cloud) { try { const fb = await import(new URL('./firebase-sync.js', location.href).href); const d = await fb.loadDocVersionSnapshot(v.cloud); if (d) data = isEx ? { ex: d.ex || d } : d; } catch (e) {} }
+    if (!data || !(isEx ? data.ex : data.app)) { window.alert('This document\'s data is no longer available, so it can\'t be made into a template.'); return; }
+    const id = 'ut' + Date.now();
+    try { const db = await this.idb('cbUserTemplates', 't'); await new Promise((res, rej) => { const tx = db.transaction('t', 'readwrite'); tx.objectStore('t').put(isEx ? { kind: 'existing', ex: data.ex } : { kind: 'new', app: data.app, photos: data.photos || null }, id); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); } catch (e) { window.alert('Could not save the template.'); return; }
+    const pages = (String(v.sub || '').split('\u00b7 ')[1] || '').trim(); const th = v.thumb || localStorage.getItem('cbThumb:' + v.t) || '';
+    let L = []; try { L = JSON.parse(localStorage.getItem('cbUserTemplates') || '[]'); } catch (e) {} L = L.filter(x => x.name !== name);
+    L.unshift({ id, kind: isEx ? 'existing' : 'new', name, desc: 'Saved from ' + (v.title || 'a document') + (pages ? ' \u00b7 ' + pages : ''), thumb: /^data:image\//.test(th) && th.length < 90000 ? th : '', savedAt: Date.now() });
+    try { localStorage.setItem('cbUserTemplates', JSON.stringify(L)); } catch (e) { L.forEach(x => { x.thumb = ''; }); try { localStorage.setItem('cbUserTemplates', JSON.stringify(L)); } catch (er) { window.alert('Not enough storage to save this template.'); return; } }
+    this.setState(s => ({ vTick: s.vTick + 1 })); window.alert('Saved as a template: ' + name + '. It now appears under My Templates.');
+  }
+  componentDidMount() { this._au = () => this.forceUpdate(); window.addEventListener('catalyst-auth', this._au); window.addEventListener('cos-ctx', this._au); if (window.CatalystAuth && window.CatalystAuth.ready) window.CatalystAuth.ready.then(this._au).catch(() => {}); this._auT = setTimeout(this._au, 1500);
+    this._pull = () => { clearTimeout(this._pT); this._pT = setTimeout(() => { const u = window.CatalystAuth && window.CatalystAuth.user && window.CatalystAuth.user(); if (!u || this._pulling) return; this._pulling = true; this.mergeCloud().catch(() => {}).then(() => { this._pulling = false; }); }, 700); };
+    window.addEventListener('catalyst-auth', this._pull); window.addEventListener('cos-ctx', this._pull); window.addEventListener('focus', this._pull); if (window.CatalystAuth && window.CatalystAuth.ready) window.CatalystAuth.ready.then(this._pull).catch(() => {}); setTimeout(this._pull, 1600); }
+  componentWillUnmount() { window.removeEventListener('catalyst-auth', this._au); window.removeEventListener('cos-ctx', this._au); clearTimeout(this._auT); clearTimeout(this._pT); window.removeEventListener('catalyst-auth', this._pull); window.removeEventListener('cos-ctx', this._pull); window.removeEventListener('focus', this._pull); }
+  firstName() {
+    let u = null; try { u = window.CatalystAuth && window.CatalystAuth.user && window.CatalystAuth.user(); } catch (e) {}
+    const cap = w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '';
+    const dn = u && (u.displayName || u.name); if (dn) return cap(String(dn).trim().split(/\s+/)[0]);
+    const em = u && u.email; if (em) { const p = String(em).split('@')[0].split(/[._\-+0-9]/).filter(Boolean)[0]; if (p) return cap(p); }
+    return '';
+  }
+  loadV() { try { return JSON.parse(localStorage.getItem('cbVersions') || '[]') || []; } catch (e) { return []; } }
+  async fillThumbs() {
+    const L = this.loadV().filter(v => !v.demo && !(v.thumb || localStorage.getItem('cbThumb:' + v.t)));
+    if (!L.length) return; let db = null;
+    try { db = await new Promise((res, rej) => { const r = indexedDB.open('cbVersionData', 1); r.onupgradeneeded = () => r.result.createObjectStore('ex'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); } catch (e) { db = null; }
+    const get = k => new Promise(res => { try { const q = db.transaction('ex', 'readonly').objectStore('ex').get(String(k)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch (e) { res(null); } });
+    let ch = false;
+    for (const v of L) {
+      let u = '';
+      if (v.kind === 'existing') { let ex = v.ex || null; if (!ex && db && v.exIdb) { const d = await get(v.exIdb === true ? v.t : v.exIdb); ex = d && (d.ex || d); } const pg = ex && (ex.pdfPages || []).find(p => p && (p.shownThumb || p.thumbUrl)); u = pg ? (pg.shownThumb || pg.thumbUrl) : ''; }
+      if (!u && v.cloud && v.cloud.id) { try { const fb = await import(new URL('./firebase-sync.js', location.href).href); const c = (window.CosCtx && window.CosCtx.get && window.CosCtx.get()) || {}; const rows = this._rows || (this._rows = await fb.loadDocVersions({ clientId: c.clientId || '', orgId: c.orgId || '' })); const r = rows.find(x => x.t === v.t); if (r && r.thumb) u = r.thumb; } catch (e) {} }
+      if (u) { try { localStorage.setItem('cbThumb:' + v.t, u); ch = true; } catch (e) {} }
+    }
+    if (ch) this.setState(s => ({ vTick: s.vTick + 1 }));
+  }
+  async deleteDoc(t) {
+    const v = this.loadV().find(x => x.t === t); if (!v) return;
+    if (!window.confirm('Permanently delete "' + (v.title || 'this document') + '"?\n\nThis removes it from the CatalystOS database for everyone in this agency. It cannot be undone.')) return;
+    this.setState({ vBusy: t });
+    try {
+      if (v.cloud && v.cloud.id) { const fb = await import(new URL('./firebase-sync.js', location.href).href); await fb.deleteDocVersion(v.cloud); }
+    } catch (e) { console.warn('Delete failed', e); this.setState({ vBusy: null }); window.alert('Could not delete this document from the CatalystOS database. Check your connection and try again.'); return; }
+    try { const D = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); if (!D.includes(t)) { D.push(t); localStorage.setItem('cbDeletedVersions', JSON.stringify(D.slice(-500))); } } catch (e) {}
+    const L = this.loadV().filter(x => x.t !== t); try { localStorage.setItem('cbVersions', JSON.stringify(L)); localStorage.removeItem('cbThumb:' + t); } catch (e) {}
+    const k = v.exIdb === true ? t : null; if (k && !L.some(x => x.exIdb === t)) { try { const r = indexedDB.open('cbVersionData', 1); r.onsuccess = () => { try { r.result.transaction('ex', 'readwrite').objectStore('ex').delete(String(k)); } catch (e) {} }; } catch (e) {} }
+    this._rows = null; this.setState(s => ({ vBusy: null, vTick: s.vTick + 1 }));
+  }
+  inWs(v) { if (!v) return false; if (v.sharedFrom || (v.cloud && v.cloud.shared)) return true; const o = (window.CosCtx && window.CosCtx.get && window.CosCtx.get().orgId) || ''; const vo = v.org || (v.cloud && v.cloud.orgId) || ''; return !vo || !o || vo === o; }
+  shVals(all) {
+    const s = this.state; const C = window.CosCtx; const adm = !!(C && C.isAdmin && C.isAdmin());
+    const ctx = (C && C.get && C.get()) || {}; const orgs = (C && C.orgs && C.orgs()) || [];
+    const sel = s.shSel || {}; const n = Object.keys(sel).filter(k => sel[k]).length;
+    const def = s.shOrg || (!ctx.personal && ctx.orgId) || '';
+    const opts = [{ id: '', name: 'Choose an agency\u2026' }].concat(orgs.length ? orgs : (ctx.orgId && !ctx.personal ? [{ id: ctx.orgId, name: ctx.agencyName || 'Current agency' }] : []));
+    return {
+      shCan: adm && !s.shOn, shOn: adm && !!s.shOn, shCount: n + ' selected', shOrgs: opts, shOrg: def,
+      shOrgChange: e => this.setState({ shOrg: e.target.value }),
+      shStart: () => this.setState({ shOn: true, shSel: {}, shOrg: def }),
+      shCancel: () => this.setState({ shOn: false, shSel: {} }),
+      shAll: () => { const o = {}; all.forEach(v => { o[v.t] = true; }); this.setState({ shSel: o }); },
+      shGoText: s.shBusy ? 'Sharing\u2026' : 'Share to Agency',
+      shGo: async () => {
+        if (s.shBusy) return; const org = this.state.shOrg || def; if (!org) { window.alert('Choose the agency to share with.'); return; }
+        const picked = all.filter(v => (this.state.shSel || {})[v.t]); if (!picked.length) { window.alert('Select one or more documents first.'); return; }
+        const name = (opts.find(o => o.id === org) || {}).name || 'the agency';
+        if (!window.confirm('Share ' + picked.length + ' document' + (picked.length === 1 ? '' : 's') + ' with ' + name + '?\n\nA copy is added to their Saved Documents. Your originals stay where they are.')) return;
+        this.setState({ shBusy: true });
+        let r = { n: 0, failed: [] };
+        try { const m = await import(new URL('./share-agency.js', location.href).href); r = await m.shareToAgency(picked, org); } catch (e) { r.failed = picked.map(v => v.title || 'Untitled'); console.warn(e); }
+        this.setState({ shBusy: false, shOn: false, shSel: {} });
+        window.alert('Shared ' + r.n + ' of ' + picked.length + ' with ' + name + '.' + (r.failed.length ? '\n\nCould not share: ' + r.failed.join(', ') + '.' : ''));
+      },
+    };
+  }
+  shCard(v) {
+    const s = this.state; const on = !!(s.shSel || {})[v.t];
+    return { selecting: !!s.shOn, selMark: on ? '\u2713' : '', toggleSel: e => { if (e) { e.preventDefault(); e.stopPropagation(); } this.setState(st => { const o = Object.assign({}, st.shSel || {}); if (o[v.t]) delete o[v.t]; else o[v.t] = true; return { shSel: o }; }); },
+      selStyle: 'position:absolute;inset:0;z-index:3;appearance:none;cursor:pointer;border-radius:12px;padding:0;display:flex;align-items:flex-start;justify-content:flex-end;background:' + (on ? 'rgba(104,24,248,0.10)' : 'rgba(255,255,255,0.01)') + ';border:' + (on ? '2.5px solid #6818F8' : '1.5px dashed #b9a6f5') + ';',
+      boxStyle: 'margin:10px;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font:800 14px Inter,sans-serif;color:#FFFFFF;box-shadow:0 2px 6px rgba(8,26,83,0.25);background:' + (on ? '#6818F8' : '#FFFFFF') + ';border:' + (on ? '2px solid #6818F8' : '2px solid #9aa0b4') + ';' };
+  }
+  shareList() { try { return JSON.parse(localStorage.getItem('cbShareWith') || '[]') || []; } catch (e) { return []; } }
+  async shareAll() {
+    const ans = window.prompt('Share your saved documents with (emails, comma-separated). They\u2019ll appear in each person\u2019s Saved Documents. Leave empty to stop sharing.', this.shareList().join(', '));
+    if (ans === null) return;
+    const emails = Array.from(new Set(ans.split(/[,;\s]+/).map(e => e.trim().toLowerCase()).filter(e => /.+@.+\..+/.test(e))));
+    try { localStorage.setItem('cbShareWith', JSON.stringify(emails)); } catch (e) {}
+    this.setState({ shareBusy: true });
+    let n = 0, fail = 0, local = 0;
+    try { const fb = await import(new URL('./firebase-sync.js', location.href).href);
+      if (typeof fb.shareDocVersion !== 'function') throw new Error('This site is running an old firebase-sync.js. Redeploy, then hard-refresh.');
+      for (const v of this.loadV()) { if (v.demo || (v.cloud && v.cloud.shared)) continue; if (!v.cloud) { local++; continue; }
+        const th = v.thumb || localStorage.getItem('cbThumb:' + v.t) || '';
+        try { await fb.shareDocVersion(v.cloud, { title: v.title, label: v.label, sub: v.sub, kind: v.kind || 'new', t: v.t, thumb: th.length < 300000 ? th : '' }, emails); n++; } catch (e) { fail++; console.warn('Share failed', e); } }
+    } catch (e) { this.setState({ shareBusy: false }); window.alert('Could not share: ' + ((e && e.message) || e)); return; }
+    this.setState(s => ({ shareBusy: false, vTick: (s.vTick || 0) + 1 }));
+    window.alert(emails.length ? 'Shared ' + n + ' document' + (n === 1 ? '' : 's') + ' with ' + emails.join(', ') + '.' + (fail ? ' ' + fail + ' could not be shared (check database permissions).' : '') + (local ? ' ' + local + ' saved only in this browser \u2014 open and re-save them to share.' : '') + ' New saves are shared automatically.' : 'Sharing turned off.');
+  }
+  async mergeCloud() {
+    if (this.state.versionsOpen) this.setState({ vLoading: true });
+    try {
+      const fb = await import(new URL('./firebase-sync.js', location.href).href);
+      const c = (window.CosCtx && window.CosCtx.get && window.CosCtx.get()) || {};
+      const rows = await fb.loadDocVersions({ clientId: c.clientId || '', orgId: c.orgId || '' });
+      const L = this.loadV(); let ch = false; let Dd = []; try { Dd = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); } catch (e) {}
+      (rows || []).forEach(r => { if (!r.t || L.some(x => x.t === r.t) || Dd.includes(r.t)) return; L.push({ t: r.t, kind: r.kind || 'new', label: r.label, sub: r.sub, title: r.title, thumb: r.thumb || '', cloud: r.ref, fromCloud: true, sharedFrom: r.sharedFrom || '', org: (r.ref && r.ref.orgId) || r.organization_id || '' }); ch = true; });
+      if (ch) { L.sort((a, b) => b.t - a.t); try { localStorage.setItem('cbVersions', JSON.stringify(L)); } catch (e) {} }
+    } catch (e) { console.warn('Could not load versions from database', e); }
+    try { const fb = await import(new URL('./firebase-sync.js', location.href).href); const c = (window.CosCtx && window.CosCtx.get && window.CosCtx.get()) || {}; const rows = await fb.loadTextDocs({ clientId: c.clientId || '', orgId: c.orgId || '' }); let T = []; try { T = JSON.parse(localStorage.getItem('cbTextDocs') || '[]') || []; } catch (e) {} let Dd = []; try { Dd = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); } catch (e) {} let ch = false; (rows || []).forEach(r => { if (!r.t || T.some(x => x.t === r.t) || Dd.includes(r.t)) return; T.push({ t: r.t, title: r.title, source: r.source, pages: r.pages, words: r.words, snippet: r.snippet, updated: r.updated || r.t, cloud: r.ref }); ch = true; }); if (ch) { T.sort((a, b) => b.t - a.t); try { localStorage.setItem('cbTextDocs', JSON.stringify(T)); } catch (e) {} } } catch (e) {}
+    this.setState(s => ({ vLoading: false, vTick: s.vTick + 1 }));
+  }
+  renderVals() {
+    let ut = []; try { ut = JSON.parse(localStorage.getItem('cbUserTemplates') || '[]'); } catch (e) {}
+    const userTpls = ut.map(u => ({ name: u.name, desc: u.desc || '', href: (u.kind === 'existing' ? 'Existing Document Builder.dc.html' : 'Catalyst Document Builder.dc.html') + '?utpl=' + encodeURIComponent(u.id), thumbBg: u.thumb ? 'url("' + u.thumb + '")' : 'none', hasThumb: !!u.thumb, noThumb: !u.thumb }));
+    const s = this.state; const all = this.loadV().filter(v => !v.demo && this.inWs(v));
+    const isEx = v => v.kind === 'existing';
+    const nNew = all.filter(v => !isEx(v)).length, nEx = all.length - nNew;
+    const tabStyle = on => 'display:inline-flex;align-items:center;gap:7px;appearance:none;border:1px solid ' + (on ? '#081A53' : '#e0e3ef') + ';background:' + (on ? '#081A53' : '#FFFFFF') + ';color:' + (on ? '#FFFFFF' : '#4a5170') + ';border-radius:999px;padding:6px 12px;font-family:Inter,sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;';
+    const vTabs = [['new', 'New Document', nNew], ['existing', 'From Existing', nEx]].map(([k, label, n]) => ({ label, n, style: tabStyle(s.vTab === k), pick: () => this.setState({ vTab: k }) }));
+    const list = all.slice().sort((a, b) => (b.savedAt || b.t || 0) - (a.savedAt || a.t || 0));
+    const vGroups = [];
+    list.forEach(v => { const d = new Date(v.savedAt || v.t || Date.now()); const date = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); let g = vGroups.find(x => x.date === date); if (!g) { g = { date, items: [] }; vGroups.push(g); }
+      const th = v.thumb || localStorage.getItem('cbThumb:' + v.t) || ''; const ok = (/^data:image\/(jpeg|png);base64,/.test(th) && th.length > 1500) || /^https:/.test(th); const pages = String(v.sub || '').split('· ')[1] || '';
+      g.items.push({ title: v.title || 'Untitled version', meta: d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) + (pages ? ' · ' + pages : ''), thumbUrl: ok ? th : '', makeTpl: () => this.makeTpl(v.t), dupText: this.state.dupBusy === v.t ? 'Duplicating…' : 'Duplicate', duplicate: async () => { if (this.state.dupBusy) return; this.setState({ dupBusy: v.t }); try { const m = await import(new URL('./share-agency.js', location.href).href); const r = await m.duplicateDocs([v]); if (r.failed.length) window.alert('Could not duplicate: ' + r.failed.join(', ')); } catch (e) { window.alert('Could not duplicate this document.'); } this.setState(s => ({ dupBusy: null, vTick: (s.vTick || 0) + 1 })); },
+        href: (isEx(v) ? 'Existing Document Builder.dc.html' : 'Catalyst Document Builder.dc.html') + '?restore=' + v.t, ...this.shCard(v), remove: () => this.deleteDoc(v.t), delText: this.state.vBusy === v.t ? 'Deleting…' : 'Delete',
+        pathLabel: isEx(v) ? 'Rebuilt' : 'New', pathStyle: 'position:absolute;left:8px;top:8px;padding:2px 7px;border-radius:4px;font-family:Inter,sans-serif;font-size:9.5px;font-weight:700;color:#FFFFFF;background:' + (isEx(v) ? '#FD5920' : '#6818F8') }); });
+    const fn = this.firstName();
+    let tx = []; try { tx = JSON.parse(localStorage.getItem('cbTextDocs') || '[]') || []; } catch (e) {}
+    const wTab = this.state.vTab === 'word';
+    const tabStyle2 = on => 'display:inline-flex;align-items:center;gap:7px;appearance:none;border:1px solid ' + (on ? '#081A53' : '#e0e3ef') + ';background:' + (on ? '#081A53' : '#FFFFFF') + ';color:' + (on ? '#FFFFFF' : '#4a5170') + ';border-radius:999px;padding:6px 12px;font-family:Inter,sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;';
+    const wDocs = tx.slice().sort((a, b) => (b.updated || b.t) - (a.updated || a.t)).map(r => { const d = new Date(r.updated || r.t); return { title: r.title || 'Untitled document', snippet: r.snippet || '', meta: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + (r.words ? ' \u00b7 ' + r.words.toLocaleString() + ' words' : ''), href: 'Existing Document Builder.dc.html?txt=' + r.t }; });
+    return { ...this.shVals(all), vTabs: [['docs', 'Documents', all.length], ['word', 'Word Documents', tx.length]].map(([k, label, n]) => ({ label, n: String(n), style: tabStyle2((k === 'word') === wTab), pick: () => this.setState({ vTab: k }) })), wTabOn: wTab, wDocs, wEmpty: wTab && !wDocs.length, vGroupsShown: wTab ? [] : vGroups, savedLabel: fn ? fn + "\u2019s Saved Documents" : 'Saved Documents', userTpls, hasUserTpls: userTpls.length > 0, vCount: all.length, nPdf: String(all.length), nWord: String((() => { try { return (JSON.parse(localStorage.getItem('cbTextDocs') || '[]') || []).length; } catch (e) { return 0; } })()), nTpl: String(ut.length), versionsOpen: s.versionsOpen, vGroups, vLoading: s.vLoading, vEmpty: !s.vLoading && !list.length && s.vTab !== 'word',
+      openVersions: () => { this.setState({ versionsOpen: true }); this.mergeCloud().then(() => this.fillThumbs()); }, closeVersions: () => this.setState({ versionsOpen: false }), shareAllClick: () => { if (!this.state.shareBusy) this.shareAll(); }, shareBtnText: this.state.shareBusy ? 'Sharing\u2026' : (this.shareList().length ? 'Shared with ' + this.shareList().length : 'Share'), stop: e => e.stopPropagation() };
+  }
+}
+</script>
+</body>
+</html>

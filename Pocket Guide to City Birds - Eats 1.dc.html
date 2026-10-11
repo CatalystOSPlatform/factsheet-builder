@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff}
+  @page{size:3.75in 5in;margin:0}
+  .app{--slug:0in;--pgscale:1;--pgvh:1;--m-out:.175in;--m-in:.25in;--m-top:.175in;--m-bottom:.25in;--m-toptext:.175in;--mt-right:.42in;--mt-bottom:.34in;--mt-left:.5in;--fs-eyebrow:5.6pt;--fs-name:18pt;--fs-sci:8.6pt;--fs-body:7.7pt;--fs-label:5.4pt;--fs-season:5.8pt;--fs-diet:6.4pt;--fs-footer:4pt;background:#fff;min-height:100vh;font-family:'Hanken Grotesk',system-ui,sans-serif}
+  .app.has-slug{--slug:.34in}
+
+  .chrome{position:sticky;top:0;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:9px 18px;padding:11px 16px;background:#1d231b;color:#EDE8D8}
+  .secnav{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:7px 16px;background:#252c20;border-top:1px solid rgba(255,255,255,.07)}
+  .secnav .sn-label{font:700 8px 'Hanken Grotesk';letter-spacing:.17em;text-transform:uppercase;color:#8f968a;margin-right:2px}
+  .secbtn{display:flex;align-items:center;gap:6px;border:0;font:600 10px 'Hanken Grotesk';padding:5px 10px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .secbtn:hover{filter:brightness(1.09)}
+  .sdot{width:7px;height:7px;border-radius:50%;flex:none}
+  .tb-group{display:flex;align-items:center;gap:7px}
+  .tb-label{font:700 8px 'Hanken Grotesk';letter-spacing:.17em;text-transform:uppercase;color:#8f968a}
+  .seg{display:flex;border:1px solid rgba(255,255,255,.2);border-radius:8px;overflow:hidden}
+  .tbtn{appearance:none;border:0;background:transparent;color:#cfcab8;font:600 11px 'Hanken Grotesk';padding:6px 12px;cursor:pointer}
+  .seg .tbtn+.tbtn{border-left:1px solid rgba(255,255,255,.16)}
+  .tbtn:hover{color:#fff;background:rgba(255,255,255,.07)}
+  .tbtn.on{background:#E9D6A2;color:#22281c}
+  .toggle{appearance:none;border:1px solid rgba(255,255,255,.22);background:transparent;color:#cfcab8;font:600 11px 'Hanken Grotesk';padding:6px 11px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:7px}
+  .toggle:hover{border-color:rgba(255,255,255,.45);color:#fff}
+  .toggle .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.28)}
+  .toggle.on{background:rgba(233,214,162,.16);border-color:#E9D6A2;color:#fff}
+  .toggle.on .dot{background:#E9D6A2}
+  .step{display:flex;align-items:center;border:1px solid rgba(255,255,255,.22);border-radius:7px;overflow:hidden}
+  .step button{appearance:none;border:0;background:transparent;color:#EDE8D8;font:700 15px 'Hanken Grotesk';width:27px;height:30px;cursor:pointer;line-height:1}
+  .step button:hover{background:rgba(255,255,255,.1)}
+  .count{font:700 12px/1 'Hanken Grotesk';padding:0 9px;min-width:46px;text-align:center;color:#fff}
+  .count small{font:600 8px 'Hanken Grotesk';color:#9aa091;letter-spacing:.08em}
+  .badge{font:700 8.5px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;white-space:nowrap}
+  .badge.ok{background:rgba(120,190,120,.18);color:#bfe6bf;border:1px solid rgba(120,190,120,.5)}
+  .badge.warn{background:rgba(230,180,90,.16);color:#f0d49a;border:1px solid rgba(230,180,90,.5)}
+  .pdf-btn{appearance:none;border:0;background:#E9D6A2;color:#22281c;font:800 11.5px 'Hanken Grotesk';letter-spacing:.03em;padding:9px 16px;border-radius:8px;cursor:pointer}
+  .pdf-btn:hover{background:#f1e2b6}
+
+  .book{display:grid;justify-content:center;align-items:start;column-gap:0;row-gap:46px;padding:34px 16px 88px}
+  .app.view-single .book{grid-template-columns:max-content}
+  .app.view-spread .book{grid-template-columns:repeat(2,max-content)}
+  @media screen{ .book{zoom:1.18} }
+  .media{position:relative;display:flow-root}
+  .media.solo{grid-column:1 / -1;justify-self:center}
+  .pg{position:relative;width:3.75in;height:calc(5in * var(--pgvh,1));background:#fff;overflow:hidden;margin:var(--slug);zoom:var(--pgscale);box-shadow:inset 15px 0 22px -15px rgba(28,24,16,.16), inset -15px 0 22px -15px rgba(28,24,16,.16), 0 12px 28px rgba(40,36,28,.20)}
+  .media.solo .pg{box-shadow:0 14px 34px rgba(40,36,28,.26)}
+
+  .book{counter-reset:pgnum}
+  .media:not(.solo){counter-increment:pgnum}
+  .pg::after{content:counter(pgnum);position:absolute;left:50%;bottom:.15in;transform:translateX(-50%);font:600 var(--fs-footer,7pt) 'Newsreader',serif;color:#9a937f;letter-spacing:.02em;z-index:6;pointer-events:none}
+  .media.solo .pg::after{content:none}
+  .pg.pg-dark::after{color:rgba(255,255,255,.74)}
+  .hide-folio .pg::after{visibility:hidden}
+  .el-folio{display:none}
+
+  .crop-mark,.reg-mark,.color-bar,.bleed-guide,.edge-line{display:none}
+  .show-crop .crop-mark{display:block}
+  .show-marks .reg-mark{display:block}
+  .show-bars .color-bar{display:flex}
+  .show-bleed .bleed-guide{display:block}
+  .show-edges .edge-line{display:block}
+
+  .hide-photo .el-photo{display:none!important}
+  .hide-eyebrow .el-eyebrow{display:none!important}
+  .hide-name .el-name{display:none!important}
+  .hide-sci .el-sci{display:none!important}
+  .hide-id .el-id{display:none!important}
+  .hide-habitat .el-habitat{display:none!important}
+  .hide-habits .el-habits{display:none!important}
+  .hide-season .el-season{display:none!important}
+  .hide-diet .el-diet{display:none!important}
+  .hide-footer .el-footer{visibility:hidden!important}
+  .hide-folio .el-folio{visibility:hidden!important}
+  .hide-secmark .el-secmark{display:none!important}
+  .photoctl{position:absolute;left:6px;top:6px;display:grid;grid-template-columns:repeat(3,18px);grid-template-rows:repeat(3,18px);gap:2px;z-index:8;opacity:.5;transition:opacity .15s}
+  .pg:hover .photoctl{opacity:1}
+  .photoctl button{appearance:none;border:0;border-radius:4px;background:rgba(18,16,10,.62);color:#fff;font-size:8px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .photoctl button:hover{background:rgba(18,16,10,.88)}
+  .adjust-btn{appearance:none;border:1px solid #5fae9c;background:#2E7D6B;color:#fff;font:800 11px 'Hanken Grotesk';padding:8px 14px;border-radius:8px;cursor:pointer;display:flex;gap:6px;align-items:center}
+  .adjust-btn:hover{background:#359182}
+  .adjust-btn.on{background:#359182;border-color:#8fd3c4}
+  .save-btn{appearance:none;border:0;background:#E2701E;color:#fff;font:800 13px 'Hanken Grotesk';letter-spacing:.05em;padding:11px 24px;border-radius:9px;cursor:pointer;display:flex;gap:8px;align-items:center;margin-left:auto;box-shadow:0 3px 12px rgba(210,90,20,.40)}
+  .save-btn:hover{background:#f47e29}
+  .save-btn.done{background:#5F8A3A;box-shadow:0 3px 12px rgba(95,138,58,.40)}
+  .dl-wrap{position:relative}
+  .dl-menu{position:absolute;top:calc(100% + 7px);right:0;width:236px;background:#fff;border:1px solid #e2ddcf;border-radius:11px;box-shadow:0 16px 42px rgba(30,26,18,.32);padding:7px;z-index:70}
+  .dl-opt{display:flex;flex-direction:column;gap:1px;width:100%;text-align:left;border:0;background:transparent;border-radius:7px;padding:8px 10px;cursor:pointer;color:#2a2620}
+  .dl-opt:hover{background:#f3efe4}
+  .dl-opt b{font:800 11.5px 'Hanken Grotesk'}
+  .dl-opt small{font:600 9px 'Hanken Grotesk';color:#8a8270}
+  .dl-note{font:500 8.5px/1.45 'Hanken Grotesk';color:#9a927d;padding:8px 10px 3px;border-top:1px solid #efe9da;margin-top:4px}
+  .dl-head{font:800 9px 'Hanken Grotesk';letter-spacing:.08em;text-transform:uppercase;color:#9a927d;padding:7px 10px 3px}
+  .dl-chk{display:flex;align-items:center;gap:8px;font:600 10.5px 'Hanken Grotesk';color:#4a4538;padding:5px 10px;cursor:pointer}
+  .dl-chk input{width:14px;height:14px;accent-color:#5F7A33;cursor:pointer}
+  .dl-opt.prime{background:#E2701E;color:#fff;align-items:center;font:800 11px 'Hanken Grotesk';margin:6px 4px 2px}
+  .dl-opt.prime:hover{background:#f47e29}
+  .adjust-btn:hover{border-color:rgba(255,255,255,.5)}
+  .adjust-btn.on{background:rgba(233,214,162,.16);border-color:#E9D6A2;color:#fff}
+  .panel{position:fixed;top:122px;right:16px;z-index:60;width:292px;max-height:73vh;overflow:auto;background:#fff;border:1px solid #e4dfd2;border-radius:13px;box-shadow:0 20px 54px rgba(30,26,18,.30);padding:14px 16px;font-family:'Hanken Grotesk'}
+  .panel .sec{padding:11px 0;border-top:1px solid #efe9da}
+  .panel .sec:first-child{border-top:0;padding-top:0}
+  .panel h4{margin:0 0 6px;font:800 9px 'Hanken Grotesk';letter-spacing:.16em;text-transform:uppercase;color:#9a927d}
+  .ps-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .ps-presets button{font:600 10px 'Hanken Grotesk';padding:6px 9px;border:1px solid #ddd6c6;border-radius:7px;background:#faf8f2;color:#4a4538;cursor:pointer}
+  .ps-presets button.on{background:#5F7A33;border-color:#5F7A33;color:#fff}
+  .pwrow{display:flex;align-items:center;gap:6px;font:600 10.5px 'Hanken Grotesk';color:#6a6453}
+  .pwrow input{width:54px;border:1px solid #ddd6c6;border-radius:6px;padding:4px 6px;font:600 11px 'Hanken Grotesk'}
+  .ctl{display:flex;align-items:center;gap:8px;margin:6px 0}
+  .ctl .nm{flex:1;font:600 10.5px 'Hanken Grotesk';color:#4a4538;white-space:nowrap}
+  .ctl input[type=range]{flex:1.1;min-width:0;accent-color:#5F7A33}
+  .ctl input[type=number]{width:46px;border:1px solid #ddd6c6;border-radius:6px;padding:3px 5px;font:600 10px 'Hanken Grotesk'}
+  label.ctl{flex-direction:row-reverse}
+  .ctl input[type=checkbox]{appearance:none;-webkit-appearance:none;width:30px;height:17px;border-radius:999px;background:#d6d0c2;position:relative;cursor:pointer;flex:none;transition:background .15s}
+  .ctl input[type=checkbox]:checked{background:#5F7A33}
+  .ctl input[type=checkbox]::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .ctl input[type=checkbox]:checked::after{left:15px}
+  .panel .reset{margin-top:12px;width:100%;border:1px solid #ddd6c6;background:#faf8f2;border-radius:8px;padding:8px;font:700 10px 'Hanken Grotesk';color:#6a6453;cursor:pointer}
+
+  @media print{
+    html,body{background:#fff}
+    .toolbar,.no-print{display:none!important}
+    .app{background:#fff}
+    .pg{box-shadow:none}
+    .bleed-guide,.edge-line{display:none!important}
+    .app.view-single .book{display:block;padding:0;zoom:1}
+    .app.view-single .media{display:block;grid-column:auto;margin:0 auto;break-after:page;break-inside:avoid}
+    .app.view-single .media:last-child{break-after:auto}
+    .app.view-spread .book{display:grid;grid-template-columns:repeat(2,var(--mediaw));grid-auto-rows:var(--mediah);column-gap:0;row-gap:0;justify-content:center;padding:0;zoom:1}
+    .app.view-spread .media{break-inside:avoid}
+    .app.view-spread .media.solo{grid-column:1 / -1;justify-self:center}
+  }
+</style>
+<style id="pagecfg"></style>
+</helmet>
+
+<div class="app {{ rootClass }}">
+
+  <div class="chrome no-print">
+  <!-- ===================== TOOLBAR ===================== -->
+  <div class="toolbar">
+    <div class="tb-group">
+      <span class="tb-label">View</span>
+      <div class="seg">
+        <button class="{{ singleCls }}" onClick="{{ setSingle }}">Single</button>
+        <button class="{{ spreadCls }}" onClick="{{ setSpread }}">Spread</button>
+      </div>
+    </div>
+    <div class="tb-group">
+      <span class="tb-label">Marks</span>
+      <button class="{{ allCls }}" onClick="{{ toggleAll }}"><span class="dot"></span>{{ allText }}</button>
+      <span style="width:1px;height:20px;background:rgba(255,255,255,.16)"></span>
+      <button class="{{ bleedCls }}" onClick="{{ toggleBleed }}"><span class="dot"></span>Bleed</button>
+      <button class="{{ cropCls }}" onClick="{{ toggleCrop }}"><span class="dot"></span>Crop</button>
+      <button class="{{ marksCls }}" onClick="{{ toggleMarks }}"><span class="dot"></span>Printer</button>
+      <button class="{{ barsCls }}" onClick="{{ toggleBars }}"><span class="dot"></span>Bars</button>
+      <span style="width:1px;height:20px;background:rgba(255,255,255,.16)"></span>
+      <button class="{{ edgesCls }}" onClick="{{ toggleEdges }}"><span class="dot" style="background:#FF3AA0"></span>Edges</button>
+    </div>
+    <div class="tb-group">
+      <span class="tb-label">Pages</span>
+      <div class="step">
+        <button onClick="{{ removeBlank }}" title="Remove a blank page">–</button>
+        <span class="count">{{ total }}<br><small>pages</small></span>
+        <button onClick="{{ addBlank }}" title="Add a blank page">+</button>
+      </div>
+      <span class="{{ badgeCls }}">{{ x4Text }}</span>
+      <button class="toggle" onClick="{{ fitX4 }}">Fit ×4</button>
+    </div>
+    <button class="{{ saveCls }}" onClick="{{ saveAll }}">{{ saveText }}</button>
+    <button class="{{ adjustCls }}" onClick="{{ togglePanel }}">⚙ Adjust</button>
+    <div class="dl-wrap">
+      <button class="pdf-btn" onClick="{{ toggleDl }}">DOWNLOAD PDF ▾</button>
+      <div class="dl-menu" style="{{ dlStyle }}">
+        <div class="dl-head">For print — CMYK, high-res</div>
+        <label class="dl-chk"><input type="checkbox" checked="{{ cropOn }}" onChange="{{ toggleCrop }}"> Crop marks</label>
+        <label class="dl-chk"><input type="checkbox" checked="{{ marksOn }}" onChange="{{ toggleMarks }}"> Registration + slug</label>
+        <label class="dl-chk"><input type="checkbox" checked="{{ barsOn }}" onChange="{{ toggleBars }}"> Color bars</label>
+        <button class="dl-opt prime" onClick="{{ downloadPrint }}">Download print PDF</button>
+        <button class="dl-opt" onClick="{{ downloadWeb }}"><b>For web</b><small>144 dpi · retina-sharp · RGB · no marks</small></button>
+        <div class="dl-note">Web export is a single lightweight RGB PDF — no crop/registration marks, no bleed. Photos embed at 144 dpi (2×), crisp on screen and small to share. For offset printing use the print PDF and convert to CMYK in prepress.</div>
+      </div>
+    </div>
+  </div>
+  <div class="secnav">
+    <span class="sn-label">Jump to</span>
+    <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="7">
+      <button class="secbtn" style="{{ sec.btnStyle }}" onClick="{{ sec.onClick }}"><span class="sdot" style="{{ sec.dotStyle }}"></span>{{ sec.short }}</button>
+    </sc-for>
+  </div>
+  </div>
+
+  <div class="panel no-print" style="{{ panelStyle }}">
+    <div class="sec">
+      <h4>Page size</h4>
+      <div class="ps-presets">
+        <button data-scale="1" data-vh="1" onClick="{{ setPage }}">3.5 × 4.75</button>
+        <button data-scale="1.143" data-vh="1" onClick="{{ setPage }}">4 × 5.4</button>
+        <button data-scale="1.214" data-vh="0.954" onClick="{{ setPage }}">4.25 × 5.5</button>
+        <button data-scale="1.214" data-vh="1" onClick="{{ setPage }}">4.25 × 5.8</button>
+        <button data-scale="1.429" data-vh="1" onClick="{{ setPage }}">5 × 6.8</button>
+      </div>
+      <div class="pwrow">Width <input type="number" id="pgw" defaultValue="3.5" step="0.25" min="2" max="8" onChange="{{ onPageWidth }}"> in&nbsp;→&nbsp;<span id="pgreadout">3.50 × 4.75 in</span></div>
+    </div>
+    <div class="sec">
+      <h4>Margins (in)</h4>
+      <div class="ctl" data-row><span class="nm">Inside / gutter</span><input type="range" min="0" max="0.6" step="0.01" defaultValue="0.25" data-var="--m-in" data-unit="in" onChange="{{ onTypeInput }}"><input type="number" min="0" max="1" step="0.01" defaultValue="0.25" data-var="--m-in" data-unit="in" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Outside</span><input type="range" min="0" max="0.6" step="0.01" defaultValue="0.175" data-var="--m-out" data-unit="in" onChange="{{ onTypeInput }}"><input type="number" min="0" max="1" step="0.01" defaultValue="0.175" data-var="--m-out" data-unit="in" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Top (species)</span><input type="range" min="0" max="0.6" step="0.01" defaultValue="0.175" data-var="--m-top" data-unit="in" onChange="{{ onTypeInput }}"><input type="number" min="0" max="1" step="0.01" defaultValue="0.175" data-var="--m-top" data-unit="in" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Top (text pages)</span><input type="range" min="0" max="0.8" step="0.01" defaultValue="0.175" data-var="--m-toptext" data-unit="in" onChange="{{ onTypeInput }}"><input type="number" min="0" max="1.2" step="0.01" defaultValue="0.175" data-var="--m-toptext" data-unit="in" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Right (text pages)</span><input type="range" min="0" max="1" step="0.01" defaultValue="0.42" data-var="--mt-right" data-unit="in" onChange="{{ onTypeInput }}"><input type="number" min="0" max="1.5" step="0.01" defaultValue="0.42" data-var="--mt-right" data-unit="in" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Bottom (text pages)</span><input type="range" min="0" max="1" step="0.01" defaultValue="0.34" data-var="--mt-bottom" data-unit="in" onChange="{{ onTypeInput }}"><input type="number" min="0" max="1.5" step="0.01" defaultValue="0.34" data-var="--mt-bottom" data-unit="in" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Left (text pages)</span><input type="range" min="0" max="1" step="0.01" defaultValue="0.5" data-var="--mt-left" data-unit="in" onChange="{{ onTypeInput }}"><input type="number" min="0" max="1.5" step="0.01" defaultValue="0.5" data-var="--mt-left" data-unit="in" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Bottom</span><input type="range" min="0" max="0.6" step="0.01" defaultValue="0.25" data-var="--m-bottom" data-unit="in" onChange="{{ onTypeInput }}"><input type="number" min="0" max="1" step="0.01" defaultValue="0.25" data-var="--m-bottom" data-unit="in" onChange="{{ onTypeInput }}"></div>
+    </div>
+    <div class="sec">
+      <h4>Text size (pt)</h4>
+      <div class="ctl" data-row><span class="nm">Group label</span><input type="range" min="3" max="12" step="0.2" defaultValue="5.6" data-var="--fs-eyebrow" onChange="{{ onTypeInput }}"><input type="number" min="3" max="20" step="0.2" defaultValue="5.6" data-var="--fs-eyebrow" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Common name</span><input type="range" min="10" max="30" step="0.5" defaultValue="18" data-var="--fs-name" onChange="{{ onTypeInput }}"><input type="number" min="6" max="40" step="0.5" defaultValue="18" data-var="--fs-name" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Scientific name</span><input type="range" min="5" max="16" step="0.2" defaultValue="8.6" data-var="--fs-sci" onChange="{{ onTypeInput }}"><input type="number" min="5" max="22" step="0.2" defaultValue="8.6" data-var="--fs-sci" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Body text</span><input type="range" min="5" max="12" step="0.1" defaultValue="7.7" data-var="--fs-body" onChange="{{ onTypeInput }}"><input type="number" min="5" max="16" step="0.1" defaultValue="7.7" data-var="--fs-body" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Field labels</span><input type="range" min="3" max="10" step="0.1" defaultValue="5.4" data-var="--fs-label" onChange="{{ onTypeInput }}"><input type="number" min="3" max="14" step="0.1" defaultValue="5.4" data-var="--fs-label" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Season tag</span><input type="range" min="3" max="10" step="0.1" defaultValue="5.8" data-var="--fs-season" onChange="{{ onTypeInput }}"><input type="number" min="3" max="14" step="0.1" defaultValue="5.8" data-var="--fs-season" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Diet chips</span><input type="range" min="4" max="11" step="0.1" defaultValue="6.4" data-var="--fs-diet" onChange="{{ onTypeInput }}"><input type="number" min="4" max="14" step="0.1" defaultValue="6.4" data-var="--fs-diet" onChange="{{ onTypeInput }}"></div>
+      <div class="ctl" data-row><span class="nm">Page number</span><input type="range" min="4" max="14" step="0.2" defaultValue="4" data-var="--fs-footer" onChange="{{ onTypeInput }}"><input type="number" min="4" max="18" step="0.2" defaultValue="4" data-var="--fs-footer" onChange="{{ onTypeInput }}"></div>
+    </div>
+    <div class="sec">
+      <h4>Show / hide elements</h4>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="photo" onChange="{{ toggleEl }}"><span class="nm">Photo</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="eyebrow" onChange="{{ toggleEl }}"><span class="nm">Group label</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="name" onChange="{{ toggleEl }}"><span class="nm">Common name</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="sci" onChange="{{ toggleEl }}"><span class="nm">Scientific name</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="id" onChange="{{ toggleEl }}"><span class="nm">Identification</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="habitat" onChange="{{ toggleEl }}"><span class="nm">Habitat</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="habits" onChange="{{ toggleEl }}"><span class="nm">Behavior</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="season" onChange="{{ toggleEl }}"><span class="nm">Season tag</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="diet" onChange="{{ toggleEl }}"><span class="nm">Diet (Eats)</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="footer" onChange="{{ toggleEl }}"><span class="nm">Footer label</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="folio" onChange="{{ toggleEl }}"><span class="nm">Page number</span></label>
+      <label class="ctl"><input type="checkbox" defaultChecked data-el="secmark" onChange="{{ toggleEl }}"><span class="nm">Section marker (dividers)</span></label>
+    </div>
+    <div class="sec">
+      <h4>Settings file — use on any browser</h4>
+      <div style="display:flex;gap:8px">
+        <button class="reset" style="margin-top:0" onClick="{{ exportSettings }}">↓ Export</button>
+        <label class="reset" style="margin-top:0;text-align:center;cursor:pointer;display:block">↑ Import<input type="file" accept="application/json,.json" onChange="{{ importSettings }}" style="display:none"></label>
+      </div>
+      <div style="font:500 8.5px/1.45 'Hanken Grotesk';color:#9a927d;margin-top:7px">Export saves a file with every change (layout, marks, margins, type, image positions). Import it in another browser or on another device to carry it all over.</div>
+      <button class="reset" style="margin-top:8px" onClick="{{ exportLink }}">{{ linkText }}</button>
+      <div style="font:500 8.5px/1.45 'Hanken Grotesk';color:#9a927d;margin-top:6px">Or copy a link that encodes your whole layout — open it in any browser to restore everything (no account needed).</div>
+    </div>
+    <div class="sec">
+      <h4>Live cloud sync (Firebase)</h4>
+      <textarea id="fbcfg" placeholder='Paste Firebase config as JSON, e.g. {"apiKey":"...","databaseURL":"https://...","projectId":"..."}' style="width:100%;height:66px;border:1px solid #ddd6c6;border-radius:7px;padding:6px 8px;font:500 9px/1.35 ui-monospace,monospace;resize:vertical"></textarea>
+      <div class="pwrow" style="margin-top:6px">Sync code <input id="fbcode" type="text" placeholder="my-book" style="flex:1;width:auto"></div>
+      <button class="reset" style="margin-top:8px" onClick="{{ doConnectCloud }}">Connect &amp; sync</button>
+      <div style="font:700 9px 'Hanken Grotesk';color:#5F7A33;margin-top:7px;min-height:11px">{{ cloudStatus }}</div>
+      <div style="font:500 8.3px/1.45 'Hanken Grotesk';color:#9a927d;margin-top:4px">Create a free Firebase Realtime Database, paste its config and any sync code, and use the same code on each device — changes then sync live across browsers.</div>
+    </div>
+    <button class="reset" onClick="{{ resetAdjust }}">Reset all adjustments</button>
+  </div>
+
+  <div class="book">
+
+  <!-- ===================== COVER ===================== -->
+  <div class="media solo">
+    <div class="pg" data-code="cover" style="background:#1c2620">
+      <img data-px="28" data-py="30" data-defx="28" data-defy="30" data-pz="1" data-defz="1" src="https://crybabydesign.com/urban-field-guide/images/BLJA.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:28% 30%;transform:scale(1);display:block">
+      <div class="photoctl no-print">
+        <button data-dir="up" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:1">▲</button>
+        <button data-dir="left" onClick="{{ nudgePhoto }}" style="grid-column:1;grid-row:2">◀</button>
+        <button data-dir="reset" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:2">◌</button>
+        <button data-dir="right" onClick="{{ nudgePhoto }}" style="grid-column:3;grid-row:2">▶</button>
+        <button data-dir="down" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:3">▼</button><button data-dir="zoomin" onClick="{{ nudgePhoto }}" style="grid-column:1;grid-row:1;font-size:9px">＋</button><button data-dir="zoomout" onClick="{{ nudgePhoto }}" style="grid-column:3;grid-row:1;font-size:11px">－</button>
+      </div>
+      <div style="position:absolute;inset:0;background:linear-gradient(178deg,rgba(18,26,20,.30) 0%,rgba(18,26,20,0) 26%,rgba(18,26,20,.05) 52%,rgba(14,20,16,.86) 100%)"></div>
+      <div style="position:absolute;left:.42in;right:.42in;bottom:.46in;color:#F8F4EA">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.3em;text-transform:uppercase;color:#E9D6A2;margin-bottom:8px">Pocket Guide to</div>
+        <h1 style="margin:0;font:500 27pt/0.98 'Newsreader',serif;letter-spacing:-.012em">Urban Birds<br>of Colorado</h1>
+        <div style="margin-top:11px;font:400 9pt/1.26 'Hanken Grotesk';opacity:.94;max-width:2.45in">A pocket field guide to the common birds of parks, yards, ponds, and city skies.</div>
+        <div style="margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.22)">
+          <div style="font:700 5.4pt/1 'Hanken Grotesk';letter-spacing:.28em;text-transform:uppercase;color:#C9B782;margin-bottom:6px">Made possible by</div>
+          <div style="display:flex;gap:16px">
+            <div style="flex:1;font:600 9pt/1.18 'Newsreader',serif;color:#F4EFE2">Bird Conservancy<br>of the Rockies</div>
+            <div style="flex:1;font:600 9pt/1.18 'Newsreader',serif;color:#F4EFE2">Ducks<br>Unlimited</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Front Cover" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <!-- ===================== SPONSORS ===================== -->
+  <div class="media">
+    <div class="pg" style="background:#1E3A2A">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 .55in">
+        <div style="max-width:2.4in;text-align:center;color:#EAE3CF">
+          <div style="width:26px;height:2px;background:#9DB87A;border-radius:2px;margin:0 auto 15px"></div>
+          <div style="font:400 5.6pt/1.35 'Hanken Grotesk';letter-spacing:.02em">First edition, 2026. Copyright © 2026 by Bird Conservancy of the Rockies, Brighton, CO. All rights reserved.</div>
+        </div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Colophon" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column;color:#26241c">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.3em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Made possible by</div>
+
+        <div style="margin-top:11px;display:flex;align-items:center;gap:11px">
+          <img src="logos/bird-conservancy.jpg" alt="Bird Conservancy of the Rockies" style="max-height:.32in;max-width:.8in;width:auto;height:auto;object-fit:contain;flex:none">
+          <h3 style="margin:0;font:500 16pt/1.0 'Newsreader',serif;color:#26241c">Bird Conservancy<br>of the Rockies</h3>
+        </div>
+        <p style="margin:8px 0 0;font:400 6.4pt/1.26 'Hanken Grotesk';color:#4a4538">We believe birds belong here. Wherever <span style="font-style:italic;color:#5F7A33">here</span> is for you. Our mission is to conserve birds and their habitats through science, education, and land stewardship.</p>
+        <p style="margin:5px 0 0;font:400 6.4pt/1.26 'Hanken Grotesk';color:#4a4538">We envision a future where birds remain forever abundant, shaping healthy landscapes and inspiring curiosity and love for the natural world. Sound science guides our work. Stewardship brings it to life. Partnerships keep it going. Together, we are improving native bird populations, the land, and the lives of the people who share it.</p>
+        <div style="margin-top:6px">
+          <span style="font:700 6pt/1.3 'Hanken Grotesk';letter-spacing:.05em;color:#5F7A33">www.birdconservancy.org</span>
+        </div>
+
+        <div style="height:1px;background:rgba(0,0,0,.12);margin:11px 0"></div>
+
+        <div style="display:flex;align-items:center;gap:11px">
+          <img src="logos/ducks-unlimited.webp" alt="Ducks Unlimited" style="max-height:.32in;max-width:.46in;width:auto;height:auto;object-fit:contain;flex:none">
+          <h3 style="margin:0;font:500 16pt/1.0 'Newsreader',serif;color:#26241c">Ducks Unlimited</h3>
+        </div>
+        <p style="margin:8px 0 0;font:400 6.4pt/1.26 'Hanken Grotesk';color:#4a4538">Our mission is to conserve, restore, and manage wetlands and the habitats that surround them for North America’s waterfowl. These same places support other wildlife and people, fueling the natural processes that keep landscapes healthy, resilient, and full of life.</p>
+        <p style="margin:5px 0 0;font:400 6.4pt/1.26 'Hanken Grotesk';color:#4a4538">Since 1937, Ducks Unlimited has brought people, expertise, and partnerships together to protect wetlands across North America. Powered by volunteers, guided by science, and carried out through practical, on-the-ground projects, our work creates lasting habitat — protecting the places that sustain waterfowl, strengthen communities, and connect people to the outdoors.</p>
+        <div style="margin-top:6px">
+          <span style="font:700 6pt/1.3 'Hanken Grotesk';letter-spacing:.05em;color:#5F7A33">www.ducks.org/colorado</span>
+        </div>
+        <div style="flex:1"></div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Our Sponsors" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <!-- ===================== HOW TO USE ===================== -->
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Learning Bird Identification</div>
+        <h2 style="margin:6px 0 0;font:500 21pt/1.04 'Newsreader',serif;color:#26241c">How to use<br>this guide</h2>
+        <p style="margin:9px 0 0;font:400 7.7pt/1.31 'Hanken Grotesk';color:#4a4538">This pocket guide introduces the urban birds you’re most likely to spot along Colorado’s Front Range. It doesn’t cover every species in the region — instead, it focuses on the birds you’ll see most often in city parks, backyards, and along urban waterways. Many of these birds live elsewhere in Colorado too, but their urban habits can differ surprisingly from their wild ones.</p>
+        <p style="margin:8px 0 0;font:400 7.7pt/1.31 'Hanken Grotesk';color:#4a4538">Species are grouped by family, so hawks appear together, sparrows together, and so on. Each entry includes:</p>
+        <div style="margin-top:11px;display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:.78in;font:800 5.8pt/1.3 'Hanken Grotesk';letter-spacing:.08em;text-transform:uppercase;color:#5F7A33">Identification</span><span style="font:400 7.4pt/1.21 'Hanken Grotesk';color:#4a4538">A description of adults in spring/summer or winter plumage, noting differences between males and females where they matter.</span></div>
+          <div style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:.78in;font:800 5.8pt/1.3 'Hanken Grotesk';letter-spacing:.08em;text-transform:uppercase;color:#5F7A33">Habitat</span><span style="font:400 7.4pt/1.21 'Hanken Grotesk';color:#4a4538">Where the species nests, feeds, and roosts.</span></div>
+          <div style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:.78in;font:800 5.8pt/1.3 'Hanken Grotesk';letter-spacing:.08em;text-transform:uppercase;color:#5F7A33">Behavior</span><span style="font:400 7.4pt/1.21 'Hanken Grotesk';color:#4a4538">Habits that set the bird apart — posture, movement, calls, flight patterns, feeding style, and how it flocks.</span></div>
+        </div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="How to Use" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <!-- ===================== DIET & SEASON KEY ===================== -->
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Key</div>
+        <h2 style="margin:6px 0 0;font:500 21pt/1.02 'Newsreader',serif;color:#26241c">Diet icons</h2>
+        <p style="margin:8px 0 0;font:400 7.2pt/1.26 'Hanken Grotesk';color:#4a4538">Bird diets are nearly as varied as birds themselves. The icons below show common food sources for Colorado species. Diets shift with the seasons, and most birds are opportunists — so while an icon reflects a typical diet, you may still spot a bird eating something outside it.</p>
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:5px 14px;align-content:start">
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Seeds" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Seeds.</b> Tree, bush, grass, grain, and forb seeds.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Vegetation" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Vegetation.</b> Leaves, roots, and stems.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Fruits" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Fruits.</b> Fruits, berries, and nuts.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Nectar" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Nectar.</b> Flower nectar.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Aquatic Invertebrates" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Aquatic invertebrates.</b> Aquatic insects, crayfish, snails.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Aquatic Vertebrates" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Aquatic vertebrates.</b> Fish.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Terrestrial or Flying Invertebrates" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Terrestrial or flying invertebrates.</b> Grasshoppers, ants, flies, other insects; spiders; worms.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Amphibians and Reptiles" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Amphibians and reptiles.</b> Frogs, toads, snakes, and lizards.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Birds and Eggs" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Birds and eggs.</b> Adult birds, nestlings, eggs.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Mammals" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Mammals.</b> Mice, voles, prairie dogs, squirrels, rabbits.</div></div>
+          <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08)"><span style="flex:none;color:#5F7A33;display:inline-flex;width:14px;justify-content:center;padding-top:1px"><dc-import name="DietIcon" kind="Carrion" hint-size="13px,13px"></dc-import></span><div style="font:400 6.5pt/1.28 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#26241c">Carrion.</b> Any dead animal.</div></div>
+        </div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Key — Diet & Seasons" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <!-- ===================== FRONT MATTER — BIRDING & CONSERVATION ===================== -->
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Getting started</div>
+        <h2 style="margin:6px 0 0;font:500 21pt/1.04 'Newsreader',serif;color:#26241c">Are you ready<br>to start birding?</h2>
+        <p style="margin:11px 0 0;font:400 7.9pt/1.35 'Hanken Grotesk';color:#4a4538">The word “birder” used to bring to mind people with the time and gear to travel deep into wild places chasing rare species. The truth is, anyone can be a birder. A birder is simply someone who notices, cares, and learns about birds.</p>
+        <p style="margin:9px 0 0;font:400 7.9pt/1.35 'Hanken Grotesk';color:#4a4538">Did you notice those pigeons on your walk to the bus stop? You’re a birder. Did you hear a strange call at the park and look up to find a bird perched on a power line? You’re a birder. Maybe you’ve hung a feeder on your balcony. Welcome to the world of birding.</p>
+        <p style="margin:9px 0 0;font:400 7.9pt/1.35 'Hanken Grotesk';color:#4a4538">All it takes is a willingness to notice, wonder, and learn. Binoculars and field guides help, but they aren’t required. We hope this guide helps you get to know your avian neighbors — and inspires you to help them thrive.</p>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Start Birding" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg pg-dark" style="background:#5F7A33">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column;justify-content:center;color:#F4EFE2">
+        <div style="font:500 62pt/0.5 'Newsreader',serif;color:rgba(255,255,255,.3)">“</div>
+        <p style="margin:10px 0 0;font:500 17.5pt/1.21 'Newsreader',serif;color:#F8F4EA;text-wrap:balance">Everyday life can pull us away from the natural world, but these feathered neighbors show up even in the busiest cities.</p>
+        <div style="margin-top:18px;width:.5in;height:3px;background:rgba(255,255,255,.55);border-radius:2px"></div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Pull Quote — Neighbors" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Field skills</div>
+        <h2 style="margin:6px 0 0;font:500 21pt/1.04 'Newsreader',serif;color:#26241c">Birding 101</h2>
+        <p style="margin:9px 0 0;font:400 7.7pt/1.31 'Hanken Grotesk';color:#4a4538">Identifying birds can feel overwhelming at first, but it gets easier fast. Use these clues alongside what you already know.</p>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.66in;font:800 6pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Size</span><span style="font:400 7.4pt/1.22 'Hanken Grotesk';color:#3c382e">Compare the bird to species you know well — a robin, crow, or goose.</span></div>
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.66in;font:800 6pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Shape</span><span style="font:400 7.4pt/1.22 'Hanken Grotesk';color:#3c382e">Round or narrow? Long-tailed or stocky? Bill pointed, broad, or hooked? Shape is often the clearest clue in poor light.</span></div>
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.66in;font:800 6pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Markings</span><span style="font:400 7.4pt/1.22 'Hanken Grotesk';color:#3c382e">Eye rings, wing bars, streaks, barring, spots, and color separate look-alikes.</span></div>
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.66in;font:800 6pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Behavior</span><span style="font:400 7.4pt/1.22 'Hanken Grotesk';color:#3c382e">Swimming, soaring, drilling, wading, hopping, snatching insects mid-air — movement reveals a lot.</span></div>
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.66in;font:800 6pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Habitat</span><span style="font:400 7.4pt/1.22 'Hanken Grotesk';color:#3c382e">Woods, grassland, or water? Different species favor different surroundings.</span></div>
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.66in;font:800 6pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Range</span><span style="font:400 7.4pt/1.22 'Hanken Grotesk';color:#3c382e">Check a range map — is the bird actually expected here, at this time of year?</span></div>
+        </div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Birding 101" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Why it matters</div>
+        <h2 style="margin:6px 0 0;font:500 21pt/1.04 'Newsreader',serif;color:#26241c">Conservation</h2>
+        <p style="margin:9px 0 0;font:400 7.5pt/1.3 'Hanken Grotesk';color:#4a4538">Nearly half of all migratory hotspots, and one-fifth of bird species worldwide, occur in urban areas. Green spaces, rivers, lakes, and even backyards can serve as critical habitat — supplying food, water, and shelter for migrating and resident birds alike. As cities expand, the pressure on these habitats grows, and bird biodiversity suffers globally, even among species that seem common in town.</p>
+        <div style="margin-top:12px;font:italic 600 11pt/1.18 'Newsreader',serif;color:#26241c">Threats in the city</div>
+        <p style="margin:6px 0 0;font:400 7.5pt/1.3 'Hanken Grotesk';color:#4a4538">More than <b style="font-weight:700;color:#26241c">one billion birds</b> die each year from building collisions in the United States alone. Migratory birds are especially vulnerable to nighttime light pollution, which throws off their navigation and often leads to fatal collisions. Feral and domestic cats kill an estimated <b style="font-weight:700;color:#26241c">2.4 billion birds</b> a year in the U.S. The single biggest threat, though, is habitat loss: as land is broken up or paved over, the food, water, and shelter birds depend on disappears with it.</p>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Conservation" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">The bigger picture</div>
+        <div style="margin:8px 0 0;font:italic 600 11pt/1.18 'Newsreader',serif;color:#26241c">Why birds matter</div>
+        <p style="margin:9px 0 0;font:400 7.5pt/1.3 'Hanken Grotesk';color:#4a4538">Birds give us more than something pleasant to watch. They offer ecosystem services we all depend on — pollination, pest control, and seed dispersal. As indicator species, their presence (or absence) tells us whether an ecosystem is healthy. There’s an economic case, too: birders spend billions each year on gear and travel, supporting more than a million jobs in conservation, education, and tourism.</p>
+        <div style="margin-top:12px;font:italic 600 11pt/1.18 'Newsreader',serif;color:#26241c">Wetlands working for communities</div>
+        <p style="margin:6px 0 0;font:400 7.5pt/1.3 'Hanken Grotesk';color:#4a4538">A wetland may be a stopover for migrating birds, but it’s a year-round asset for the community around it. Wetlands slow the flow of water, filter runoff before it reaches rivers and streams, and offer green space close to home. That makes them natural infrastructure: cleaner water, reduced flood risk, and room for nature as the Front Range grows.</p>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Why Birds Matter" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg pg-dark" style="background:#2E7D6B">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column;justify-content:center;color:#F4EFE2">
+        <div style="font:500 62pt/0.5 'Newsreader',serif;color:rgba(255,255,255,.3)">“</div>
+        <p style="margin:10px 0 0;font:500 17.5pt/1.21 'Newsreader',serif;color:#F8F4EA;text-wrap:balance">A wetland may be a stopover for migrating birds, but it’s a year-round asset for the community around it.</p>
+        <div style="margin-top:18px;width:.5in;height:3px;background:rgba(255,255,255,.55);border-radius:2px"></div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Pull Quote — Wetland" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">What’s at stake</div>
+        <h2 style="margin:6px 0 0;font:500 21pt/1.04 'Newsreader',serif;color:#26241c">What’s at stake</h2>
+        <p style="margin:11px 0 0;font:400 8.2pt/1.4 'Hanken Grotesk';color:#4a4538">Without birds, ecosystems would unravel and the natural world would change forever. Beyond their ecological role, birds have value simply as living creatures we share the world with.</p>
+        <p style="margin:9px 0 0;font:400 8.2pt/1.4 'Hanken Grotesk';color:#4a4538">As good stewards, we owe it to them to act — and even small steps help, from turning off lights at night to supporting local habitat conservation.</p>
+        <div style="flex:1"></div>
+        <div style="width:.5in;height:3px;background:#5F7A33;border-radius:2px"></div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="What's at Stake" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg pg-dark" style="background:#1c2620">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column;justify-content:center;color:#EBE6D6">
+        <div style="font:500 62pt/0.5 'Newsreader',serif;color:#C9B782;opacity:.55">“</div>
+        <p style="margin:10px 0 0;font:500 18pt/1.21 'Newsreader',serif;color:#F8F4EA;text-wrap:balance">Without birds, ecosystems would unravel and the natural world would change forever.</p>
+        <div style="margin-top:18px;width:.5in;height:3px;background:#E9D6A2;border-radius:2px"></div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Pull Quote — Unravel" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Take action</div>
+        <h2 style="margin:6px 0 0;font:500 20pt/1.03 'Newsreader',serif;color:#26241c">Bird-friendly living</h2>
+        <p style="margin:8px 0 0;font:400 7.3pt/1.28 'Hanken Grotesk';color:#4a4538">Bird populations are declining worldwide. A few simple changes to your routine can make a real difference. Seven things you can do:</p>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:#5F7A33;color:#fff;font:800 7pt/15px 'Hanken Grotesk';text-align:center">1</span><span style="font:400 7.1pt/1.21 'Hanken Grotesk';color:#3c382e"><b style="font-weight:700;color:#26241c">Make windows safe.</b> Add visible lines to glass with blinds, screens, or decals; keep feeders at safe distances.</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:#5F7A33;color:#fff;font:800 7pt/15px 'Hanken Grotesk';text-align:center">2</span><span style="font:400 7.1pt/1.21 'Hanken Grotesk';color:#3c382e"><b style="font-weight:700;color:#26241c">Keep cats indoors</b> unless supervised.</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:#5F7A33;color:#fff;font:800 7pt/15px 'Hanken Grotesk';text-align:center">3</span><span style="font:400 7.1pt/1.21 'Hanken Grotesk';color:#3c382e"><b style="font-weight:700;color:#26241c">Reduce lawn, plant natives.</b> Their nectar, seeds, berries, and insects help birds thrive.</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:#5F7A33;color:#fff;font:800 7pt/15px 'Hanken Grotesk';text-align:center">4</span><span style="font:400 7.1pt/1.21 'Hanken Grotesk';color:#3c382e"><b style="font-weight:700;color:#26241c">Avoid pesticides.</b> Choose organic when you can and cut back at home.</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:#5F7A33;color:#fff;font:800 7pt/15px 'Hanken Grotesk';text-align:center">5</span><span style="font:400 7.1pt/1.21 'Hanken Grotesk';color:#3c382e"><b style="font-weight:700;color:#26241c">Drink bird-friendly coffee.</b> Shade-grown coffee preserves the forest canopies migrants depend on.</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:#5F7A33;color:#fff;font:800 7pt/15px 'Hanken Grotesk';text-align:center">6</span><span style="font:400 7.1pt/1.21 'Hanken Grotesk';color:#3c382e"><b style="font-weight:700;color:#26241c">Reduce plastic.</b> Reuse and recycle to keep plastic out of the places birds feed.</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:none;width:15px;height:15px;border-radius:50%;background:#5F7A33;color:#fff;font:800 7pt/15px 'Hanken Grotesk';text-align:center">7</span><span style="font:400 7.1pt/1.21 'Hanken Grotesk';color:#3c382e"><b style="font-weight:700;color:#26241c">Watch birds, share what you see.</b> Join a community science project like eBird, the Christmas Bird Count, or Breeding Bird Survey.</span></div>
+        </div>
+        <div style="flex:1;min-height:6px"></div>
+        <div style="border-top:1px solid rgba(0,0,0,.11);padding-top:7px;font:700 6.2pt/1.3 'Hanken Grotesk';letter-spacing:.04em;color:#5F7A33">More at www.birdconservancy.org/resources/live-bird-friendly</div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Bird-Friendly Living" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Make space for birds</div>
+        <h2 style="margin:6px 0 0;font:500 20pt/1.03 'Newsreader',serif;color:#26241c">Food, water,<br>shelter, space</h2>
+        <p style="margin:9px 0 0;font:400 7.6pt/1.31 'Hanken Grotesk';color:#4a4538">Habitat loss is the biggest threat birds face — but we can push back by making our yards and shared spaces bird-friendly. Like all living things, birds need four key things.</p>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.62in;font:800 6.4pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Food</span><span style="font:400 7.5pt/1.26 'Hanken Grotesk';color:#3c382e">Plant natives for nectar, berries, seeds, and insects. Seeds, grain, suet, and nectar make good supplements.</span></div>
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.62in;font:800 6.4pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Water</span><span style="font:400 7.5pt/1.26 'Hanken Grotesk';color:#3c382e">Birds need clean water to drink and bathe. A bird bath works well — refill and clean it often.</span></div>
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.62in;font:800 6.4pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Shelter</span><span style="font:400 7.5pt/1.26 'Hanken Grotesk';color:#3c382e">Native plants offer the best shelter and need less care. Brush piles and nest boxes work, too.</span></div>
+          <div style="display:flex;gap:9px;align-items:baseline"><span style="flex:none;width:.62in;font:800 6.4pt/1.3 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#5F7A33">Space</span><span style="font:400 7.5pt/1.26 'Hanken Grotesk';color:#3c382e">Your yard is one piece of a bird’s larger habitat. Even a balcony or small patio can make a difference.</span></div>
+        </div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Food, Water, Shelter, Space" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <!-- ===================== SECTIONS + SPECIES ===================== -->
+  <sc-for list="{{ pages }}" as="p" hint-placeholder-count="0">
+
+    <sc-if value="{{ p.isDivider }}" hint-placeholder-val="{{ true }}">
+      <div class="media" data-sec="{{ p.key }}">
+        <div class="pg pg-dark" data-code="{{ p.code }}" style="background:{{ p.color }}">
+          <img data-px="{{ p.px }}" data-py="{{ p.py }}" data-defx="50" data-defy="50" data-pz="{{ p.pz }}" data-defz="1" src="{{ p.heroPhoto }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ p.photoPos }};transform:scale({{ p.pz }});display:block">
+          <div class="photoctl no-print">
+            <button data-dir="up" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:1">▲</button>
+            <button data-dir="left" onClick="{{ nudgePhoto }}" style="grid-column:1;grid-row:2">◀</button>
+            <button data-dir="reset" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:2">◌</button>
+            <button data-dir="right" onClick="{{ nudgePhoto }}" style="grid-column:3;grid-row:2">▶</button>
+            <button data-dir="down" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:3">▼</button><button data-dir="zoomin" onClick="{{ nudgePhoto }}" style="grid-column:1;grid-row:1;font-size:9px">＋</button><button data-dir="zoomout" onClick="{{ nudgePhoto }}" style="grid-column:3;grid-row:1;font-size:11px">－</button>
+          </div>
+          <div style="position:absolute;inset:0;background:linear-gradient(176deg,rgba(16,20,16,.34) 0%,rgba(16,20,16,.10) 34%,{{ p.colorScrim }} 100%)"></div>
+          <div class="el-secmark" style="position:absolute;top:.40in;left:.50in;right:.42in;display:flex;justify-content:space-between;align-items:center;color:#F6F1E6">
+            <span style="font:700 6.5pt/1 'Hanken Grotesk';letter-spacing:.3em;text-transform:uppercase;opacity:.9">Section</span>
+            <span style="font:600 7pt 'Newsreader',serif;letter-spacing:.06em;opacity:.9">{{ p.idxLabel }}</span>
+          </div>
+          <div style="position:absolute;left:.50in;right:.42in;bottom:.5in;color:#F8F4EA">
+            <div style="font:700 6.4pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:7px">{{ p.sub }}</div>
+            <h2 style="margin:0;font:500 25pt/1.0 'Newsreader',serif;letter-spacing:-.01em">{{ p.label }}</h2>
+            <div style="margin-top:9px;font:400 8.4pt/1.28 'Hanken Grotesk';max-width:2.55in;opacity:.95">{{ p.desc }}</div>
+            <div style="margin-top:13px;display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.42);padding:4px 10px;border-radius:999px;font:700 6pt/1 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase">{{ p.countLabel }}</div>
+          </div>
+        </div>
+        <dc-import name="PrintMarks" label="{{ p.label }}" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ p.isSpecies }}" hint-placeholder-val="{{ true }}">
+      <div class="media">
+        <div class="pg" style="background:#fff">
+          <!-- FRAMED PHOTO -->
+          <div class="el-photo" data-code="{{ p.code }}" style="position:absolute;top:var(--m-top);left:var(--m-out);right:var(--m-out);height:1.85in;overflow:hidden;border-radius:4px;background:#E4DECF">
+          <img data-px="{{ p.px }}" data-py="{{ p.py }}" data-defx="50" data-defy="38" data-pz="{{ p.pz }}" data-defz="1" src="{{ p.photo }}" style="width:100%;height:100%;object-fit:cover;object-position:{{ p.photoPos }};transform:scale({{ p.pz }});display:block">
+            <div style="position:absolute;left:0;right:0;bottom:0;height:36%;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(24,20,13,.5))"></div>
+            <sc-if value="{{ p.hasCaption }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute;bottom:5px;left:9px;right:9px;color:rgba(255,255,255,.95);font:500 italic 5.8pt/1.2 'Newsreader',serif;text-shadow:0 1px 2px rgba(0,0,0,.55)">{{ p.caption }}</div>
+            </sc-if>
+            <div class="photoctl no-print">
+              <button data-dir="up" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:1">▲</button>
+              <button data-dir="left" onClick="{{ nudgePhoto }}" style="grid-column:1;grid-row:2">◀</button>
+              <button data-dir="reset" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:2">◌</button>
+              <button data-dir="right" onClick="{{ nudgePhoto }}" style="grid-column:3;grid-row:2">▶</button>
+              <button data-dir="down" onClick="{{ nudgePhoto }}" style="grid-column:2;grid-row:3">▼</button><button data-dir="zoomin" onClick="{{ nudgePhoto }}" style="grid-column:1;grid-row:1;font-size:9px">＋</button><button data-dir="zoomout" onClick="{{ nudgePhoto }}" style="grid-column:3;grid-row:1;font-size:11px">－</button>
+            </div>
+          </div>
+          <!-- SEASON PILL (straddling image bottom-right) -->
+          <div class="el-season" style="position:absolute;top:calc(var(--m-top) + 1.73in);right:calc(var(--m-out) + .125in);z-index:3;display:inline-flex;align-items:center;gap:4px;background:#F7F2E6;color:#3a3428;font:700 var(--fs-season)/1 'Hanken Grotesk';padding:4px 9px 4px 7px;border-radius:999px;border:1px solid rgba(0,0,0,.08)">
+            <span style="font-size:8pt;color:{{ p.color }};display:inline-flex"><dc-import name="SeasonIcon" season="{{ p.season }}" hint-size="11px,11px"></dc-import></span>{{ p.season }}
+          </div>
+          <!-- CONTENT -->
+          <div style="position:absolute;top:calc(var(--m-top) + 1.99in);left:0;right:0;bottom:var(--m-bottom);padding:0 {{ p.padR }} 0 {{ p.padL }};display:flex;flex-direction:column">
+            <div class="el-eyebrow" style="font:800 var(--fs-eyebrow)/1 'Hanken Grotesk';letter-spacing:.18em;text-transform:uppercase;color:{{ p.color }};margin-bottom:5px">{{ p.groupLabel }}</div>
+            <div class="el-name" style="font:600 var(--fs-name)/1.0 'Newsreader',serif;color:#26241c;letter-spacing:-.01em;text-wrap:balance">{{ p.name }}</div>
+            <div class="el-sci" style="margin-top:3px;font:500 italic var(--fs-sci) 'Newsreader',serif;color:#7d7765">{{ p.sci }}</div>
+            <div style="margin-top:7px;width:.46in;height:2.5px;background:{{ p.color }};border-radius:2px"></div>
+            <div style="margin-top:9px;display:flex;flex-direction:column;gap:5px">
+              <p class="el-id" style="margin:0;font:400 var(--fs-body)/1.22 'Hanken Grotesk';color:#3c382e"><span style="font:800 var(--fs-label) 'Hanken Grotesk';letter-spacing:.13em;text-transform:uppercase;color:{{ p.color }};margin-right:6px">Identity</span>{{ p.id }}</p>
+              <p class="el-habitat" style="margin:0;font:400 var(--fs-body)/1.22 'Hanken Grotesk';color:#3c382e"><span style="font:800 var(--fs-label) 'Hanken Grotesk';letter-spacing:.13em;text-transform:uppercase;color:{{ p.color }};margin-right:6px">Habitat</span>{{ p.habitat }}</p>
+              <p class="el-habits" style="margin:0;font:400 var(--fs-body)/1.22 'Hanken Grotesk';color:#3c382e"><span style="font:800 var(--fs-label) 'Hanken Grotesk';letter-spacing:.13em;text-transform:uppercase;color:{{ p.color }};margin-right:6px">Behavior</span>{{ p.behavior }}</p>
+            </div>
+            <div style="flex:1 1 auto;min-height:5px"></div>
+            <div class="el-diet" style="border-top:1px solid rgba(0,0,0,.11);padding-top:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font:800 var(--fs-label) 'Hanken Grotesk';letter-spacing:.16em;text-transform:uppercase;color:{{ p.color }}">Eats</span>
+              <sc-for list="{{ p.diet }}" as="d" hint-placeholder-count="3">
+                <span style="display:inline-flex;align-items:center;gap:3px;font:600 var(--fs-diet) 'Hanken Grotesk';color:{{ p.color }};background:{{ p.tint }};border:1px solid {{ p.tintBorder }};padding:2px 6px 2px 5px;border-radius:999px">
+                  <span style="font-size:9pt;color:{{ p.color }};display:inline-flex"><dc-import name="DietIcon" kind="{{ d.kind }}" hint-size="11px,11px"></dc-import></span>{{ d.label }}
+                </span>
+              </sc-for>
+            </div>
+            <div style="margin-top:8px;display:flex;flex-direction:{{ p.footerDir }};align-items:center;justify-content:space-between">
+              <div class="el-footer" style="display:flex;align-items:center;gap:6px">
+                <span style="width:14px;height:3px;background:{{ p.color }};border-radius:2px"></span>
+                <span style="font:700 5.2pt/1 'Hanken Grotesk';letter-spacing:.16em;text-transform:uppercase;color:#9a937f">{{ p.groupLabel }}</span>
+              </div>
+              <span class="el-folio" style="font:600 var(--fs-footer) 'Newsreader',serif;color:#9a937f">{{ p.folio }}</span>
+            </div>
+          </div>
+        </div>
+        <dc-import name="PrintMarks" label="{{ p.name }}" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+      </div>
+    </sc-if>
+
+  </sc-for>
+
+  <!-- ===================== BACK MATTER — GET INVOLVED ===================== -->
+  <div class="media">
+    <div class="pg pg-dark" style="background:#1c2620">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column;color:#EBE6D6">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.3em;text-transform:uppercase;color:#C9B782">Before you go</div>
+        <h2 style="margin:9px 0 0;font:500 25pt/1.0 'Newsreader',serif;color:#F4EFE2">Get involved</h2>
+        <p style="margin:15px 0 0;font:400 8.4pt/1.4 'Hanken Grotesk';color:#cdc7b4">You’ve spent time getting to know the birds that share your city. Now you can help make sure they stick around.</p>
+        <p style="margin:10px 0 0;font:400 8.4pt/1.4 'Hanken Grotesk';color:#cdc7b4">Bird Conservancy of the Rockies and Ducks Unlimited lead the work that keeps Colorado’s birds and habitats thriving — and both welcome new supporters at every level.</p>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:14px;height:3px;background:#E9D6A2;border-radius:2px;flex:none"></span>
+          <span style="font:700 6.4pt/1.3 'Hanken Grotesk';letter-spacing:.06em;color:#C9B782">Two ways to help, on the next pages</span>
+        </div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Get Involved" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Get involved</div>
+        <h2 style="margin:6px 0 0;font:500 18pt/1.04 'Newsreader',serif;color:#26241c">Bird Conservancy<br>of the Rockies</h2>
+        <p style="margin:8px 0 0;font:400 7.2pt/1.26 'Hanken Grotesk';color:#4a4538">Headquartered in Brighton, Colorado, Bird Conservancy has worked for decades to study, protect, and advocate for the birds you’ve met in this guide — putting science to work on the ground from the Front Range to the Great Plains, Mexico, and beyond.</p>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div style="font:400 7.1pt/1.22 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#5F7A33">Volunteer.</b> Help with bird banding, habitat restoration, education events, and field research. There’s a role for every interest and schedule.</div>
+          <div style="font:400 7.1pt/1.22 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#5F7A33">Take a birding tour.</b> Join Bird Conservancy biologists for guided tours across the Rockies, Great Plains, and select international destinations. Proceeds support conservation.</div>
+          <div style="font:400 7.1pt/1.22 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#5F7A33">Live bird friendly.</b> Take what you’ve learned into daily life — from window decals to native plantings. (See Bird-friendly living.)</div>
+          <div style="font:400 7.1pt/1.22 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#5F7A33">Donate.</b> Your gift sustains the science, education, and stewardship that protect birds for generations. Give at birdconservancy.org/donate.</div>
+        </div>
+        <div style="flex:1;min-height:6px"></div>
+        <div style="border-top:1px solid rgba(0,0,0,.11);padding-top:7px;font:700 6.4pt/1.3 'Hanken Grotesk';letter-spacing:.04em;color:#5F7A33">Learn more and get involved at birdconservancy.org</div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Get Involved — Bird Conservancy" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <div class="media">
+    <div class="pg" style="background:#fff">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.26em;text-transform:uppercase;color:#A89A6E;margin-bottom:12px">Get involved</div>
+        <h2 style="margin:6px 0 0;font:500 21pt/1.04 'Newsreader',serif;color:#26241c">Ducks Unlimited</h2>
+        <p style="margin:8px 0 0;font:400 7.2pt/1.26 'Hanken Grotesk';color:#4a4538">Ducks Unlimited’s work runs on a grassroots network of people who care about wetlands, waterfowl, and the outdoors. Across Colorado, local chapters bring volunteers and supporters together to build community, raise awareness, and fund habitat conservation.</p>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div style="font:400 7.1pt/1.22 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#2E7D6B">Volunteer.</b> Join a local chapter to help with habitat projects, fundraising events, and community outreach.</div>
+          <div style="font:400 7.1pt/1.22 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#2E7D6B">Attend events.</b> DU hosts more than 4,000 events a year — banquets, youth days, and volunteer workdays. There’s likely one near you.</div>
+          <div style="font:400 7.1pt/1.22 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#2E7D6B">Become a DU member.</b> Membership includes DU Magazine, member decals, a card, exclusive online content, and the DU mobile apps.</div>
+          <div style="font:400 7.1pt/1.22 'Hanken Grotesk';color:#3c382e"><b style="font-weight:800;color:#2E7D6B">Donate.</b> A one-time or monthly gift directly funds wetland restoration and waterfowl conservation across North America.</div>
+        </div>
+        <div style="flex:1;min-height:6px"></div>
+        <div style="border-top:1px solid rgba(0,0,0,.11);padding-top:7px;font:700 6.4pt/1.3 'Hanken Grotesk';letter-spacing:.04em;color:#2E7D6B">Find a chapter or get involved at ducks.org/get-involved</div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Get Involved — Ducks Unlimited" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  <!-- ===================== BLANK PAGES (booklet fill) ===================== -->
+  <sc-for list="{{ blanksArr }}" as="b" hint-placeholder-count="0">
+    <div class="media">
+      <div class="pg" style="background:#fff">
+        <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.35in">
+          <span style="font:500 italic 6.4pt 'Newsreader',serif;color:#c4bda9;letter-spacing:.02em">This page is intentionally left blank</span>
+        </div>
+      </div>
+      <dc-import name="PrintMarks" label="Blank" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+    </div>
+  </sc-for>
+
+  <!-- ===================== BACK COVER ===================== -->
+  <div class="media solo">
+    <div class="pg" style="background:#21281e">
+      <div style="position:absolute;inset:0;padding:var(--m-toptext) var(--mt-right) var(--mt-bottom) var(--mt-left);display:flex;flex-direction:column;color:#EBE6D6">
+        <div style="font:700 6pt 'Hanken Grotesk';letter-spacing:.3em;text-transform:uppercase;color:#C9B782">Pocket Guide to</div>
+        <h2 style="margin:7px 0 0;font:500 23pt/1.0 'Newsreader',serif;color:#F4EFE2">City Birds</h2>
+        <p style="margin:11px 0 0;font:400 8pt/1.35 'Hanken Grotesk';color:#cdc7b4;max-width:2.5in">Eighty-two of the birds you’re most likely to meet in town — on park ponds, at the feeder, overhead, and in the hedge. Grouped, color-coded, and built to fit a pocket.</p>
+        <div style="flex:1"></div>
+      </div>
+    </div>
+    <dc-import name="PrintMarks" label="Back Cover" hint-size="100%,100%" style="position:absolute;inset:0;pointer-events:none"></dc-import>
+  </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { pages: [], blanks: 0, view: 'spread', bleed: false, crop: false, marks: false, bars: false, edges: true, activeSection: null, panelOpen: false, hidden: {}, saved: false, dlOpen: false, linked: false, cloudStatus: '' };
+
+  componentDidMount() {
+    let saved = null;
+    try {
+      if (location.hash && location.hash.indexOf('#s=') === 0) {
+        const obj = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(location.hash.slice(3))))));
+        if (obj.app) localStorage.setItem('cbAppState', JSON.stringify(obj.app));
+        if (obj.photos) localStorage.setItem('cbPhotoPos', JSON.stringify(obj.photos));
+      }
+    } catch (e) {}
+    try { saved = JSON.parse(localStorage.getItem('cbAppState') || 'null'); } catch (e) {}
+    import('./birds-data.js')
+      .then(m => {
+        const pages = this.build(m.BIRDS);
+        const base = 19 + pages.length;
+        const need = (4 - (base % 4)) % 4;
+        const first = (this._sections && this._sections[0]) ? this._sections[0].key : null;
+        const init = { pages, activeSection: first, blanks: (saved && typeof saved.blanks === 'number') ? saved.blanks : need };
+        if (saved) Object.assign(init, { view: saved.view, bleed: saved.bleed, crop: saved.crop, marks: saved.marks, bars: saved.bars, edges: saved.edges, hidden: saved.hidden || {} });
+        this.setState(init, () => {
+          if (saved) { this._pageScale = saved.pageScale || 1; this._pgvh = saved.pgvh || 1; this.applyVars(saved.vars); }
+          this.applyScale(this._pageScale || 1, this._pgvh || 1);
+          this.syncPanel();
+          this.fitPreview();
+          this.updatePageCfg();
+          this.applyStoredPhotos();
+          this.syncCount();
+          setTimeout(() => this.syncCount(), 300);
+        });
+      })
+      .catch(e => console.error('birds-data load failed', e));
+    this.updatePageCfg();
+    this._scroll = () => this.onScroll();
+    window.addEventListener('scroll', this._scroll, { passive: true });
+    this._resize = () => this.fitPreview();
+    window.addEventListener('resize', this._resize);
+    this._beforePrint = () => { const b = document.querySelector('.book'); if (b) b.style.zoom = ''; };
+    this._afterPrint = () => this.fitPreview();
+    window.addEventListener('beforeprint', this._beforePrint);
+    window.addEventListener('afterprint', this._afterPrint);
+    try { const c = JSON.parse(localStorage.getItem('cbCloud') || 'null'); if (c && c.cfg) setTimeout(() => this.connectCloud(c.cfg, c.code), 400); } catch (e) {}
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._scroll);
+    window.removeEventListener('resize', this._resize);
+    window.removeEventListener('beforeprint', this._beforePrint);
+    window.removeEventListener('afterprint', this._afterPrint);
+  }
+
+  onScroll() {
+    if (this._raf) return;
+    this._raf = requestAnimationFrame(() => {
+      this._raf = null;
+      const th = 150;
+      let active = null;
+      document.querySelectorAll('[data-sec]').forEach(el => {
+        if (el.getBoundingClientRect().top <= th) active = el.getAttribute('data-sec');
+      });
+      if (active && active !== this.state.activeSection) this.setState({ activeSection: active });
+    });
+  }
+
+  jumpTo(key) {
+    const el = document.querySelector(`[data-sec="${key}"]`);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  nudgePhoto(e) {
+    const btn = e.currentTarget;
+    const wrap = btn.closest('[data-code]');
+    if (!wrap) return;
+    const img = wrap.querySelector('img');
+    const code = wrap.getAttribute('data-code');
+    let x = parseFloat(img.getAttribute('data-px')); if (isNaN(x)) x = 50;
+    let y = parseFloat(img.getAttribute('data-py')); if (isNaN(y)) y = 38;
+    let z = parseFloat(img.getAttribute('data-pz')); if (isNaN(z)) z = 1;
+    const step = 4, zstep = 0.12;
+    const dir = btn.getAttribute('data-dir');
+    if (dir === 'left') x = Math.max(0, x - step);
+    else if (dir === 'right') x = Math.min(100, x + step);
+    else if (dir === 'up') y = Math.max(0, y - step);
+    else if (dir === 'down') y = Math.min(100, y + step);
+    else if (dir === 'zoomin') z = Math.min(4, z + zstep);
+    else if (dir === 'zoomout') z = Math.max(0.4, z - zstep);
+    else if (dir === 'reset') { x = parseFloat(img.getAttribute('data-defx')); if (isNaN(x)) x = 50; y = parseFloat(img.getAttribute('data-defy')); if (isNaN(y)) y = 38; z = 1; }
+    z = Math.round(z * 1000) / 1000;
+    img.setAttribute('data-px', x);
+    img.setAttribute('data-py', y);
+    img.setAttribute('data-pz', z);
+    img.style.objectPosition = x + '% ' + y + '%';
+    img.style.transform = 'scale(' + z + ')';
+    let map = {};
+    try { map = JSON.parse(localStorage.getItem('cbPhotoPos') || '{}'); } catch (er) {}
+    if (dir === 'reset') delete map[code]; else map[code] = x + ' ' + y + ' ' + z;
+    localStorage.setItem('cbPhotoPos', JSON.stringify(map));
+    this.persistSoon();
+  }
+
+  togglePanel() { this.setState(st => ({ panelOpen: !st.panelOpen })); }
+
+  onTypeInput(e) {
+    const el = e.target;
+    const v = el.value;
+    const unit = el.getAttribute('data-unit') || 'pt';
+    const varName = el.getAttribute('data-var');
+    if (varName) document.querySelector('.app').style.setProperty(varName, v + unit);
+    const row = el.closest('[data-row]');
+    if (row) row.querySelectorAll('input').forEach(i => { if (i !== el) i.value = v; });
+    this.persistSoon();
+  }
+
+  toggleEl(e) {
+    const key = e.target.getAttribute('data-el');
+    const on = e.target.checked;
+    this.setState(st => ({ hidden: Object.assign({}, st.hidden, { [key]: !on }) }));
+  }
+
+  setPage(e) { this.applyScale(parseFloat(e.currentTarget.getAttribute('data-scale')), parseFloat(e.currentTarget.getAttribute('data-vh')) || 1); }
+
+  onPageWidth(e) {
+    let w = parseFloat(e.target.value);
+    if (!w || w < 2) w = 2; if (w > 8) w = 8;
+    this.applyScale(w / 3.5, 1);
+  }
+
+  collectState() {
+    const app = document.querySelector('.app');
+    const cs = getComputedStyle(app);
+    const VARS = ['--pgscale','--pgvh','--m-out','--m-in','--m-top','--m-bottom','--m-toptext','--mt-right','--mt-bottom','--mt-left','--fs-eyebrow','--fs-name','--fs-sci','--fs-body','--fs-label','--fs-season','--fs-diet','--fs-footer'];
+    const vars = {};
+    VARS.forEach(v => { vars[v] = (app.style.getPropertyValue(v) || cs.getPropertyValue(v)).trim(); });
+    const s = this.state;
+    return { view: s.view, bleed: s.bleed, crop: s.crop, marks: s.marks, bars: s.bars, edges: s.edges, blanks: s.blanks, hidden: s.hidden, pageScale: this._pageScale || 1, pgvh: this._pgvh || 1, vars };
+  }
+
+  applyVars(vars) {
+    const app = document.querySelector('.app');
+    if (!app || !vars) return;
+    Object.entries(vars).forEach(([k, v]) => { if (v) app.style.setProperty(k, v); });
+  }
+
+  syncPanel() {
+    const app = document.querySelector('.app');
+    if (!app) return;
+    const cs = getComputedStyle(app);
+    document.querySelectorAll('.panel .ctl input[data-var]').forEach(i => {
+      const val = parseFloat(app.style.getPropertyValue(i.getAttribute('data-var')) || cs.getPropertyValue(i.getAttribute('data-var')));
+      if (!isNaN(val)) i.value = val;
+    });
+    const h = this.state.hidden || {};
+    document.querySelectorAll('.panel input[data-el]').forEach(c => { c.checked = !h[c.getAttribute('data-el')]; });
+  }
+
+  applyStoredPhotos() {
+    let map = {};
+    try { map = JSON.parse(localStorage.getItem('cbPhotoPos') || '{}'); } catch (e) {}
+    document.querySelectorAll('[data-code]').forEach(wrap => {
+      const code = wrap.getAttribute('data-code');
+      const pos = map[code];
+      if (!pos) return;
+      const im = wrap.querySelector('img');
+      if (!im) return;
+      const parts = pos.split(' ');
+      const z = parts[2] || '1';
+      im.setAttribute('data-px', parts[0]); im.setAttribute('data-py', parts[1]); im.setAttribute('data-pz', z);
+      im.style.objectPosition = parts[0] + '% ' + parts[1] + '%';
+      im.style.transform = 'scale(' + z + ')';
+    });
+  }
+
+  saveAll() {
+    // 1. In-browser store — instant, survives reloads in this browser
+    try { localStorage.setItem('cbAppState', JSON.stringify(this.collectState())); } catch (e) {}
+    // 2. Push to Firebase if cloud sync is connected (no-op otherwise)
+    try { this.pushCloud(); } catch (e) {}
+    // 3. Permanent file backup the user keeps — survives clearing the browser or moving machines
+    try { this.exportSettings(); } catch (e) {}
+    this.setState({ saved: true });
+    clearTimeout(this._savedT);
+    this._savedT = setTimeout(() => this.setState({ saved: false }), 2200);
+  }
+
+  fitPreview() {
+    const book = document.querySelector('.book');
+    if (!book) return;
+    const scale = this._pageScale || 1;
+    const slug = (this.state.crop || this.state.marks || this.state.bars) ? 0.34 : 0;
+    const mediaW = (3.75 + 2 * slug) * scale;
+    const cols = this.state.view === 'spread' ? 2 : 1;
+    const avail = (window.innerWidth || 1000) - 56;
+    const z = Math.max(0.45, Math.min(1.22, avail / (cols * mediaW * 96)));
+    book.style.zoom = z;
+  }
+
+  applyScale(scale, vh) {
+    if (vh == null) vh = this._pgvh || 1;
+    this._pageScale = scale; this._pgvh = vh;
+    const app = document.querySelector('.app');
+    if (app) { app.style.setProperty('--pgscale', scale); app.style.setProperty('--pgvh', vh); }
+    this.updatePageCfg();
+    const r = document.getElementById('pgreadout');
+    if (r) r.textContent = (3.5 * scale).toFixed(2) + ' \u00d7 ' + (4.75 * scale * vh).toFixed(2) + ' in';
+    const w = document.getElementById('pgw');
+    if (w && document.activeElement !== w) w.value = (3.5 * scale).toFixed(2);
+    document.querySelectorAll('.ps-presets button').forEach(b => {
+      const on = Math.abs(parseFloat(b.getAttribute('data-scale')) - scale) < 0.005 && Math.abs((parseFloat(b.getAttribute('data-vh')) || 1) - vh) < 0.01;
+      b.style.background = on ? '#5F7A33' : '';
+      b.style.borderColor = on ? '#5F7A33' : '';
+      b.style.color = on ? '#fff' : '';
+    });
+    this.fitPreview();
+    this.persistSoon();
+  }
+
+  resetAdjust() {
+    const app = document.querySelector('.app');
+    const defs = { '--m-out':'.175in','--m-in':'.25in','--m-top':'.175in','--m-bottom':'.25in','--m-toptext':'.175in','--mt-right':'.42in','--mt-bottom':'.34in','--mt-left':'.5in','--fs-eyebrow':'5.6pt','--fs-name':'18pt','--fs-sci':'8.6pt','--fs-body':'7.7pt','--fs-label':'5.4pt','--fs-season':'5.8pt','--fs-diet':'6.4pt','--fs-footer':'4pt' };
+    Object.entries(defs).forEach(([k, v]) => app.style.setProperty(k, v));
+    document.querySelectorAll('.panel .ctl input').forEach(i => {
+      const vn = i.getAttribute('data-var');
+      if (vn && defs[vn] != null) i.value = parseFloat(defs[vn]);
+      if (i.type === 'checkbox') i.checked = true;
+    });
+    this.applyScale(1, 1);
+    this.setState({ hidden: {} });
+  }
+
+  exportSettings() {
+    let photos = {};
+    try { photos = JSON.parse(localStorage.getItem('cbPhotoPos') || '{}'); } catch (e) {}
+    const data = { v: 1, app: this.collectState(), photos };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'city-birds-settings.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  exportLink() {
+    let photos = {};
+    try { photos = JSON.parse(localStorage.getItem('cbPhotoPos') || '{}'); } catch (e) {}
+    const data = { v: 1, app: this.collectState(), photos };
+    const enc = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
+    const url = location.origin + location.pathname + '#s=' + enc;
+    const done = () => { this.setState({ linked: true }); clearTimeout(this._linkT); this._linkT = setTimeout(() => this.setState({ linked: false }), 1800); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, () => window.prompt('Copy this link:', url));
+    } else { window.prompt('Copy this link:', url); }
+  }
+
+  importSettings(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const d = JSON.parse(reader.result);
+        if (d.app) localStorage.setItem('cbAppState', JSON.stringify(d.app));
+        if (d.photos) localStorage.setItem('cbPhotoPos', JSON.stringify(d.photos));
+        this.applyImported(d);
+      } catch (err) { console.error('import failed', err); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
+  applyImported(d) {
+    const a = d.app || {};
+    this._pageScale = a.pageScale || 1;
+    this._pgvh = a.pgvh || 1;
+    this.setState({
+      view: a.view || 'spread', bleed: !!a.bleed, crop: !!a.crop, marks: !!a.marks, bars: !!a.bars, edges: !!a.edges,
+      blanks: (typeof a.blanks === 'number') ? a.blanks : this.state.blanks, hidden: a.hidden || {}
+    }, () => {
+      this.applyVars(a.vars);
+      this.applyScale(this._pageScale, this._pgvh);
+      this.syncPanel();
+      this.applyStoredPhotos();
+      this.fitPreview();
+      this.setState({ saved: true });
+      clearTimeout(this._savedT);
+      this._savedT = setTimeout(() => this.setState({ saved: false }), 1600);
+    });
+  }
+
+  componentDidUpdate() { this.updatePageCfg(); this.fitPreview(); this.persistSoon(); this.syncCount(); }
+
+  syncCount() {
+    const all = document.querySelectorAll('.book .media').length;
+    if (!all) return;
+    const fixed = all - this.state.blanks;
+    if (fixed > 0 && this._fixed !== fixed) { this._fixed = fixed; this.forceUpdate(); }
+    if (!this._normalized && fixed > 0) {
+      this._normalized = true;
+      if ((fixed + this.state.blanks) % 4 !== 0) {
+        const need = (4 - (fixed % 4)) % 4;
+        this.setState({ blanks: need });
+      }
+    }
+  }
+
+  persistSoon() {
+    clearTimeout(this._persistT);
+    this._persistT = setTimeout(() => {
+      try { localStorage.setItem('cbAppState', JSON.stringify(this.collectState())); } catch (e) {}
+      this.pushCloud();
+    }, 350);
+  }
+
+  async connectCloud(cfg, code) {
+    try {
+      this.setState({ cloudStatus: 'Connecting\u2026' });
+      const appMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+      const dbMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+      const app = appMod.initializeApp(cfg, 'cb-' + Date.now());
+      const db = dbMod.getDatabase(app);
+      code = (code || 'default').replace(/[.#$\[\]/]/g, '-');
+      this._cloudRef = dbMod.ref(db, 'cityBirds/' + code);
+      this._cloudSet = dbMod.set;
+      dbMod.onValue(this._cloudRef, (snap) => {
+        const val = snap.val();
+        if (!val) return;
+        if (val.t && this._lastCloudT && val.t <= this._lastCloudT) return;
+        this._lastCloudT = val.t || 0;
+        this._cloudApplying = true;
+        this.applyImported(val);
+        setTimeout(() => { this._cloudApplying = false; }, 200);
+      });
+      localStorage.setItem('cbCloud', JSON.stringify({ cfg, code }));
+      this.setState({ cloudStatus: 'Synced \u00b7 code \u201c' + code + '\u201d' });
+      this.pushCloud();
+    } catch (e) {
+      console.error('cloud connect failed', e);
+      this.setState({ cloudStatus: 'Error: ' + (e.message || e) });
+    }
+  }
+
+  pushCloud() {
+    if (!this._cloudRef || !this._cloudSet || this._cloudApplying) return;
+    let photos = {};
+    try { photos = JSON.parse(localStorage.getItem('cbPhotoPos') || '{}'); } catch (e) {}
+    const t = Date.now();
+    this._lastCloudT = t;
+    try { this._cloudSet(this._cloudRef, { app: this.collectState(), photos, t }); } catch (e) {}
+  }
+
+  doConnectCloud() {
+    const cfgEl = document.getElementById('fbcfg');
+    const codeEl = document.getElementById('fbcode');
+    let cfg;
+    try { cfg = JSON.parse(cfgEl.value); } catch (e) { this.setState({ cloudStatus: 'Config must be valid JSON (quoted keys)' }); return; }
+    this.connectCloud(cfg, (codeEl.value || '').trim());
+  }
+
+  updatePageCfg() {
+    const el = document.getElementById('pagecfg');
+    if (!el) return;
+    const slug = (this.state.crop || this.state.marks || this.state.bars) ? 0.34 : 0;
+    const scale = this._pageScale || 1;
+    const vh = this._pgvh || 1;
+    const mw = (3.75 + 2 * slug) * scale;
+    const mh = (5 * vh + 2 * slug) * scale;
+    const app = document.querySelector('.app');
+    if (app) { app.style.setProperty('--mediaw', mw.toFixed(3) + 'in'); app.style.setProperty('--mediah', mh.toFixed(3) + 'in'); }
+    const pw = (this.state.view === 'spread' ? mw * 2 : mw).toFixed(3);
+    const next = `@page{size:${pw}in ${mh.toFixed(3)}in;margin:0}`;
+    if (el.textContent !== next) el.textContent = next;
+  }
+
+  hexToRgba(hex, a) {
+    const n = hex.replace('#', '');
+    const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  build(BIRDS) {
+    const GROUPS = [
+      { key:'waterfowl',   label:'Waterfowl',                 short:'Waterfowl',    sub:'Geese & Ducks',           desc:'Geese and ducks of city ponds, lakes, reservoirs, and rivers.',                                color:'#4E6E7E', hero:'WODU' },
+      { key:'waterbirds',  label:'Waterbirds & Shorebirds',   short:'Waterbirds',   sub:'Herons, Gulls & Kin',     desc:'Long-legged waders, gulls, coots, and other birds of the water’s edge.',                       color:'#2E7D6B', hero:'GBHE' },
+      { key:'raptors',     label:'Birds of Prey',             short:'Birds of Prey',sub:'Hawks, Eagles & Owls',    desc:'Hawks, eagles, falcons, vultures, and owls that hunt over the city.',                          color:'#B05A2C', hero:'RTHA' },
+      { key:'doves',       label:'Doves & Game Birds',        short:'Doves',        sub:'Pigeons, Doves & Turkey', desc:'Familiar pigeons and doves, plus the Wild Turkey.',                                             color:'#B89030', hero:'MODO' },
+      { key:'woodpeckers', label:'Woodpeckers',               short:'Woodpeckers',  sub:'Drummers of the Trees',   desc:'Tree-climbing woodpeckers and flickers of parks and yards.',                                   color:'#9A3F3A', hero:'NOFL' },
+      { key:'hummingbirds',label:'Hummingbirds',              short:'Hummingbirds', sub:'Garden Jewels',           desc:'Tiny, iridescent nectar-feeders of summer gardens.',                                           color:'#9C4E72', hero:'BTAH' },
+      { key:'songbirds',   label:'Songbirds & Perching Birds',short:'Songbirds',    sub:'Jays to Warblers',        desc:'The great variety of perching birds — jays and crows, sparrows and finches, warblers and more.',color:'#5F7A33', hero:'WEME' },
+    ];
+    const DLABEL = {
+      'Vegetation':'Greens', 'Seeds':'Seeds', 'Fruits':'Fruit', 'Nectar':'Nectar',
+      'Aquatic Invertebrates':'Aquatic inverts', 'Terrestrial or Flying Invertebrates':'Insects',
+      'Aquatic Vertebrates':'Fish', 'Amphibians and Reptiles':'Frogs & reptiles',
+      'Birds and Eggs':'Birds & eggs', 'Mammals':'Mammals', 'Carrion':'Carrion',
+    };
+    const img = c => `https://crybabydesign.com/urban-field-guide/images/${c}.jpg`;
+
+    this._sections = GROUPS.map(g => ({ key: g.key, short: g.short, color: g.color }));
+    let posMap = {};
+    try { posMap = JSON.parse(localStorage.getItem('cbPhotoPos') || '{}'); } catch (e) {}
+
+    const pages = [];
+    let folio = 0;
+    let pageNo = 3;
+    GROUPS.forEach((G, gi) => {
+      const list = BIRDS.filter(b => b.group === G.key);
+      pageNo++;
+      const dcode = 'div-' + G.key;
+      const dpos = posMap[dcode];
+      const dpx = dpos ? dpos.split(' ')[0] : '50';
+      const dpy = dpos ? dpos.split(' ')[1] : '50';
+      const dpz = (dpos && dpos.split(' ')[2]) ? dpos.split(' ')[2] : '1';
+      pages.push({
+        type:'divider', isDivider:true, isSpecies:false,
+        label:G.label, sub:G.sub, desc:G.desc, color:G.color,
+        colorScrim:this.hexToRgba(G.color, 0.95), heroPhoto:img(G.hero),
+        idxLabel:String(gi+1).padStart(2,'0') + ' / 07',
+        countLabel:list.length + ' Species',
+        key:G.key, code:dcode, px:dpx, py:dpy, pz:dpz, photoPos:dpx + '% ' + dpy + '%',
+      });
+      list.forEach(b => {
+        folio++;
+        pageNo++;
+        const recto = pageNo % 2 === 1;
+        const pos = posMap[b.code];
+        const px = pos ? pos.split(' ')[0] : '50';
+        const py = pos ? pos.split(' ')[1] : '38';
+        const pz = (pos && pos.split(' ')[2]) ? pos.split(' ')[2] : '1';
+        pages.push({
+          type:'species', isDivider:false, isSpecies:true,
+          name:b.name, sci:b.sci, season:b.season, caption:b.caption, hasCaption:!!b.caption,
+          id:b.id, habitat:b.habitat, behavior:b.behavior,
+          diet:b.diet.map(d => ({ kind:d, label:DLABEL[d] || d })),
+          color:G.color, groupLabel:G.short,
+          tint:this.hexToRgba(G.color, 0.09), tintBorder:this.hexToRgba(G.color, 0.30),
+          photo:img(b.code), code:b.code, px, py, pz, photoPos: px + '% ' + py + '%',
+          padL: recto ? 'var(--m-in)' : 'var(--m-out)', padR: recto ? 'var(--m-out)' : 'var(--m-in)',
+          footerDir: recto ? 'row' : 'row-reverse',
+          folio:String(folio).padStart(2,'0'),
+        });
+      });
+    });
+    return pages;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const fixed = this._fixed || (s.pages.length + 19);
+    const total = fixed + s.blanks;
+    const rem = total % 4;
+    const slug = (s.crop || s.marks || s.bars);
+    const hid = s.hidden || {};
+    return {
+      pages: s.pages,
+      sections: (this._sections || []).map(g => {
+        const active = s.activeSection === g.key;
+        return {
+          key: g.key, short: g.short,
+          btnStyle: active
+            ? `background:${g.color};color:#fff;box-shadow:inset 0 0 0 1px ${g.color}`
+            : `background:${this.hexToRgba(g.color, 0.16)};color:#e7e2d2;box-shadow:inset 0 0 0 1px ${this.hexToRgba(g.color, 0.5)}`,
+          dotStyle: active ? 'background:rgba(255,255,255,.95)' : `background:${g.color}`,
+          onClick: () => this.jumpTo(g.key),
+        };
+      }),
+      blanksArr: Array.from({ length: s.blanks }, (_, i) => i),
+      total,
+      x4Text: rem === 0 ? 'Booklet-ready ×4' : `+${4 - rem} to ×4`,
+      badgeCls: rem === 0 ? 'badge ok' : 'badge warn',
+      rootClass: [
+        'view-' + s.view,
+        s.bleed ? 'show-bleed' : '',
+        s.crop ? 'show-crop' : '',
+        s.marks ? 'show-marks' : '',
+        s.bars ? 'show-bars' : '',
+        s.edges ? 'show-edges' : '',
+        slug ? 'has-slug' : '',
+        ...Object.keys(hid).filter(k => hid[k]).map(k => 'hide-' + k),
+      ].filter(Boolean).join(' '),
+      singleCls: s.view === 'single' ? 'tbtn on' : 'tbtn',
+      spreadCls: s.view === 'spread' ? 'tbtn on' : 'tbtn',
+      allCls: (s.bleed && s.crop && s.marks && s.bars) ? 'toggle on' : 'toggle',
+      allText: (s.bleed && s.crop && s.marks && s.bars) ? 'All on' : 'All marks',
+      toggleAll: () => this.setState(st => {
+        const allOn = st.bleed && st.crop && st.marks && st.bars;
+        return { bleed: !allOn, crop: !allOn, marks: !allOn, bars: !allOn };
+      }),
+      bleedCls: s.bleed ? 'toggle on' : 'toggle',
+      cropCls: s.crop ? 'toggle on' : 'toggle',
+      marksCls: s.marks ? 'toggle on' : 'toggle',
+      barsCls: s.bars ? 'toggle on' : 'toggle',
+      edgesCls: s.edges ? 'toggle on' : 'toggle',
+      setSingle: () => this.setState({ view: 'single' }),
+      setSpread: () => this.setState({ view: 'spread' }),
+      toggleBleed: () => this.setState(st => ({ bleed: !st.bleed })),
+      toggleCrop: () => this.setState(st => ({ crop: !st.crop })),
+      toggleMarks: () => this.setState(st => ({ marks: !st.marks })),
+      toggleBars: () => this.setState(st => ({ bars: !st.bars })),
+      toggleEdges: () => this.setState(st => ({ edges: !st.edges })),
+      addBlank: () => this.setState(st => ({ blanks: st.blanks + 1 })),
+      removeBlank: () => this.setState(st => ({ blanks: Math.max(0, st.blanks - 1) })),
+      fitX4: () => this.setState(st => {
+        const fixed = this._fixed || (st.pages.length + 19);
+        const t = fixed + st.blanks;
+        const need = (4 - (t % 4)) % 4;
+        return { blanks: st.blanks + need };
+      }),
+      savePdf: () => { this.updatePageCfg(); setTimeout(() => window.print(), 80); },
+      toggleDl: () => this.setState(st => ({ dlOpen: !st.dlOpen })),
+      dlStyle: s.dlOpen ? 'display:block' : 'display:none',
+      cropOn: s.crop, marksOn: s.marks, barsOn: s.bars,
+      downloadPrint: () => this.setState({ dlOpen: false }, () => { this.updatePageCfg(); setTimeout(() => window.print(), 140); }),
+      downloadWeb: () => this.setState({ dlOpen: false, bleed: false, crop: false, marks: false, bars: false, edges: false }, () => { this.updatePageCfg(); setTimeout(() => window.print(), 140); }),
+      panelStyle: s.panelOpen ? 'display:block' : 'display:none',
+      adjustCls: s.panelOpen ? 'adjust-btn on' : 'adjust-btn',
+      togglePanel: () => this.togglePanel(),
+      onTypeInput: (e) => this.onTypeInput(e),
+      toggleEl: (e) => this.toggleEl(e),
+      setPage: (e) => this.setPage(e),
+      onPageWidth: (e) => this.onPageWidth(e),
+      resetAdjust: () => this.resetAdjust(),
+      exportSettings: () => this.exportSettings(),
+      importSettings: (e) => this.importSettings(e),
+      exportLink: () => this.exportLink(),
+      linkText: s.linked ? 'Link copied ✓' : '⧉ Copy shareable link',
+      doConnectCloud: () => this.doConnectCloud(),
+      cloudStatus: s.cloudStatus,
+      nudgePhoto: (e) => this.nudgePhoto(e),
+      saveAll: () => this.saveAll(),
+      saveCls: s.saved ? 'save-btn done' : 'save-btn',
+      saveText: s.saved ? 'SAVED ✓' : 'SAVE',
+    };
+  }
+}
+</script>
+</body>
+</html>
