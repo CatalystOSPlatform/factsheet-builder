@@ -53,7 +53,7 @@
 </div>
 
 <div style="background:#0E2266;border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 24px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-family:'Manrope',sans-serif;font-size:20px;color:#FFFFFF;user-select:none;">
-  <span style="font-weight:800;">Multi-Page Document Builder:</span>
+  <span style="font-weight:800;">Fact Sheet Builder:</span>
   <span style="font-weight:800;color:#FF7A45;">{{ appClientName }}</span>
   <div data-cos="account" style="margin-left:auto;display:none;align-items:center;gap:8px;align-self:center;font-family:'Manrope',sans-serif;"><span data-cos="email" style="font-size:12px;font-weight:600;color:#C9CFE8;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span><a data-cos="signout" href="#" style="display:flex;align-items:center;gap:6px;background:#FFFFFF;color:#081A53;font-weight:800;font-size:12px;border-radius:999px;padding:5px 13px 5px 10px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.25);text-decoration:none;" style-hover="background:#FFD23F;color:#081A53;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sign out</a></div>
 </div>
@@ -520,7 +520,7 @@
     </div>
     <div style="width:100%;max-width:860px;display:flex;flex-direction:column;gap:14px;">
       <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-        <div style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:#081A53;">Start from a Template</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:#081A53;">Start from a Fact Sheet Template</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;">
       <div onClick="{{ tplPicks.fs_quant }}" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
@@ -540,42 +540,6 @@
           <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Firm story, philosophy, process and team.</div>
         </div>
         <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#6818F8;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">2 pages</span><span style="white-space:nowrap;">Use template →</span></div>
-      </div>
-      <div onClick="{{ tplPicks.sell_sheet }}" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
-        <div style="height:96px;border-radius:9px;background:#FFF1E9;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#FD5920;border-radius:2px;"></div><div style="height:22px;background:#ffe0cf;border-radius:2px;"></div><div style="height:3px;width:85%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;gap:3px;"><i style="flex:1;height:8px;background:#ffe0cf"></i><i style="flex:1;height:8px;background:#ffe0cf"></i><i style="flex:1;height:8px;background:#ffe0cf"></i></div><div style="height:6px;width:50%;background:#FD5920;border-radius:3px;margin-top:2px;"></div></div></div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          
-          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Sell Sheet</div>
-          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">One page: hero, benefits, features, call to action.</div>
-        </div>
-        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#FD5920;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">1 page</span><span style="white-space:nowrap;">Use template →</span></div>
-      </div>
-      <div onClick="{{ tplPicks.case_study }}" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
-        <div style="height:96px;border-radius:9px;background:#FFF6E0;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#B86E00;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:70%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;gap:3px;margin-top:2px;"><b style="flex:1;font:800 8px Manrope;color:#B86E00">XX%</b><b style="flex:1;font:800 8px Manrope;color:#B86E00">$XK</b></div><div style="height:3px;width:85%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:60%;background:#d8dbe6;border-radius:2px;"></div></div></div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          
-          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Case Study</div>
-          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Challenge, solution and measurable results.</div>
-        </div>
-        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#B86E00;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">2 pages</span><span style="white-space:nowrap;">Use template →</span></div>
-      </div>
-      <div onClick="{{ tplPicks.white_paper }}" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
-        <div style="height:96px;border-radius:9px;background:#EEF1F6;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#081A53;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:95%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:88%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:92%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:70%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:60%;background:#d8dbe6;border-radius:2px;"></div></div></div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          
-          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">White Paper</div>
-          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Cover, summary, long-form sections and data.</div>
-        </div>
-        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#081A53;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">4 pages</span><span style="white-space:nowrap;">Use template →</span></div>
-      </div>
-      <div onClick="{{ tplPicks.proposal }}" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
-        <div style="height:96px;border-radius:9px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#1921FE;border-radius:2px;"></div><div style="height:3px;width:80%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;flex-direction:column;gap:2px;margin-top:2px;"><i style="height:5px;background:#d6defc"></i><i style="height:5px;background:#eef2ff"></i><i style="height:5px;background:#d6defc"></i></div><div style="height:3px;width:55%;background:#1921FE;border-radius:2px;"></div></div></div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          
-          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Proposal</div>
-          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Objectives, scope, timeline and investment.</div>
-        </div>
-        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#1921FE;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">4 pages</span><span style="white-space:nowrap;">Use template →</span></div>
       </div>
       </div>
     </div>
