@@ -1,6 +1,6 @@
 [
   {
-    "origin": ["https://document-builder-pi.vercel.app", "https://pilot-dash-ten.vercel.app", "http://localhost:3000"],
+    "origin": ["https://catalystos-document-builder-staging.vercel.app", "https://catalystos-dashboard-staging.vercel.app", "http://localhost:3000"],
     "method": ["GET", "HEAD"],
     "responseHeader": ["Content-Type", "Content-Length", "Content-Disposition"],
     "maxAgeSeconds": 3600

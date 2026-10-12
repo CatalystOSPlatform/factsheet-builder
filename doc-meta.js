@@ -1,7 +1,7 @@
 // Saved-document extras shared by Doc Home and the builders: the Approved switch (approved documents go to the client's
 // Brand Command knowledge base, where we decide whether they belong to the whole brand or to campaigns, and ask when
 // unsure) and assigning a saved document to one or more Brand Command campaigns.
-const PILOT = 'https://pilot-dash-ten.vercel.app/';
+const PILOT = 'https://catalystos-dashboard-staging.vercel.app/';
 const fbMod = () => import(new URL('./firebase-sync.js', import.meta.url).href);
 const akMod = () => import(PILOT + 'approved-knowledge.js');
 // Shared Saved Files bar index (same entry is updated when approval or campaigns change).

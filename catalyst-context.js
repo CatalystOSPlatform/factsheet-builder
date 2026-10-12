@@ -6,7 +6,7 @@
 (function () {
   if (window.CosCtx) return;
   var KEY = 'cosCtx';
-  var DASH = 'https://pilot-dash-ten.vercel.app/COS.dc.html';
+  var DASH = 'https://catalystos-dashboard-staging.vercel.app/COS.dc.html';
   var ctx = {};
   try { ctx = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { ctx = {}; }
   delete ctx.dashboardUrl; delete ctx.agencySlug;

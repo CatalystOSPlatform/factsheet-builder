@@ -30,9 +30,9 @@
   @media (max-width:1180px){[data-exgrid]{grid-template-columns:240px minmax(0,1fr)!important}[data-exright]{grid-column:1 / -1;position:static!important}}
   @media (max-width:760px){[data-exgrid]{grid-template-columns:minmax(0,1fr)!important;padding:16px!important}[data-exleft]{position:static!important;max-height:none!important}[data-exeditor]{grid-column:auto!important;position:static!important}}
 </style>
-<script>(function(){var h=location.hostname;if(!/vercel\.app$/i.test(h)&&!/[?&]auth=1/.test(location.search)){window.COS_AUTH_SKIPPED=true;return;}var s=document.createElement('script');s.src='https://pilot-dash-ten.vercel.app/cos-app-auth.js';['data-require','data-no-back','data-no-button'].forEach(function(a){s.setAttribute(a,'')});s.setAttribute('data-home','https://pilot-dash-ten.vercel.app/COS.dc.html');document.head.appendChild(s);})();</script>
-<link rel="stylesheet" href="https://pilot-dash-ten.vercel.app/catalyst-ui.css">
-<script src="https://pilot-dash-ten.vercel.app/saved-bar.js"></script>
+<script>(function(){var h=location.hostname;if(!/vercel\.app$/i.test(h)&&!/[?&]auth=1/.test(location.search)){window.COS_AUTH_SKIPPED=true;return;}var s=document.createElement('script');s.src='https://catalystos-dashboard-staging.vercel.app/cos-app-auth.js';['data-require','data-no-back','data-no-button'].forEach(function(a){s.setAttribute(a,'')});s.setAttribute('data-home','https://catalystos-dashboard-staging.vercel.app/COS.dc.html');document.head.appendChild(s);})();</script>
+<link rel="stylesheet" href="https://catalystos-dashboard-staging.vercel.app/catalyst-ui.css">
+<script src="https://catalystos-dashboard-staging.vercel.app/saved-bar.js"></script>
 <style>
   /* CatalystOS task bar (style guide): Saved Files and this app's Saved Documents at the far left; every other action right-aligned, Save last */
   [data-cb-saved-left]{display:flex!important;align-items:center;gap:8px;margin-right:auto!important;flex:none}
@@ -63,7 +63,7 @@
 <div style="width:100%;min-height:100vh;background-color:#f5f6f8;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;color:#3a4159;">
 
 <div class="no-print" style="position:relative;display:flex;align-items:center;justify-content:center;gap:11px;padding:12px 20px;background:radial-gradient(120% 180% at 50% -40%, #12296f 0%, #081A53 60%);border-bottom:2px solid;border-image:linear-gradient(90deg,#1921FE,#6818F8,#C1229C,#FD5920,#FDA71A) 1;font-family:'Manrope',sans-serif;">
-  <a href="https://pilot-dash-ten.vercel.app/" data-cos="back" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:4px;font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;color:#FFFFFF;text-decoration:none;background:linear-gradient(180deg,#FF7A45 0%,#E8460F 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,0.35),inset 0 -2px 3px rgba(140,30,0,0.35),0 3px 8px -3px rgba(232,70,15,0.6);border-radius:7px;padding:0 9px;height:22px;box-sizing:border-box;overflow:visible;white-space:nowrap;" style-hover="background:linear-gradient(180deg,#FF8F5F 0%,#FF561F 100%);color:#FFFFFF;"><img src="icons/rocket4.png" alt="" style="width:40px;height:40px;object-fit:contain;transform:scaleX(-1);flex:none;margin:-9px -4px -9px -3px;">Back to Dashboard</a>
+  <a href="https://catalystos-dashboard-staging.vercel.app/" data-cos="back" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:4px;font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;color:#FFFFFF;text-decoration:none;background:linear-gradient(180deg,#FF7A45 0%,#E8460F 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,0.35),inset 0 -2px 3px rgba(140,30,0,0.35),0 3px 8px -3px rgba(232,70,15,0.6);border-radius:7px;padding:0 9px;height:22px;box-sizing:border-box;overflow:visible;white-space:nowrap;" style-hover="background:linear-gradient(180deg,#FF8F5F 0%,#FF561F 100%);color:#FFFFFF;"><img src="icons/rocket4.png" alt="" style="width:40px;height:40px;object-fit:contain;transform:scaleX(-1);flex:none;margin:-9px -4px -9px -3px;">Back to Dashboard</a>
   <span style="width:25px;height:25px;border-radius:8px;background:linear-gradient(135deg,#1921FE,#6818F8 38%,#C1229C 64%,#FD5920 84%,#FDA71A);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#FFFFFF;box-shadow:0 3px 10px rgba(105,24,248,0.5);">OS</span>
   <span class="cos-pw" style="font-size:10.5px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#8B95C4;">Powered by</span>
   <span style="font-size:14px;font-weight:700;color:#FFFFFF;">Catalyst<span style="color:#C1229C;">OS</span></span>
@@ -4239,5 +4239,5 @@ class Component extends DCLogic {
   }
 }
 </script>
-</body>
+<script data-cos-staging>(function(){function a(){if(document.getElementById("cos-staging-flag"))return;var d=document.createElement("div");d.id="cos-staging-flag";d.setAttribute("role","note");d.textContent="STAGING · test data only";d.style.cssText="position:fixed;left:50%;bottom:8px;transform:translateX(-50%);z-index:2147483646;background:#111827;color:#FDE68A;font:800 11px/1 Inter,system-ui,sans-serif;letter-spacing:.08em;padding:6px 12px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.3);pointer-events:none";document.body.appendChild(d);}if(document.body)a();else document.addEventListener("DOMContentLoaded",a);})();</script></body>
 </html>

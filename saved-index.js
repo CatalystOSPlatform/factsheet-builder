@@ -2,8 +2,8 @@
 // This only adds an index entry; the document itself is still saved exactly as before (browser + CatalystOS database).
 // The one line that differs between the Document Builder and the Fact Sheet Builder is APP / LIVE below (this is the Fact Sheet Builder).
 export const APP = 'factsheets';
-export const LIVE = 'https://factsheet-builder.vercel.app/';
-const SF = () => import('https://pilot-dash-ten.vercel.app/saved-files.js');
+export const LIVE = 'https://catalystos-factsheet-builder-staging.vercel.app/';
+const SF = () => import('https://catalystos-dashboard-staging.vercel.app/saved-files.js');
 function ctx() { try { return (window.CosCtx && window.CosCtx.get && window.CosCtx.get()) || {}; } catch (e) { return {}; } }
 export function clientOf(v, fallback) { return (v && v.cloud && v.cloud.clientId) || (v && v.clientId) || fallback || ctx().clientId || ''; }
 export function openUrlFor(v, clientId) {

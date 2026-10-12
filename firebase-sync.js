@@ -3,10 +3,10 @@
 // simple read/write helpers other apps/pages can reuse against the same data.
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAAjSItlAtEYLKsQWazjCZ2QUSSvT7JKkc",
-  authDomain: "catalyst-brand-command.firebaseapp.com",
-  projectId: "catalyst-brand-command",
-  storageBucket: "catalyst-brand-command.firebasestorage.app",
+  apiKey: "AIzaSyA0s678NudXhvRHTNVKRje_SQwQX2_mU3E",
+  authDomain: "catalystos-staging.firebaseapp.com",
+  projectId: "catalystos-staging",
+  storageBucket: "catalystos-staging.firebasestorage.app",
 };
 
 // Wait for the CatalystOS sign-in (cos-app-auth.js) so Firestore reads run as the signed-in agency user.
