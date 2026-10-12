@@ -71,7 +71,7 @@
   .app.view-spread .book{grid-template-columns:repeat(2,max-content)}
   @media screen{ .book{zoom:1.18} }
   .media{position:relative;display:flow-root}
-  @media screen{ .book,.empty-start{background-color:#f4f3f8;background-image:radial-gradient(#d6d1e6 1px,transparent 1px);background-size:14px 14px} }
+  @media screen{ .book,.empty-start{background-color:#f4f3f8;} }
   @media screen{ .book > .media{content-visibility:auto;contain-intrinsic-size:auto 4in auto 5.4in} .book > .media.pm-hl-wrap{content-visibility:visible} }
   @media print{ .book > .media{content-visibility:visible!important} }
   .book.rz > .media{content-visibility:visible!important}
@@ -221,9 +221,9 @@
   .badge.warn{background:#fff4e2;color:#a0600a;border:1px solid #f6d59c}
   .pdf-btn{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #d8d7d3;color:#3a4159;font:600 12.5px 'Inter';letter-spacing:0;padding:7px 13px;border-radius:7px}
   .pdf-btn:hover{background:#f7f7f5}
-  .save-btn,.tb-out .save-btn{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#FDA71A 0%,#FD5920 100%);border:0;color:#fff;font:700 12.5px 'Inter';letter-spacing:0;padding:7px 14px;border-radius:7px;box-shadow:0 2px 6px rgba(253,89,32,.28)}
-  .save-btn:hover{background:linear-gradient(135deg,#FDA71A 0%,#FD5920 100%);filter:brightness(1.05)}
-  .save-btn.done{background:linear-gradient(135deg,#FDA71A 0%,#FD5920 100%);box-shadow:0 2px 6px rgba(253,89,32,.28)}
+  .save-btn,.tb-out .save-btn{display:flex;align-items:center;gap:7px;background:linear-gradient(180deg,#C94310 0%,#A8360A 100%);border:0;color:#fff;font:700 12.5px 'Inter';letter-spacing:0;padding:7px 14px;border-radius:7px;box-shadow:0 2px 6px rgba(168,54,10,.28)}
+  .save-btn:hover{background:linear-gradient(180deg,#C94310 0%,#A8360A 100%);filter:brightness(1.05)}
+  .save-btn.done{background:linear-gradient(180deg,#C94310 0%,#A8360A 100%);box-shadow:0 2px 6px rgba(168,54,10,.28)}
   .tb-sec{flex-direction:row;align-items:center;gap:8px;padding:5px 8px 5px 10px}
   .tb-sec .tb-label{white-space:nowrap}
   .toolbar{padding:16px 16px;gap:6px 8px}
@@ -311,7 +311,7 @@
   .dp-win.wide{width:min(940px,calc(100vw - 40px))!important;max-width:none!important}
   .dv-body{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;padding:16px 18px 18px;max-height:calc(100vh - 140px);overflow:auto}
   .dv-left{display:flex;flex-direction:column;gap:8px;min-width:0}
-  .dv-prev{height:250px;border:1px solid #e0e3ef;border-radius:10px;background:#ECEAF2;background-image:radial-gradient(#cfcadd 1px,transparent 1px);background-size:14px 14px;display:flex;align-items:center;justify-content:center;padding:14px}
+  .dv-prev{height:250px;border:1px solid #e0e3ef;border-radius:10px;background:#ECEAF2;display:flex;align-items:center;justify-content:center;padding:14px}
   .dv-prev > div{background:#fff;box-shadow:0 2px 10px rgba(8,26,83,.12);width:100%;max-width:440px;aspect-ratio:1.45}
   .dv-grid-hd{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .dv-grid-hd .ed-lb{margin:0 auto 0 0}
@@ -1057,7 +1057,7 @@
   .ed-x{background:none;border:0;color:#fff;cursor:pointer;padding:4px;display:flex;opacity:.8}
   .ed-x:hover{opacity:1}
   .ed-body{display:grid;grid-template-columns:minmax(0,1fr) 250px;min-height:0;flex:1;overflow:hidden}
-  .ed-stage-wrap{background:#ECEAF2;background-image:radial-gradient(#cfcadd 1px,transparent 1px);background-size:14px 14px;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow:auto;min-height:320px}
+  .ed-stage-wrap{background:#ECEAF2;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow:auto;min-height:320px}
   .ed-stage{position:relative;background:#fff;box-shadow:0 2px 12px rgba(8,26,83,.14);transform-origin:top left;cursor:default;user-select:none}
   .ed-stage [data-ek]{cursor:move}
   .ed-stage [data-ek]:hover{outline:1px dashed rgba(104,24,248,.6);outline-offset:1px}
@@ -1181,20 +1181,26 @@
 <link rel="stylesheet" href="https://pilot-dash-ten.vercel.app/catalyst-ui.css">
 <script src="https://pilot-dash-ten.vercel.app/saved-bar.js"></script>
 <style>
-  /* CatalystOS saved row: shared Saved Files bar (all apps) + this app's Saved Documents list, same look */
-  [data-cb-saved-row]{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#FFFFFF;border-bottom:1px solid rgba(8,26,83,0.08);padding:0 24px 0 0;min-height:54px}
-  [data-cb-saved-row] [data-cos="saved-mount"]{display:flex}
-  [data-cb-saved-row] .cos-savedbar{border-bottom:0!important;background:transparent!important;padding:10px 0 10px 24px!important}
+  /* CatalystOS task bar (style guide): Saved Files and this app's Saved Documents at the far left; every other action right-aligned, Save last */
+  [data-cb-saved-left]{display:flex!important;align-items:center;gap:8px;margin-right:auto!important;flex:none}
+  [data-cb-saved-left] [data-cos="saved-mount"]{display:flex}
+  [data-cb-saved-left] .cos-savedbar{border:0!important;background:transparent!important;padding:0!important}
+  [data-cos-taskbar]{flex-wrap:wrap!important;row-gap:8px!important}
+  [data-cb-saved-left]{flex-wrap:wrap;max-width:100%}
+  @media (max-width:520px){[data-cb-saved-left] .cb-saved-docs{flex-wrap:wrap;height:auto!important;min-height:34px;padding:6px 10px!important;white-space:normal!important;row-gap:4px}}
   .cb-saved-docs:focus-visible,.cos-savedbar-btn:focus-visible{outline:3px solid #FFD23F!important;outline-offset:2px}
   [data-cos-taskbar] button,[data-cos-taskbar] a{text-transform:none!important;letter-spacing:0!important}
   [data-cos-taskbar] > .tb-spacer,[data-cos-taskbar] > div:empty{display:none!important}
   [data-cos-taskbar] button[data-cos-primary]{min-width:0!important;width:auto!important}
   /* Task bar (style guide): white 32px buttons, one orange primary. Keeps the Download menu working. */
   .toolbar[data-cos-taskbar]{overflow:visible!important;flex-wrap:wrap!important}
-  .toolbar[data-cos-taskbar] .tb-actions{margin-left:0!important;flex:1 1 auto!important;justify-content:flex-start!important;flex-wrap:wrap}
+  .toolbar[data-cos-taskbar] .tb-actions{margin-left:0!important;flex:0 1 auto!important;justify-content:flex-end!important;flex-wrap:wrap}
   .toolbar[data-cos-taskbar] .tb-actions button{text-transform:none!important;letter-spacing:0!important}
-  .toolbar[data-cos-taskbar] .tb-actions > button[data-cos-primary]{margin-left:auto!important;min-width:0!important}
   .toolbar[data-cos-taskbar] .tb-actions .dl-wrap{display:flex}
+  /* Compact spacing so Saved Files, Saved Documents and every action fit on one row on a laptop; wraps (still right-aligned) when narrower */
+  .toolbar[data-cos-taskbar],.toolbar[data-cos-taskbar] .tb-actions{gap:6px!important}
+  .toolbar[data-cos-taskbar] .tb-actions button:not([data-cos-keep]){padding:0 10px!important}
+  [data-cb-saved-left] .cb-saved-docs{gap:6px!important}
 </style>
 <script src="./catalyst-context.js"></script>
 </helmet>
@@ -1229,15 +1235,14 @@
     <span style="position:absolute;right:0;top:0;bottom:0;width:40px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(8,26,83,0.14);pointer-events:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#081A53" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
   </div>
 </div>
-<div class="no-print" data-cb-saved-row="">
-  <div data-cos="saved-mount" data-cos-app="factsheets"></div>
-  <button onClick="{{ openVersions }}" title="Browse this app’s saved documents, Word files and templates" type="button" class="cb-saved-docs" style="display:inline-flex;align-items:center;gap:8px;height:34px;box-sizing:border-box;padding:0 8px 0 12px;border-radius:10px;border:0;background:#1A6B2E;color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 4px 12px rgba(26,107,46,0.22);" style-hover="background:#155A26"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>{{ savedLabel }}<span onClick="{{ openVerDocs }}" title="Show saved documents" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#C2410C;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>PDF</span><span>{{ versionCount }}</span></span><span onClick="{{ openVerWord }}" title="Show Word documents" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#6818F8;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>Word</span><span>{{ wordCount }}</span></span><span onClick="{{ openVerTpls }}" title="Show my templates" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#15803D;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>Templates</span><span>{{ savedTplCount }}</span></span></button>
-</div>
   </div>
   <div class="chrome no-print">
   <!-- ===================== TOOLBAR ===================== -->
   <div class="toolbar" data-cos-taskbar="">
-    
+    <div data-cb-saved-left="">
+      <div data-cos="saved-mount" data-cos-app="factsheets"></div>
+      <button data-cos-keep="" onClick="{{ openVersions }}" title="Browse this app’s saved documents, Word files and templates" type="button" class="cb-saved-docs" style="display:inline-flex;align-items:center;gap:8px;height:34px;box-sizing:border-box;padding:0 8px 0 12px;border-radius:10px;border:0;background:#1A6B2E;color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 4px 12px rgba(26,107,46,0.22);" style-hover="background:#155A26"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>{{ savedLabel }}<span onClick="{{ openVerDocs }}" title="Show saved documents" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#C2410C;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>PDF</span><span>{{ versionCount }}</span></span><span onClick="{{ openVerWord }}" title="Show Word documents" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#6818F8;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>Word</span><span>{{ wordCount }}</span></span><span onClick="{{ openVerTpls }}" title="Show my templates" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#15803D;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>Templates</span><span>{{ savedTplCount }}</span></span></button>
+    </div>
     <div class="no-print" style="flex:none;align-self:center;display:flex;align-items:center;gap:8px;margin-left:12px;"></div>
     <span class="tb-spacer"></span>
     <div class="tb-actions" style="flex:none;align-self:center;margin-left:auto;display:flex;align-items:center;gap:8px;">
@@ -1614,7 +1619,7 @@
           <div style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#081A53;">Upload and Rebuild a Document</div>
           <div style="font-size:13.5px;line-height:1.5;color:#5a6178;text-wrap:pretty;">Upload a PDF, PowerPoint, Word or text file and rebuild, update or rebrand it.</div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#FD5920;">Upload Document <span>→</span></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#C94310;">Upload Document <span>→</span></div>
       </a>
     </div>
     <div style="width:100%;max-width:860px;display:flex;flex-direction:column;gap:14px;">
@@ -2458,7 +2463,7 @@
     <div style="font-size:13.5px;line-height:1.6;color:#3a4159;text-wrap:pretty;">You're going back to the templates. <b style="color:#081A53;">Your work on this document will be lost if you don't save it first.</b></div>
     <div style="display:flex;flex-direction:column;gap:8px;">
       <sc-if value="{{ leaveHasSaved }}" hint-placeholder-val="{{ false }}"><button onClick="{{ leaveSaveOver }}" style="height:42px;border:0;border-radius:9px;background:#6818F8;color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;cursor:pointer;">Save Over Existing &amp; Continue</button></sc-if>
-      <button onClick="{{ leaveSaveNew }}" style="height:42px;border:0;border-radius:9px;background:#FD5920;color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;cursor:pointer;">Save as New Version &amp; Continue</button>
+      <button onClick="{{ leaveSaveNew }}" style="height:42px;border:0;border-radius:9px;background:linear-gradient(180deg,#C94310 0%,#A8360A 100%);color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;cursor:pointer;">Save as New Version &amp; Continue</button>
       <button onClick="{{ leaveNoSave }}" style="height:40px;border:1.5px solid #d8d7d3;border-radius:9px;background:#FFFFFF;color:#B42318;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;">Leave Without Saving</button>
       <button onClick="{{ leaveCancel }}" style="height:36px;border:0;background:none;color:#5a6178;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;">Cancel</button>
     </div>
@@ -7247,7 +7252,7 @@ class Component extends DCLogic {
       versionsList: [], imBrandToggle: () => this.setState(z => ({ imBrandOpen: !z.imBrandOpen })), imBrandChev: 'flex:none;transition:transform .15s;transform:rotate(' + (this.state.imBrandOpen ? '90' : '0') + 'deg)', docPgCount: (() => { const n = (this._pageList || []).filter(q => !(s.deletedPages || []).includes(q.pid)).length; return n + (n === 1 ? ' page' : ' pages') + ' in this document'; })(), ...(() => { const S = on => 'height:28px;border:0;border-radius:6px;font-family:Manrope,sans-serif;font-size:10.5px;font-weight:800;cursor:pointer;' + (on ? 'background:#6818F8;color:#FFFFFF;box-shadow:0 2px 6px rgba(104,24,248,.25);' : 'background:transparent;color:#081A53;'); const set = (k, v) => { this.setState({ [k]: v, saved: false }, () => { this._hdrKey = null; this._ftrKey = null; try { this.syncHeaders(); this.syncFooters(); } catch (e) {} }); try { localStorage.setItem('cb_' + k, v ? '1' : ''); } catch (e) {} }; const hN = !!s.hdrNoCover, fN = !!s.ftrNoCover; return { hdcAllPg: () => set('hdrNoCover', false), hdcNoCov: () => set('hdrNoCover', true), hdcAllPgStyle: S(!hN), hdcNoCovStyle: S(hN), ftcAllPg: () => set('ftrNoCover', false), ftcNoCov: () => set('ftrNoCover', true), ftcAllPgStyle: S(!fN), ftcNoCovStyle: S(fN) }; })(), apToastOn: !!s.apToast, apToast: s.apToast || '',
       versionGroups: (() => { const out = []; const dm = this.isDemo(); const tab = s.vgTab === 'word' || s.vgTab === 'tpl' ? s.vgTab : 'new'; const vl = (s.versions || this.loadVersions()).filter(v => (dm ? !!v.demo : !v.demo) && tab === 'new').sort((a, b) => (b.savedAt || b.t || 0) - (a.savedAt || a.t || 0)); vl.forEach((v, i0) => { const i = this.loadVersions().findIndex(x => x.t === v.t); const d = new Date(v.savedAt || v.t || Date.now()); const date = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); let g = out.find(x => x.date === date); if (!g) { g = { date, items: [] }; out.push(g); }
         g.items.push({ title: v.title || ('Version ' + (vl.length - i)), time: d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }), pages: (String(v.sub || '').split('· ')[1] || ''), ...(() => { const th = v.thumb || localStorage.getItem('cbThumb:' + v.t) || ''; const ok = /^(data:image\/(jpeg|png);base64,|https:)/.test(th) && th.length > 1500 || /^https:/.test(th); return { thumb: th, hasThumb: ok, noThumb: !ok }; })(),
-          pathLabel: v.kind === 'existing' ? 'Rebuilt' : 'New', pathColor: v.kind === 'existing' ? 'background:#FD5920' : 'background:#6818F8',
+          pathLabel: v.kind === 'existing' ? 'Rebuilt' : 'New', pathColor: v.kind === 'existing' ? 'background:linear-gradient(180deg,#C94310 0%,#A8360A 100%)' : 'background:#6818F8',
           ...this.shCard(v), restoreLbl: s.vgPick ? 'Use This Text' : 'Restore', restore: () => s.vgPick ? this.pickTextFlow(() => this.versionTextBlocks(v), v.title) : this.restoreVersion(v), remove: () => this.deleteVersion(this.loadVersions().findIndex(z => z.t === v.t)), duplicate: async () => { const L = this.loadVersions(); if (!L[i]) return; try { const m = await import(new URL('./share-agency.js', location.href).href); const r = await m.duplicateDocs([L[i]]); if (r.failed.length) window.alert('Could not duplicate: ' + r.failed.join(', ')); } catch (err) { window.alert('Could not duplicate this document.'); } this._vCache = null; this.setState({ versions: this.loadVersions(), vConfirm: null }); }, rename: e => this.renameVersion(i, e.target.value), apAria: v.approved ? 'true' : 'false', apLbl: v.approved ? 'Approved' : 'Approve', apLblStyle: 'font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:' + (v.approved ? '#1FA35C' : '#8A93A8'), apTrack: 'position:relative;width:28px;height:16px;flex:none;border-radius:999px;transition:background .15s;background:' + (v.approved ? '#1FA35C' : '#D5D9E6'), apKnob: 'position:absolute;top:3px;left:' + (v.approved ? '15px' : '3px') + ';width:10px;height:10px;border-radius:50%;background:#FFFFFF;transition:left .15s;', apToggle: e => { e && e.stopPropagation && e.stopPropagation(); this.docApprove(v, !v.approved); }, campPick: e => { e && e.stopPropagation && e.stopPropagation(); this.docAssignCamps(v); }, campLbl: (() => { const ids = v.campaignIds || []; if (!ids.length) return 'Assign to Campaigns'; const L = (s.teamCamps && s.teamCamps.list) || []; const nm = L.filter(c => ids.includes(c.id)).map(c => c.name); return 'Campaigns: ' + (nm.length ? nm.join(', ') : ids.length); })(),
           confirming: s.vConfirm === v.t, cardCls: 'vg-card' + (s.vConfirm === v.t ? ' confirm' : ''),
           askDelete: () => this.setState({ vConfirm: v.t }), makeTpl: () => this.makeTemplate(this.loadVersions().findIndex(z => z.t === v.t)), cancel: () => this.setState({ vConfirm: null }) }); }); return out; })(),

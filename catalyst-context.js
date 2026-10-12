@@ -2,7 +2,7 @@
 // COS opens apps with ?client=<id>&org=<id>&app=factsheetbuilder (older links: ?brand=<base64 JSON>).
 // Keeps agency (org) + client in localStorage so every page shares them, fills
 // [data-cos="client"|"agency"|"email"], wires [data-cos="back"|"signout"] and the
-// select[data-cos="picker"] client picker. Clients are always the signed-in agency's own.
+// select[data-cos="picker"] client picker (switches client in this app). Clients are always the signed-in agency's own.
 (function () {
   if (window.CosCtx) return;
   var KEY = 'cosCtx';
@@ -39,6 +39,8 @@
   if (next.clientId && next.clientId !== ctx.clientId) ctx.clientName = '';
   Object.keys(next).forEach(function (k) { if (next[k]) ctx[k] = next[k]; });
   save();
+  // Never reopen one client's working document for another client.
+  try { if (ctx.clientId) { var pc = localStorage.getItem('cbProjectClient'); if (pc && pc !== ctx.clientId && localStorage.getItem('cbProjectOpen') === '1') localStorage.setItem('cbProjectOpen', '0'); } } catch (e) {}
   try { var ac2 = JSON.parse(localStorage.getItem('cos-app-ctx') || '{}') || {}; if (ctx.orgId) ac2.org = ctx.orgId; if (ctx.clientId) ac2.client = ctx.clientId; localStorage.setItem('cos-app-ctx', JSON.stringify(ac2)); } catch (e) {}
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(ctx)); } catch (e) {} }
@@ -137,6 +139,7 @@
     var h = dashUrl();
     document.querySelectorAll('[data-cos="back"]').forEach(function (el) { if (el.getAttribute('href') !== h) el.setAttribute('href', h); });
     paintSaved();
+    try { if (ctx.clientId && !ctx.personal && localStorage.getItem('cbProjectOpen') === '1' && localStorage.getItem('cbProjectClient') !== ctx.clientId) localStorage.setItem('cbProjectClient', ctx.clientId); } catch (e) {}
   }
   // Shared CatalystOS Saved Files bar (saved-bar.js): every app's files for this client. Kept in step with the client picker.
   var savedSig = '';
@@ -165,13 +168,32 @@
     setClient: function (id, name) { if (!id || (id === ctx.clientId && (!name || name === ctx.clientName))) return; ctx.clientId = id; if (name) ctx.clientName = name; save(); emit(); }
   };
 
-  // Switching client in the app picker opens that client's dashboard (CatalystOS rule: apps never reload with a new client).
+  // Switching client in the app picker switches right here, in this app (CatalystOS style guide): the page reopens for the
+  // new client, so nothing of the old client's work stays on screen (clients never mix). The editor goes to the app's
+  // start page for that client; an open document with unsaved changes asks first.
+  function pageFile() { try { return decodeURIComponent(location.pathname.split('/').pop() || ''); } catch (e) { return ''; } }
+  function openWork() {
+    try {
+      var a = window.__cbApp; if (a && a.state && a.state.projectOpen && a.isDirty && a.isDirty()) return true;
+      var x = window.__exApp; if (x && x.state && (x.state.pdfPages || []).length) return true;
+    } catch (e) {}
+    return false;
+  }
+  function switchClient(id, name) {
+    if (openWork() && !window.confirm('Switch to ' + (name || 'this client') + '? The document you have open belongs to ' + (ctx.clientName || 'the current client') + '. Changes you have not saved will be lost unless you click Cancel, then Save Document.')) return false;
+    var u = new URL(location.href);
+    ['project', 'restore', 'resume', 'version', 'start', 'tpl', 'utpl', 'txt', 'new', 'brand', 'clientName'].forEach(function (k) { u.searchParams.delete(k); });
+    u.hash = '';
+    if (/Catalyst Document Builder/i.test(pageFile())) { u.pathname = u.pathname.replace(/[^\/]*$/, encodeURIComponent('Catalyst Doc Home.dc.html')); try { localStorage.setItem('cbProjectOpen', '0'); } catch (e) {} }
+    u.searchParams.set('client', id); if (ctx.orgId) u.searchParams.set('org', ctx.orgId); if (name) u.searchParams.set('clientName', name);
+    try { var s2 = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; s2.clientId = id; s2.clientName = name || ''; localStorage.setItem(KEY, JSON.stringify(s2)); } catch (e) {}
+    go(u.href); return true;
+  }
   document.addEventListener('change', function (e) {
     var sel = e.target; if (!sel || !sel.matches || !sel.matches('select[data-cos="picker"]')) return;
     var id = sel.value; if (!id || id === ctx.clientId) return;
     var m = (clients || []).find(function (c) { return c.id === id; });
-    window.CosCtx.setClient(id, m ? m.name : '');
-    go(dashUrl(id));
+    if (!switchClient(id, m ? m.name : '')) { sel.value = ctx.clientId || ''; sel.__cosSig = ''; paint(); }
   }, true);
   document.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('[data-cos="back"],[data-cos="signout"]'); if (!t) return;
