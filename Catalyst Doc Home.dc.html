@@ -240,23 +240,14 @@ class Component extends DCLogic {
   idb(name, store) { return new Promise((res, rej) => { const r = indexedDB.open(name, 1); r.onupgradeneeded = () => r.result.createObjectStore(store); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
   async makeTpl(t) {
     const v = this.loadV().find(x => x.t === t); if (!v) return;
-    const name = (window.prompt('Name this template. It will appear under My Templates across the app.', v.title || 'My Template') || '').trim(); if (!name) return;
-    const isEx = v.kind === 'existing'; let data = isEx ? (v.ex ? { ex: v.ex } : null) : (v.app ? { app: v.app, photos: v.photos } : null);
-    if (!data && v.exIdb) { try { const db = await this.idb('cbVersionData', 'ex'); const d = await new Promise(res => { const q = db.transaction('ex', 'readonly').objectStore('ex').get(String(v.exIdb === true ? v.t : v.exIdb)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); }); if (d) data = isEx ? { ex: d.ex || d } : d; } catch (e) {} }
-    if (!data && v.cloud) { try { const fb = await import(new URL('./firebase-sync.js', location.href).href); const d = await fb.loadDocVersionSnapshot(v.cloud); if (d) data = isEx ? { ex: d.ex || d } : d; } catch (e) {} }
-    if (!data || !(isEx ? data.ex : data.app)) { window.alert('This document\'s data is no longer available, so it can\'t be made into a template.'); return; }
-    const id = 'ut' + Date.now();
-    try { const db = await this.idb('cbUserTemplates', 't'); await new Promise((res, rej) => { const tx = db.transaction('t', 'readwrite'); tx.objectStore('t').put(isEx ? { kind: 'existing', ex: data.ex } : { kind: 'new', app: data.app, photos: data.photos || null }, id); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); } catch (e) { window.alert('Could not save the template.'); return; }
-    const pages = (String(v.sub || '').split('\u00b7 ')[1] || '').trim(); const th = v.thumb || localStorage.getItem('cbThumb:' + v.t) || '';
-    let L = []; try { L = JSON.parse(localStorage.getItem('cbUserTemplates') || '[]'); } catch (e) {} L = L.filter(x => x.name !== name);
-    L.unshift({ id, kind: isEx ? 'existing' : 'new', name, desc: 'Saved from ' + (v.title || 'a document') + (pages ? ' \u00b7 ' + pages : ''), thumb: /^data:image\//.test(th) && th.length < 90000 ? th : '', savedAt: Date.now() });
-    try { localStorage.setItem('cbUserTemplates', JSON.stringify(L)); } catch (e) { L.forEach(x => { x.thumb = ''; }); try { localStorage.setItem('cbUserTemplates', JSON.stringify(L)); } catch (er) { window.alert('Not enough storage to save this template.'); return; } }
+    const name = await (await this.docMeta()).makeTemplate(v); if (!name) return;
     this.setState(s => ({ vTick: s.vTick + 1 })); window.alert('Saved as a template: ' + name + '. It now appears under My Templates.');
   }
-  componentDidMount() { this._au = () => this.forceUpdate(); window.addEventListener('catalyst-auth', this._au); window.addEventListener('cos-ctx', this._au); if (window.CatalystAuth && window.CatalystAuth.ready) window.CatalystAuth.ready.then(this._au).catch(() => {}); this._auT = setTimeout(this._au, 1500);
+  componentDidMount() { import(new URL('./saved-actions.js', location.href).href).catch(e => console.warn('Saved Files actions', e)); this._sfc = () => { this._rows = null; this.setState(s => ({ vTick: (s.vTick || 0) + 1 })); }; window.addEventListener('cb-saved-changed', this._sfc);
+    this._au = () => this.forceUpdate(); window.addEventListener('catalyst-auth', this._au); window.addEventListener('cos-ctx', this._au); if (window.CatalystAuth && window.CatalystAuth.ready) window.CatalystAuth.ready.then(this._au).catch(() => {}); this._auT = setTimeout(this._au, 1500);
     this._pull = () => { clearTimeout(this._pT); this._pT = setTimeout(() => { const u = window.CatalystAuth && window.CatalystAuth.user && window.CatalystAuth.user(); if (!u || this._pulling) return; this._pulling = true; this.mergeCloud().catch(() => {}).then(() => { this._pulling = false; }); }, 700); };
     window.addEventListener('catalyst-auth', this._pull); window.addEventListener('cos-ctx', this._pull); window.addEventListener('focus', this._pull); if (window.CatalystAuth && window.CatalystAuth.ready) window.CatalystAuth.ready.then(this._pull).catch(() => {}); setTimeout(this._pull, 1600); }
-  componentWillUnmount() { window.removeEventListener('catalyst-auth', this._au); window.removeEventListener('cos-ctx', this._au); clearTimeout(this._auT); clearTimeout(this._pT); window.removeEventListener('catalyst-auth', this._pull); window.removeEventListener('cos-ctx', this._pull); window.removeEventListener('focus', this._pull); }
+  componentWillUnmount() { window.removeEventListener('cb-saved-changed', this._sfc); window.removeEventListener('catalyst-auth', this._au); window.removeEventListener('cos-ctx', this._au); clearTimeout(this._auT); clearTimeout(this._pT); window.removeEventListener('catalyst-auth', this._pull); window.removeEventListener('cos-ctx', this._pull); window.removeEventListener('focus', this._pull); }
   firstName() {
     let u = null; try { u = window.CatalystAuth && window.CatalystAuth.user && window.CatalystAuth.user(); } catch (e) {}
     const cap = w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '';
@@ -283,13 +274,8 @@ class Component extends DCLogic {
     const v = this.loadV().find(x => x.t === t); if (!v) return;
     if (!window.confirm('Permanently delete "' + (v.title || 'this document') + '"?\n\nThis removes it from the CatalystOS database for everyone in this agency. It cannot be undone.')) return;
     this.setState({ vBusy: t });
-    try {
-      if (v.cloud && v.cloud.id) { const fb = await import(new URL('./firebase-sync.js', location.href).href); await fb.deleteDocVersion(v.cloud); }
-    } catch (e) { console.warn('Delete failed', e); this.setState({ vBusy: null }); window.alert('Could not delete this document from the CatalystOS database. Check your connection and try again.'); return; }
-    try { const D = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); if (!D.includes(t)) { D.push(t); localStorage.setItem('cbDeletedVersions', JSON.stringify(D.slice(-500))); } } catch (e) {}
-    const L = this.loadV().filter(x => x.t !== t); try { localStorage.setItem('cbVersions', JSON.stringify(L)); localStorage.removeItem('cbThumb:' + t); } catch (e) {}
-    const k = v.exIdb === true ? t : null; if (k && !L.some(x => x.exIdb === t)) { try { const r = indexedDB.open('cbVersionData', 1); r.onsuccess = () => { try { r.result.transaction('ex', 'readwrite').objectStore('ex').delete(String(k)); } catch (e) {} }; } catch (e) {} }
-    import(new URL('./saved-index.js', location.href).href).then(m => m.removeVersion(v)).catch(() => {});
+    try { await (await this.docMeta()).deleteVersion(v); }
+    catch (e) { console.warn('Delete failed', e); this.setState({ vBusy: null }); window.alert('Could not delete this document from the CatalystOS database. Check your connection and try again.'); return; }
     this._rows = null; this.setState(s => ({ vBusy: null, vTick: s.vTick + 1 }));
   }
   inWs(v) { if (!v) return false; if (v.sharedFrom || (v.cloud && v.cloud.shared)) return true; const o = (window.CosCtx && window.CosCtx.get && window.CosCtx.get().orgId) || ''; const vo = v.org || (v.cloud && v.cloud.orgId) || ''; return !vo || !o || vo === o; }

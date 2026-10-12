@@ -11,13 +11,18 @@ export function openUrlFor(v, clientId) {
   const p = new URLSearchParams(); p.set('restore', String(v.t)); if (clientId) p.set('client', clientId); const o = ctx().orgId; if (o && !/^personal-/.test(o)) p.set('org', o);
   return LIVE + page + '?' + p.toString();
 }
+// The document's own thumbnail (first page, captured when it's saved): a data URL Saved Files stores once, or an https URL.
+export function thumbOf(v) {
+  if (!v) return ''; let th = typeof v.thumb === 'string' ? v.thumb : ''; if (!th) { try { th = localStorage.getItem('cbThumb:' + v.t) || ''; } catch (e) {} }
+  return /^https:/.test(th) || (/^data:image\/(png|jpeg|jpg|webp);base64,/.test(th) && th.length > 1500) ? th : '';
+}
 // Adds or updates the Saved Files entry for a saved version. Never throws.
 export async function recordVersion(v, { clientId = '' } = {}) {
   try {
     if (!v || v.t == null || v.demo) return null;
     const cid = clientOf(v, clientId); const org = (v.cloud && v.cloud.orgId) || v.org || ctx().orgId || '';
     if (!cid && (!org || /^personal-/.test(org))) return null; // no client: listed as an agency file
-    const thumb = typeof v.thumb === 'string' && /^https:/.test(v.thumb) ? v.thumb : '';
+    const thumb = thumbOf(v);
     const rec = { clientId: cid, app: APP, ref: String(v.t), title: v.title || 'Untitled document', campaignIds: Array.isArray(v.campaignIds) ? v.campaignIds.slice() : [], openUrl: openUrlFor(v, cid), thumb, orgId: (v.cloud && v.cloud.orgId) || v.org || ctx().orgId || '' };
     if (v.approved !== undefined) rec.approved = !!v.approved;
     return await (await SF()).recordSave(rec);
@@ -39,10 +44,21 @@ export async function syncAll() {
     const items = [];
     L.forEach((v) => { if (!v || v.t == null || v.demo) return; const o = (v.cloud && v.cloud.orgId) || v.org || ''; if (!inWs(o)) return;
       const cid = (v.cloud && v.cloud.clientId) || v.clientId || ''; const oo = o || org; if (!cid && !okOrg(oo)) return;
-      items.push({ clientId: cid, orgId: okOrg(oo) ? oo : '', app: APP, ref: String(v.t), title: v.title || 'Untitled document', campaignIds: Array.isArray(v.campaignIds) ? v.campaignIds : [], openUrl: openUrlFor(v, cid), thumb: typeof v.thumb === 'string' && /^https:/.test(v.thumb) ? v.thumb : '', approved: v.approved, at: v.savedAt || v.t }); });
+      items.push({ clientId: cid, orgId: okOrg(oo) ? oo : '', app: APP, ref: String(v.t), title: v.title || 'Untitled document', campaignIds: Array.isArray(v.campaignIds) ? v.campaignIds : [], openUrl: openUrlFor(v, cid), thumb: thumbOf(v), approved: v.approved, at: v.savedAt || v.t }); });
     T.forEach((r) => { if (!r || r.t == null) return; const o = (r.cloud && r.cloud.orgId) || r.org || ''; if (!inWs(o)) return; const cid = (r.cloud && r.cloud.clientId) || r.clientId || ''; const oo = o || org; if (!cid && !okOrg(oo)) return;
       const p = new URLSearchParams(); p.set('txt', String(r.t)); if (cid) p.set('client', cid); if (okOrg(oo)) p.set('org', oo);
       items.push({ clientId: cid, orgId: okOrg(oo) ? oo : '', app: APP, ref: 'txt:' + r.t, title: (r.title || 'Untitled document') + ' (Word)', openUrl: LIVE + 'Existing%20Document%20Builder.dc.html?' + p.toString(), at: r.updated || r.t }); });
-    return items.length ? await (await SF()).syncSaved(items) : 0;
+    if (!items.length) return 0;
+    const sf = await SF(); const added = await sf.syncSaved(items);
+    // Entries listed before thumbnails were sent get the document's thumbnail (nothing else changes; waiting actions are left alone).
+    try {
+      const byScope = new Map(); items.forEach((it) => { if (!it.thumb) return; const sc = sf.scopeOf(it.clientId, it.orgId); if (sc && !/^org:/.test(sc)) { if (!byScope.has(sc)) byScope.set(sc, []); byScope.get(sc).push(it); } });
+      for (const [sc, list] of byScope) {
+        const rows = await sf.listSaved(sc).catch(() => []); const by = new Map(rows.map((r) => [r.app + '~' + r.ref, r]));
+        for (const it of list) { const r = by.get(it.app + '~' + it.ref); if (!r || r.thumb || r.pending) continue;
+          await sf.recordSave({ clientId: sc, app: it.app, ref: it.ref, title: r.title || it.title, campaignIds: r.campaignIds || [], openUrl: r.openUrl || it.openUrl, thumb: it.thumb, approved: r.approved, note: r.note || '', at: r.at }); }
+      }
+    } catch (e) { console.warn('Saved Files thumbnails', e); }
+    return added;
   } catch (e) { console.warn('Saved Files sync', e); return 0; }
 }

@@ -122,3 +122,47 @@ export async function assignCampaigns(v, { app = 'Document Builder', clientId = 
   return ids;
 }
 export function campaignNames(v, camps) { const ids = (v && v.campaignIds) || []; return (camps || []).filter((c) => ids.includes(c.id)).map((c) => c.name || 'Untitled campaign'); }
+
+function idbOpen(name, store) { return new Promise((res, rej) => { const r = indexedDB.open(name, 1); r.onupgradeneeded = () => r.result.createObjectStore(store); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+const bump = () => { try { window.dispatchEvent(new StorageEvent('storage', { key: 'cbVersions' })); } catch (e) {} };
+
+// Saves a saved document as one of "My Templates" (asks for the name). Resolves the template name, or '' if not made.
+export async function makeTemplate(v, name) {
+  if (!v) return '';
+  if (name == null) name = window.prompt('Name this template. It will appear under My Templates across the app.', v.title || 'My Template');
+  name = String(name || '').trim(); if (!name) return '';
+  const isEx = v.kind === 'existing'; let data = isEx ? (v.ex ? { ex: v.ex } : null) : (v.app ? { app: v.app, photos: v.photos } : null);
+  if (!data && v.exIdb) { const d = await idbGet(v.exIdb === true ? v.t : v.exIdb); if (d) data = isEx ? { ex: d.ex || d } : d; }
+  if (!data && v.cloud) { try { const d = await (await fbMod()).loadDocVersionSnapshot(v.cloud); if (d) data = isEx ? { ex: d.ex || d } : d; } catch (e) {} }
+  if (!data || !(isEx ? data.ex : data.app)) { window.alert('This document’s data is no longer available, so it can’t be made into a template.'); return ''; }
+  const id = 'ut' + Date.now();
+  try { const db = await idbOpen('cbUserTemplates', 't'); await new Promise((res, rej) => { const tx = db.transaction('t', 'readwrite'); tx.objectStore('t').put(isEx ? { kind: 'existing', ex: data.ex } : { kind: 'new', app: data.app, photos: data.photos || null }, id); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); } catch (e) { window.alert('Could not save the template.'); return ''; }
+  const pages = (String(v.sub || '').split('· ')[1] || '').trim(); const th = v.thumb || localStorage.getItem('cbThumb:' + v.t) || '';
+  let L = []; try { L = JSON.parse(localStorage.getItem('cbUserTemplates') || '[]'); } catch (e) {} L = L.filter((x) => x.name !== name);
+  L.unshift({ id, kind: isEx ? 'existing' : 'new', name, desc: 'Saved from ' + (v.title || 'a document') + (pages ? ' · ' + pages : ''), thumb: /^data:image\//.test(th) && th.length < 90000 ? th : '', savedAt: Date.now() });
+  try { localStorage.setItem('cbUserTemplates', JSON.stringify(L)); } catch (e) { L.forEach((x) => { x.thumb = ''; }); try { localStorage.setItem('cbUserTemplates', JSON.stringify(L)); } catch (er) { window.alert('Not enough storage to save this template.'); return ''; } }
+  try { window.dispatchEvent(new StorageEvent('storage', { key: 'cbUserTemplates' })); } catch (e) {}
+  return name;
+}
+
+// Permanently deletes a saved document (CatalystOS database, this browser, and its Saved Files entry). No confirm here:
+// callers ask first. Throws if the database copy couldn't be deleted (nothing is removed then).
+export async function deleteVersion(v) {
+  if (!v) return; const t = v.t;
+  if (v.cloud && v.cloud.id) await (await fbMod()).deleteDocVersion(v.cloud);
+  try { const D = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); if (!D.includes(t)) { D.push(t); localStorage.setItem('cbDeletedVersions', JSON.stringify(D.slice(-500))); } } catch (e) {}
+  const L = loadV().filter((x) => x.t !== t); try { localStorage.setItem('cbVersions', JSON.stringify(L)); localStorage.removeItem('cbThumb:' + t); } catch (e) {}
+  const k = v.exIdb === true ? t : null; if (k && !L.some((x) => x.exIdb === t)) { try { const db = await idbOpen('cbVersionData', 'ex'); db.transaction('ex', 'readwrite').objectStore('ex').delete(String(k)); } catch (e) {} }
+  sfMod().then((m) => m.removeVersion(v)).catch(() => {});
+  bump();
+}
+// Word documents (made from uploads in the Existing Document Builder): same delete as that page's own.
+export async function deleteTextDocument(t) {
+  let T = []; try { T = JSON.parse(localStorage.getItem('cbTextDocs') || '[]') || []; } catch (e) {}
+  const rec = T.find((x) => x.t === t);
+  try { const D = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); if (!D.includes(t)) { D.push(t); localStorage.setItem('cbDeletedVersions', JSON.stringify(D)); } } catch (e) {}
+  if (rec && rec.cloud) { try { await (await fbMod()).deleteTextDoc(rec.cloud); } catch (e) { console.warn('Cloud delete of text document failed; removed from this gallery', e); } }
+  try { const db = await idbOpen('cbVersionData', 'ex'); db.transaction('ex', 'readwrite').objectStore('ex').delete('txt:' + t); } catch (e) {}
+  try { localStorage.setItem('cbTextDocs', JSON.stringify(T.filter((x) => x.t !== t))); } catch (e) {}
+  try { window.dispatchEvent(new StorageEvent('storage', { key: 'cbTextDocs' })); } catch (e) {}
+}

@@ -944,7 +944,7 @@ class Component extends DCLogic {
     this.sfRecord(v);
     this.setState({ versions: list });
   };
-  refreshExThumb(t) { t = t || this.state.curVersionT; if (!t) return; const u = this.exThumb(); if (!u) return; try { localStorage.setItem('cbThumb:' + t, u); } catch (e) {} const L = this.loadVersions(); const v = L.find(x => x.t === t); if (v && v.thumb !== u) { v.thumb = u; if (!this.storeVersions(L)) { v.thumb = ''; this.storeVersions(L); } this.setState({ versions: L }); if (v.cloud) this.fbMod().then(fb => fb.saveDocVersionMeta && fb.saveDocVersionMeta(v.cloud, { thumb: u.length < 300000 ? u : '' })).catch(() => {}); } }
+  refreshExThumb(t) { t = t || this.state.curVersionT; if (!t) return; const u = this.exThumb(); if (!u) return; try { localStorage.setItem('cbThumb:' + t, u); } catch (e) {} const L = this.loadVersions(); const v = L.find(x => x.t === t); if (v && v.thumb !== u) { v.thumb = u; if (!this.storeVersions(L)) { v.thumb = ''; this.storeVersions(L); } this.setState({ versions: L }); this.sfRecord(v); if (v.cloud) this.fbMod().then(fb => fb.saveDocVersionMeta && fb.saveDocVersionMeta(v.cloud, { thumb: u.length < 300000 ? u : '' })).catch(() => {}); } }
   exThumb() { const pg = this.state.pdfPages || []; for (const p of pg) { const u = p && (p.thumbUrl || p.shownThumb); if (u && /^data:/.test(u)) return u; } const b = (this.state.pageBlocks || []).find(b => b && b.artworkSrc && /^data:/.test(b.artworkSrc)); if (b) { try { const im = new Image(); im.src = b.artworkSrc; if (im.naturalWidth) { const c = document.createElement('canvas'); const sc = 240 / im.naturalWidth; c.width = 240; c.height = Math.round(im.naturalHeight * sc); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.6); } } catch (e) {} } return ''; }
   async restoreVersion(i) {
     const v = this.loadVersions()[i]; if (!v) return;
@@ -981,6 +981,8 @@ class Component extends DCLogic {
   }
   exHasDoc() { const s = this.state; return !!((s.pdfPages || []).length || s.pdfLoading || s.pdfName || s.pdfError); }
   componentDidMount() {
+    window.__cbSfUrl = location.href; // read by saved-actions.js (Saved Files Duplicate / Make Template link) before the link is cleared below
+    import(new URL('./saved-actions.js', location.href).href).catch(e => console.warn('Saved Files actions', e)); this._sfc = () => this.setState({ versions: this.loadVersions(), txtList: this.loadTxt() }); window.addEventListener('cb-saved-changed', this._sfc);
     window.__exApp = this;
     this._undoKey = ev => { const k = (ev.key || '').toLowerCase(); if (!(ev.metaKey || ev.ctrlKey) || (k !== 'z' && k !== 'y')) return; const a = document.activeElement; if (a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) return; ev.preventDefault(); if (k === 'y' || ev.shiftKey) this.histGo(false); else this.histGo(true); }; window.addEventListener('keydown', this._undoKey);
     try { const hf = JSON.parse(localStorage.getItem('cbExHF') || 'null'); if (hf) this.setState({ exHF: hf }); } catch (err) {}
@@ -1050,6 +1052,7 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
+    window.removeEventListener('cb-saved-changed', this._sfc);
     window.removeEventListener('pointermove', this.onMarginPointerMove);
     window.removeEventListener('pointerup', this.onMarginPointerUp);
   }

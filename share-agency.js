@@ -46,24 +46,26 @@ export async function duplicateDocs(list) {
   const fb = await import(new URL('./firebase-sync.js', location.href).href);
   const ctx = (window.CosCtx && window.CosCtx.get && window.CosCtx.get()) || {};
   let L = []; try { L = JSON.parse(localStorage.getItem('cbVersions') || '[]') || []; } catch (e) {}
-  let n = 0; const failed = [];
+  let n = 0; const failed = []; const made = [];
   for (let i = 0; i < list.length; i++) {
     const v = list[i]; const t = Date.now() + i; const title = (v.title || 'Untitled document') + ' Copy';
     try {
       const snap = await snapshotOf(v, fb);
       if (!snap) { failed.push((v.title || 'Untitled document') + ' (no saved data found)'); continue; }
       let thumb = v.thumb || localStorage.getItem('cbThumb:' + v.t) || ''; if (thumb.length > 300000) thumb = '';
-      const entry = JSON.parse(JSON.stringify(v)); delete entry.cloud; delete entry.sharedFrom; entry.t = t; entry.title = title; entry.savedAt = t; delete entry.sig;
+      const entry = JSON.parse(JSON.stringify(v)); delete entry.cloud; delete entry.sharedFrom; entry.t = t; entry.title = title; entry.savedAt = t; delete entry.sig; delete entry.approved; // a copy is approved on its own (Approved files it to the knowledge base)
       if (v.exIdb) entry.exIdb = v.exIdb === true ? v.t : v.exIdb;
       if (!entry.ex && !entry.exIdb && !entry.app && (v.kind === 'existing')) entry.ex = snap;
       try { const ref = await fb.saveDocVersion({ clientId: ctx.clientId || '', orgId: ctx.orgId || '', versionId: String(t), snapshot: snap, meta: { title, label: v.label || '', sub: v.sub || '', kind: v.kind || 'new', t, thumb, copiedFrom: String(v.t) } }); if (ref) { entry.cloud = ref; entry.org = ref.orgId || ctx.orgId || ''; } } catch (e) { console.warn('Duplicate cloud save failed', e); }
       if (thumb) { try { localStorage.setItem('cbThumb:' + t, thumb); } catch (e) {} }
-      L.unshift(entry); n++;
+      L.unshift(entry); made.push(entry); n++;
     } catch (e) { failed.push((v.title || 'Untitled document') + ' (' + ((e && (e.code || e.message)) || 'error') + ')'); }
   }
   const put = list2 => { try { localStorage.setItem('cbVersions', JSON.stringify(list2)); return true; } catch (e) { return false; } };
   if (!put(L)) put(L.map((x, k) => k < n ? x : Object.assign({}, x, { ex: x.cloud ? undefined : x.ex, app: x.cloud ? undefined : x.app })));
   try { window.dispatchEvent(new StorageEvent('storage', { key: 'cbVersions' })); } catch (e) {}
-  return { n, failed };
+  // Each copy is its own entry in the shared Saved Files (same client as the original).
+  try { const sf = await import(new URL('./saved-index.js', location.href).href); for (const e of made) await sf.recordVersion(e) } catch (e) { console.warn('Saved Files', e); }
+  return { n, failed, made };
 }
 export function galleryImages() { try { return (JSON.parse(localStorage.getItem('cbImageLib') || '[]') || []).filter(x => x && x.src); } catch (e) { return []; } }

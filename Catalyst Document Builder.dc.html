@@ -2475,6 +2475,8 @@ class Component extends DCLogic {
   state = { booting: (() => { try { return /[?&](start|restore|utpl|tpl)\b/.test(location.search); } catch (e) { return false; } })(), projectOpen: (() => { try { if (/[?&]start\b/.test(location.search) || /start/.test(location.hash)) return false; return localStorage.getItem('cbProjectOpen') === '1'; } catch (e) { return false; } })(), docName: '', pages: [], blanks: 0, view: 'single', bleed: false, crop: false, marks: false, bars: false, edges: false, margins: false, activeSection: null, panelOpen: true, panelMin: true, pmPanelMin: true, hfMin: true, showBirdControls: false, birdMin: true, hidden: {}, saved: false, dlOpen: false, linked: false, cloudStatus: '' };
 
   componentDidMount() {
+    window.__cbSfUrl = location.href; // read by saved-actions.js (Saved Files Duplicate / Make Template link) before the link is cleared below
+    import(new URL('./saved-actions.js', location.href).href).catch(e => console.warn('Saved Files actions', e)); this._sfc = () => { this._vCache = null; this.setState({ versions: this.loadVersions() }); }; window.addEventListener('cb-saved-changed', this._sfc);
     setTimeout(() => this.rteInit(), 0);
     if (!window.__cbNavGuard) { window.__cbNavGuard = true; const self = this; const ok = () => !self._actPid || Date.now() - (self._allowNav || 0) < 1200; const wrap = (o, k) => { const f = o[k]; if (!f) return; o[k] = function () { if (!ok()) return; return f.apply(this, arguments); }; }; wrap(window, 'scrollTo'); wrap(window, 'scrollBy'); wrap(Element.prototype, 'scrollTo'); wrap(Element.prototype, 'scrollBy'); wrap(Element.prototype, 'scrollIntoView'); }
     this._navUserWheel = () => { this._allowNav = Date.now(); };
@@ -2614,6 +2616,7 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
+    window.removeEventListener('cb-saved-changed', this._sfc);
     cancelAnimationFrame(this._tbRaf);
     window.removeEventListener('scroll', this._scroll);
     window.removeEventListener('resize', this._resize);
@@ -3042,6 +3045,7 @@ class Component extends DCLogic {
       const list = this.loadVersions(); const v = list.find(x => x.t === t); if (!v) return; v.thumb = url;
       if (!this.storeVersions(list)) { list.forEach(x => { if (x.t !== t && x.thumb && localStorage.getItem('cbThumb:' + x.t)) x.thumb = ''; }); this.storeVersions(list); }
       this.setState({ versions: list });
+      if (!light) this.sfRecord(v); // Saved Files card shows this thumbnail
       if (light) { if (v.cloud) this.fbMod().then(fb => fb.saveDocVersionMeta && fb.saveDocVersionMeta(v.cloud, { thumb: url.length < 300000 ? url : '' })).catch(() => {}); return; }
     } catch (e) { console.warn('thumbnail failed', e); }
     if (!light) this.cloudSaveVersion(t);
