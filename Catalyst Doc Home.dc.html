@@ -68,7 +68,7 @@
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
       <div style="font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.02em;color:#081A53;">What Do You Want to Build?</div>
     </div>
-    <div style="width:100%;max-width:1180px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
+    <div style="width:100%;max-width:800px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
       <div onClick="{{ openVersions }}" role="button" tabindex="0" style="cursor:pointer;display:flex;flex-direction:column;gap:18px;padding:26px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#15803D;box-shadow:0 10px 30px rgba(21,128,61,.16);color:#1d2340">
         <div style="height:150px;border-radius:10px;background:#E8F7EE;display:flex;align-items:center;justify-content:center;">
           <div style="display:grid;grid-template-columns:repeat(2,40px);gap:8px;">
@@ -93,25 +93,6 @@
           <div style="font-size:13.5px;line-height:1.5;color:#5a6178;text-wrap:pretty;">Start from a fact sheet template or a blank page, built with your text styles, headers, footers and Brand Command.</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#6818F8;">Start New <span>→</span></div>
-      </a>
-      <a href="Existing Document Builder.dc.html?new=1" style="display:flex;flex-direction:column;gap:18px;padding:26px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
-        <div style="height:150px;border-radius:10px;background:#FFF1E9;display:flex;align-items:center;justify-content:center;">
-          <div style="position:relative;width:74px;height:98px;">
-            <div style="position:absolute;left:-14px;top:8px;width:74px;height:98px;background:#fff;border-radius:3px;box-shadow:0 4px 14px rgba(8,26,83,.1);transform:rotate(-6deg);"></div>
-            <div style="position:absolute;inset:0;background:#fff;border-radius:3px;box-shadow:0 4px 14px rgba(8,26,83,.16);padding:12px 10px;display:flex;flex-direction:column;gap:6px;">
-              <div style="height:6px;width:70%;background:#FD5920;border-radius:2px;"></div>
-              <div style="height:3px;background:#d8dbe6;border-radius:2px;"></div>
-              <div style="height:3px;background:#d8dbe6;border-radius:2px;"></div>
-              <div style="height:3px;width:80%;background:#d8dbe6;border-radius:2px;"></div>
-              <div style="height:22px;background:#ffe0cf;border-radius:2px;margin-top:2px;"></div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#081A53;">Upload and Rebuild a Document</div>
-          <div style="font-size:13.5px;line-height:1.5;color:#5a6178;text-wrap:pretty;">Upload a PDF, PowerPoint, Word or text file and rebuild, update or rebrand it.</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#C94310;">Upload Document <span>→</span></div>
       </a>
     </div>
     <sc-if value="{{ hasUserTpls }}" hint-placeholder-val="{{ false }}">
