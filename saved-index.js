@@ -17,13 +17,21 @@ export function thumbOf(v) {
   return /^https:/.test(th) || (/^data:image\/(png|jpeg|jpg|webp);base64,/.test(th) && th.length > 1500) ? th : '';
 }
 // Adds or updates the Saved Files entry for a saved version. Never throws.
+// What the document is, shown on its Saved Files thumbnail: its template type, Custom, Rebuilt (from an upload) or Text (Word).
+const KINDS = { 'sell-sheet': 'Sell sheet', 'case-study': 'Case study', 'white-paper': 'White paper', proposal: 'Proposal', 'fact-sheet': 'Fact sheet' };
+export function kindOf(v) {
+  if (!v) return 'Custom'; if (KINDS[v.docType]) return KINDS[v.docType];
+  const t = String(v.title || '').toLowerCase();
+  if (/case[- ]?stud/.test(t)) return 'Case study'; if (/sell[- ]?sheet|one[- ]?pager/.test(t)) return 'Sell sheet'; if (/white[- ]?paper/.test(t)) return 'White paper'; if (/proposal|\brfp\b/.test(t)) return 'Proposal'; if (/fact[- ]?sheet/.test(t)) return 'Fact sheet';
+  return v.kind === 'existing' ? 'Rebuilt' : 'Custom';
+}
 export async function recordVersion(v, { clientId = '' } = {}) {
   try {
     if (!v || v.t == null || v.demo) return null;
     const cid = clientOf(v, clientId); const org = (v.cloud && v.cloud.orgId) || v.org || ctx().orgId || '';
     if (!cid && (!org || /^personal-/.test(org))) return null; // no client: listed as an agency file
     const thumb = thumbOf(v);
-    const rec = { clientId: cid, app: APP, ref: String(v.t), title: v.title || 'Untitled document', campaignIds: Array.isArray(v.campaignIds) ? v.campaignIds.slice() : [], openUrl: openUrlFor(v, cid), thumb, orgId: (v.cloud && v.cloud.orgId) || v.org || ctx().orgId || '' };
+    const rec = { clientId: cid, app: APP, ref: String(v.t), title: v.title || 'Untitled document', campaignIds: Array.isArray(v.campaignIds) ? v.campaignIds.slice() : [], openUrl: openUrlFor(v, cid), thumb, kind: kindOf(v), orgId: (v.cloud && v.cloud.orgId) || v.org || ctx().orgId || '' };
     if (v.approved !== undefined) rec.approved = !!v.approved;
     return await (await SF()).recordSave(rec);
   } catch (e) { console.warn('Saved Files', e); return null; }
@@ -44,10 +52,10 @@ export async function syncAll() {
     const items = [];
     L.forEach((v) => { if (!v || v.t == null || v.demo) return; const o = (v.cloud && v.cloud.orgId) || v.org || ''; if (!inWs(o)) return;
       const cid = (v.cloud && v.cloud.clientId) || v.clientId || ''; const oo = o || org; if (!cid && !okOrg(oo)) return;
-      items.push({ clientId: cid, orgId: okOrg(oo) ? oo : '', app: APP, ref: String(v.t), title: v.title || 'Untitled document', campaignIds: Array.isArray(v.campaignIds) ? v.campaignIds : [], openUrl: openUrlFor(v, cid), thumb: thumbOf(v), approved: v.approved, at: v.savedAt || v.t }); });
+      items.push({ clientId: cid, orgId: okOrg(oo) ? oo : '', app: APP, ref: String(v.t), title: v.title || 'Untitled document', campaignIds: Array.isArray(v.campaignIds) ? v.campaignIds : [], openUrl: openUrlFor(v, cid), thumb: thumbOf(v), kind: kindOf(v), approved: v.approved, at: v.savedAt || v.t }); });
     T.forEach((r) => { if (!r || r.t == null) return; const o = (r.cloud && r.cloud.orgId) || r.org || ''; if (!inWs(o)) return; const cid = (r.cloud && r.cloud.clientId) || r.clientId || ''; const oo = o || org; if (!cid && !okOrg(oo)) return;
       const p = new URLSearchParams(); p.set('txt', String(r.t)); if (cid) p.set('client', cid); if (okOrg(oo)) p.set('org', oo);
-      items.push({ clientId: cid, orgId: okOrg(oo) ? oo : '', app: APP, ref: 'txt:' + r.t, title: (r.title || 'Untitled document') + ' (Word)', openUrl: LIVE + 'Existing%20Document%20Builder.dc.html?' + p.toString(), at: r.updated || r.t }); });
+      items.push({ clientId: cid, orgId: okOrg(oo) ? oo : '', app: APP, ref: 'txt:' + r.t, title: (r.title || 'Untitled document') + ' (Word)', openUrl: LIVE + 'Existing%20Document%20Builder.dc.html?' + p.toString(), kind: 'Text', at: r.updated || r.t }); });
     if (!items.length) return 0;
     const sf = await SF(); const added = await sf.syncSaved(items);
     // Entries listed before thumbnails were sent get the document's thumbnail (nothing else changes; waiting actions are left alone).
@@ -59,6 +67,12 @@ export async function syncAll() {
           await sf.recordSave({ clientId: sc, app: it.app, ref: it.ref, title: r.title || it.title, campaignIds: r.campaignIds || [], openUrl: r.openUrl || it.openUrl, thumb: it.thumb, approved: r.approved, note: r.note || '', at: r.at }); }
       }
     } catch (e) { console.warn('Saved Files thumbnails', e); }
+    // Entries listed before kinds were sent get their label (Case study, Sell sheet, Custom, Text…), keeping their place in the date order.
+    try {
+      const scopes = new Map(); items.forEach((it) => { const sc = sf.scopeOf(it.clientId, it.orgId); if (sc) { if (!scopes.has(sc)) scopes.set(sc, []); scopes.get(sc).push(it); } });
+      for (const [sc, list] of scopes) { const rows = await sf.listSaved(sc).catch(() => []); const by = new Map(rows.map((r) => [r.app + '~' + r.ref, r]));
+        for (const it of list) { const r = by.get(it.app + '~' + it.ref); if (r && it.kind && r.kind !== it.kind && sf.patchSave) await sf.patchSave(sc, it.app, it.ref, { kind: it.kind }); } }
+    } catch (e) { console.warn('Saved Files labels', e); }
     return added;
   } catch (e) { console.warn('Saved Files sync', e); return 0; }
 }
