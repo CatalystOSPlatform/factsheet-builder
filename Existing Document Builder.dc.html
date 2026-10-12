@@ -43,7 +43,7 @@
   [data-cos-taskbar] > .ex-actions{flex:0 1 auto!important;max-width:100%}
   @media (max-width:520px){[data-cb-saved-left] .cb-saved-docs{flex-wrap:wrap;height:auto!important;min-height:34px;padding:6px 10px!important;white-space:normal!important;row-gap:4px}}
   .cb-saved-docs:focus-visible,.cos-savedbar-btn:focus-visible{outline:3px solid #FFD23F!important;outline-offset:2px}
-  /* Everything is in Your Saved Files now, so the app's own saved-documents button is hidden (its list still opens from Your Saved Projects → Open File). */
+  /* Everything is in Your Saved Files now, so the app's own saved-documents button is hidden (Your Saved Files covers it). */
   .cb-saved-docs{display:none!important}
   [data-cos-taskbar] button,[data-cos-taskbar] a{text-transform:none!important;letter-spacing:0!important}
   [data-cos-taskbar] > .tb-spacer,[data-cos-taskbar] > div:empty{display:none!important}
@@ -494,33 +494,6 @@
     <div class="no-print" onClick="{{ closeTplPicker }}" style="position:fixed;inset:0;z-index:3000;background:rgba(8,26,83,.45);display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto;">
       <div onClick="{{ stopProp }}" style="position:relative;width:min(940px,100%);background:#F5F7FA;border-radius:18px;box-shadow:0 30px 80px rgba(8,26,83,.35);padding:36px 40px 40px;display:flex;flex-direction:column;align-items:center;gap:28px;font-family:'Inter',sans-serif;color:#3a4159;">
         <button onClick="{{ closeTplPicker }}" title="Close" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border:1px solid #e3e1ee;border-radius:9px;background:#fff;color:#3a4159;font-size:15px;cursor:pointer;" style-hover="border-color:#6818F8;color:#6818F8">✕</button>
-    <div style="width:100%;max-width:1180px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;">
-      <div onClick="{{ tplPickOpenFile }}" role="button" tabindex="0" style="cursor:pointer;display:flex;flex-direction:column;gap:18px;padding:26px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#15803D;box-shadow:0 10px 30px rgba(21,128,61,.16);color:#1d2340">
-        <div style="height:150px;border-radius:10px;background:#E8F7EE;display:flex;align-items:center;justify-content:center;">
-          <div style="display:grid;grid-template-columns:repeat(2,40px);gap:8px;">
-            <div style="height:52px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.12);padding:7px 6px;display:flex;flex-direction:column;gap:4px;"><div style="height:4px;width:70%;background:#22C55E;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div></div>
-            <div style="height:52px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.12);padding:7px 6px;display:flex;flex-direction:column;gap:4px;"><div style="height:4px;width:60%;background:#15803D;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div><div style="height:12px;background:#c9efd7;border-radius:2px;"></div></div>
-            <div style="height:52px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.12);padding:7px 6px;display:flex;flex-direction:column;gap:4px;"><div style="height:4px;width:80%;background:#15803D;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div></div>
-            <div style="height:52px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.12);padding:7px 6px;display:flex;flex-direction:column;gap:4px;"><div style="height:4px;width:55%;background:#22C55E;border-radius:2px;"></div><div style="height:12px;background:#c9efd7;border-radius:2px;"></div><div style="height:2px;background:#d8dbe6;border-radius:2px;"></div></div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#081A53;">Open Existing File</div>
-          <div style="font-size:13.5px;line-height:1.5;color:#5a6178;text-wrap:pretty;">Pick up any document or Word file saved in this agency and keep working on it.</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#15803D;">Open File <span>→</span></div>
-      </div>
-      <div onClick="{{ tplPickBlank }}" style="cursor:pointer;display:flex;flex-direction:column;gap:18px;padding:26px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#6818F8;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
-        <div style="height:150px;border-radius:10px;background:#F0EAFE;display:flex;align-items:center;justify-content:center;gap:10px;">
-          <div style="width:74px;height:98px;background:#fff;border-radius:3px;box-shadow:0 4px 14px rgba(8,26,83,.14);border:1.5px dashed #b9a2f7;display:flex;align-items:center;justify-content:center;color:#6818F8;font-size:28px;font-weight:300;">+</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:#081A53;">Blank Document</div>
-          <div style="font-size:13.5px;line-height:1.5;color:#5a6178;text-wrap:pretty;">Choose a page format and build from a blank layout with your text styles, headers, footers and Brand Command.</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#6818F8;">Start New <span>→</span></div>
-      </div>
-    </div>
     <div style="width:100%;max-width:860px;display:flex;flex-direction:column;gap:14px;">
       <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:#081A53;">Start from a Fact Sheet Template</div>
@@ -552,6 +525,15 @@
           <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Story and numbers: strategy, performance, holdings and risk.</div>
         </div>
         <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#C2410C;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">2 pages</span><span style="white-space:nowrap;">Use template →</span></div>
+      </div>
+      <div onClick="{{ tplPickBlank }}" role="button" tabindex="0" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#081A53;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:96px;border-radius:9px;background:#F1F2F6;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.10);border:1.5px dashed #9aa0b8;display:flex;align-items:center;justify-content:center;color:#5a6178;font-size:22px;font-weight:300;line-height:1;" aria-hidden="true">+</div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4a5068;">Start Fresh</div>
+          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Blank</div>
+          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">An empty page with your brand's text styles, header and footer.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#081A53;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">1 page</span><span style="white-space:nowrap;">Start blank →</span></div>
       </div>
       </div>
     </div>
