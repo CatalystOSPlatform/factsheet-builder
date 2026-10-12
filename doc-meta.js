@@ -4,6 +4,8 @@
 const PILOT = 'https://pilot-dash-ten.vercel.app/';
 const fbMod = () => import(new URL('./firebase-sync.js', import.meta.url).href);
 const akMod = () => import(PILOT + 'approved-knowledge.js');
+// Shared Saved Files bar index (same entry is updated when approval or campaigns change).
+const sfMod = () => import(new URL('./saved-index.js', import.meta.url).href);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 export function loadV() { try { return JSON.parse(localStorage.getItem('cbVersions') || '[]') || []; } catch (e) { return []; } }
@@ -48,6 +50,7 @@ async function file(v, list, i, app, fallback) {
 export async function setApproved(v, on, { app = 'Document Builder', clientId = '' } = {}) {
   const list = loadV(); const i = list.findIndex((z) => z.t === v.t); if (i < 0) return '';
   list[i].approved = !!on; saveV(list);
+  sfMod().then((m) => m.recordVersion(list[i], { clientId })).catch(() => {});
   if (list[i].cloud) { try { const fb = await fbMod(); fb.saveDocVersionMeta && (await fb.saveDocVersionMeta(list[i].cloud, { approved: !!on })); } catch (e) {} }
   const cid = clientIdFor(list[i], clientId);
   if (!cid) return 'Marked approved here. Pick a client at the top so it can be added to that client’s Brand Command knowledge base.';
@@ -72,6 +75,7 @@ export async function setApproved(v, on, { app = 'Document Builder', clientId = 
 export async function setCampaigns(v, ids, { app = 'Document Builder', clientId = '' } = {}) {
   const list = loadV(); const i = list.findIndex((z) => z.t === v.t); if (i < 0) return;
   list[i].campaignIds = ids.slice(); saveV(list);
+  sfMod().then((m) => m.recordVersion(list[i], { clientId })).catch(() => {});
   if (list[i].cloud) { try { const fb = await fbMod(); fb.saveDocVersionMeta && (await fb.saveDocVersionMeta(list[i].cloud, { campaignIds: ids.slice() })); } catch (e) {} }
   if (list[i].approved && clientIdFor(list[i], clientId)) { try { await file(list[i], list, i, app, clientId); } catch (e) {} }
 }

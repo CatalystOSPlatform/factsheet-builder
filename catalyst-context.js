@@ -136,6 +136,17 @@
     document.querySelectorAll('[data-cos="account"]').forEach(function (el) { var d = user ? 'flex' : 'none'; if (el.style.display !== d) el.style.display = d; });
     var h = dashUrl();
     document.querySelectorAll('[data-cos="back"]').forEach(function (el) { if (el.getAttribute('href') !== h) el.setAttribute('href', h); });
+    paintSaved();
+  }
+  // Shared CatalystOS Saved Files bar (saved-bar.js): every app's files for this client. Kept in step with the client picker.
+  var savedSig = '';
+  function paintSaved() {
+    var m = document.querySelector('[data-cos="saved-mount"]'); if (!m || !window.CosSavedBar) return;
+    var cid = ctx.personal ? '' : (ctx.clientId || ''), org = ctx.personal ? '' : (ctx.orgId || '');
+    var sig = [cid, org].join('|');
+    if (m.querySelector('.cos-savedbar') && sig === savedSig) return;
+    var first = !savedSig; savedSig = sig;
+    try { if (first || !m.querySelector('.cos-savedbar')) window.CosSavedBar.mount({ app: m.getAttribute('data-cos-app') || '', mount: m, clientId: cid, orgId: org }); else window.CosSavedBar.update({ clientId: cid, orgId: org }); } catch (e) { console.warn('[CatalystOS] saved bar', e); }
   }
   var emitting = false;
   function emit() {

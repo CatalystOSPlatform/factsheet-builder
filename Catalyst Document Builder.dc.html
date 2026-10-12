@@ -1178,6 +1178,24 @@
 </style>
 <style id="pagecfg"></style>
 <script>(function(){var h=location.hostname;if(!/vercel\.app$/i.test(h)&&!/[?&]auth=1/.test(location.search)){window.COS_AUTH_SKIPPED=true;return;}var s=document.createElement('script');s.src='https://pilot-dash-ten.vercel.app/cos-app-auth.js';['data-require','data-no-back','data-no-button'].forEach(function(a){s.setAttribute(a,'')});s.setAttribute('data-home','https://pilot-dash-ten.vercel.app/COS.dc.html');document.head.appendChild(s);})();</script>
+<link rel="stylesheet" href="https://pilot-dash-ten.vercel.app/catalyst-ui.css">
+<script src="https://pilot-dash-ten.vercel.app/saved-bar.js"></script>
+<style>
+  /* CatalystOS saved row: shared Saved Files bar (all apps) + this app's Saved Documents list, same look */
+  [data-cb-saved-row]{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#FFFFFF;border-bottom:1px solid rgba(8,26,83,0.08);padding:0 24px 0 0;min-height:54px}
+  [data-cb-saved-row] [data-cos="saved-mount"]{display:flex}
+  [data-cb-saved-row] .cos-savedbar{border-bottom:0!important;background:transparent!important;padding:10px 0 10px 24px!important}
+  .cb-saved-docs:focus-visible,.cos-savedbar-btn:focus-visible{outline:3px solid #FFD23F!important;outline-offset:2px}
+  [data-cos-taskbar] button,[data-cos-taskbar] a{text-transform:none!important;letter-spacing:0!important}
+  [data-cos-taskbar] > .tb-spacer,[data-cos-taskbar] > div:empty{display:none!important}
+  [data-cos-taskbar] button[data-cos-primary]{min-width:0!important;width:auto!important}
+  /* Task bar (style guide): white 32px buttons, one orange primary. Keeps the Download menu working. */
+  .toolbar[data-cos-taskbar]{overflow:visible!important;flex-wrap:wrap!important}
+  .toolbar[data-cos-taskbar] .tb-actions{margin-left:0!important;flex:1 1 auto!important;justify-content:flex-start!important;flex-wrap:wrap}
+  .toolbar[data-cos-taskbar] .tb-actions button{text-transform:none!important;letter-spacing:0!important}
+  .toolbar[data-cos-taskbar] .tb-actions > button[data-cos-primary]{margin-left:auto!important;min-width:0!important}
+  .toolbar[data-cos-taskbar] .tb-actions .dl-wrap{display:flex}
+</style>
 <script src="./catalyst-context.js"></script>
 </helmet>
 <sc-if value="{{ undoShow }}" hint-placeholder-val="{{ false }}">
@@ -1205,32 +1223,36 @@
     <div data-cos="account" style="margin-left:auto;display:none;align-items:center;gap:8px;align-self:center;font-family:'Manrope',sans-serif;"><span data-cos="email" style="font-size:12px;font-weight:600;color:#C9CFE8;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span><a data-cos="signout" href="#" style="display:flex;align-items:center;gap:6px;background:#FFFFFF;color:#081A53;font-weight:800;font-size:12px;border-radius:999px;padding:5px 13px 5px 10px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.25);text-decoration:none;" style-hover="background:#FFD23F;color:#081A53;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sign out</a></div>
   </div>
 <div class="no-print" style="background:#F1F2F5;border-bottom:1px solid rgba(8,26,83,0.08);padding:7px 24px;display:flex;align-items:center;justify-content:center;gap:12px;color:#081A53;">
-  <span style="font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#8A93A8;">Client:</span>
+  <span style="font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#5E6475;">Client:</span>
   <div style="position:relative;display:inline-flex;align-items:center;background:#E3E6EC;border:1px solid rgba(8,26,83,0.14);border-radius:10px;height:36px;box-sizing:border-box;">
     <span data-cos="picker-mount" style="display:flex;height:100%;"></span>
     <span style="position:absolute;right:0;top:0;bottom:0;width:40px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(8,26,83,0.14);pointer-events:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#081A53" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
   </div>
 </div>
+<div class="no-print" data-cb-saved-row="">
+  <div data-cos="saved-mount" data-cos-app="factsheets"></div>
+  <button onClick="{{ openVersions }}" title="Browse this app’s saved documents, Word files and templates" type="button" class="cb-saved-docs" style="display:inline-flex;align-items:center;gap:8px;height:34px;box-sizing:border-box;padding:0 8px 0 12px;border-radius:10px;border:0;background:#1A6B2E;color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 4px 12px rgba(26,107,46,0.22);" style-hover="background:#155A26"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>{{ savedLabel }}<span onClick="{{ openVerDocs }}" title="Show saved documents" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#C2410C;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>PDF</span><span>{{ versionCount }}</span></span><span onClick="{{ openVerWord }}" title="Show Word documents" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#6818F8;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>Word</span><span>{{ wordCount }}</span></span><span onClick="{{ openVerTpls }}" title="Show my templates" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#15803D;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;"><span>Templates</span><span>{{ savedTplCount }}</span></span></button>
+</div>
   </div>
   <div class="chrome no-print">
   <!-- ===================== TOOLBAR ===================== -->
-  <div class="toolbar">
-    <div style="flex:none;align-self:center;display:flex;align-items:center;"><button onClick="{{ openVersions }}" title="Browse saved documents" style="display:inline-flex;align-items:center;gap:6px;height:40px;box-sizing:border-box;padding:0 16px;border-radius:9px;border:0;background:linear-gradient(135deg,#22C55E 0%,#15803D 100%);color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 4px 14px rgba(21,128,61,0.35);" style-hover="filter:brightness(1.08);box-shadow:0 6px 18px rgba(21,128,61,0.45)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>{{ savedLabel }}<span onClick="{{ openVerDocs }}" title="Show saved documents" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#C2410C;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;"><span>PDF</span><span>{{ versionCount }}</span></span><span onClick="{{ openVerWord }}" title="Show Word documents" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#6818F8;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;"><span>Word</span><span>{{ wordCount }}</span></span><span onClick="{{ openVerTpls }}" title="Show my templates" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#15803D;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;"><span>Templates</span><span>{{ savedTplCount }}</span></span></button></div>
+  <div class="toolbar" data-cos-taskbar="">
+    
     <div class="no-print" style="flex:none;align-self:center;display:flex;align-items:center;gap:8px;margin-left:12px;"></div>
     <span class="tb-spacer"></span>
     <div class="tb-actions" style="flex:none;align-self:center;margin-left:auto;display:flex;align-items:center;gap:8px;">
-        <sc-if value="{{ projectOpenFlag }}" hint-placeholder-val="{{ false }}"><button onClick="{{ saveAsTpl }}" title="Save this document as a reusable template" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;box-sizing:border-box;padding:0 16px;border:1.5px solid #15803D;border-radius:9px;font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;color:#15803D;background:#FFFFFF;white-space:nowrap;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M9 21V9"></path></svg>SAVE AS TEMPLATE</button></sc-if><sc-if value="{{ true }}" hint-placeholder-val="{{ true }}"><button class="startover-top no-print" style="position:static;width:auto;height:auto;height:40px;box-sizing:border-box;padding:0 16px;border-radius:9px;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:700;border:1px solid #6818F8;background:#6818F8;color:#FFFFFF;animation:none;white-space:nowrap;flex:none;display:flex;align-items:center;gap:5px;cursor:pointer" onClick="{{ goHomeStart }}" title="Back to the Catalyst home screen"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path></svg>Start Over</button></sc-if><sc-if value="{{ tplBtnOn }}" hint-placeholder-val="{{ false }}"><button class="no-print" onClick="{{ openTplPicker }}" title="Paths: start a blank, existing or template document" style="display:inline-flex;align-items:center;gap:6px;height:40px;box-sizing:border-box;padding:0 16px;border-radius:9px;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:700;border:1px solid #6818F8;background:#6818F8;color:#FFFFFF;white-space:nowrap;cursor:pointer;" style-hover="background:#5512D6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"></rect><path d="M8 7h8M8 11h8M8 15h5"></path></svg>Create a New Document</button></sc-if>
+        <sc-if value="{{ projectOpenFlag }}" hint-placeholder-val="{{ false }}"><button onClick="{{ saveAsTpl }}" title="Save this document as a reusable template" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;box-sizing:border-box;padding:0 16px;border:1.5px solid #15803D;border-radius:9px;font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;color:#15803D;background:#FFFFFF;white-space:nowrap;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M9 21V9"></path></svg>Save as Template</button></sc-if><sc-if value="{{ true }}" hint-placeholder-val="{{ true }}"><button class="startover-top no-print" style="position:static;width:auto;height:auto;height:40px;box-sizing:border-box;padding:0 16px;border-radius:9px;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:700;border:1px solid #6818F8;background:#6818F8;color:#FFFFFF;animation:none;white-space:nowrap;flex:none;display:flex;align-items:center;gap:5px;cursor:pointer" onClick="{{ goHomeStart }}" title="Back to the Catalyst home screen"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path></svg>Start Over</button></sc-if><sc-if value="{{ tplBtnOn }}" hint-placeholder-val="{{ false }}"><button class="no-print" onClick="{{ openTplPicker }}" title="Paths: start a blank, existing or template document" style="display:inline-flex;align-items:center;gap:6px;height:40px;box-sizing:border-box;padding:0 16px;border-radius:9px;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:700;border:1px solid #6818F8;background:#6818F8;color:#FFFFFF;white-space:nowrap;cursor:pointer;" style-hover="background:#5512D6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"></rect><path d="M8 7h8M8 11h8M8 15h5"></path></svg>Create a New Document</button></sc-if>
         
     <div class="dl-wrap">
       <button class="pdf-btn" onClick="{{ toggleDl }}" style="display:inline-flex;align-items:center;gap:7px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg><span>Download Document ▾</span></button>
       <div class="dl-menu" style="{{ dlStyle }}">
-        <button class="dl-opt prime" onClick="{{ downloadPrint }}"><b>Download PDF</b></button>
-        <button class="dl-opt prime" onClick="{{ downloadPptx }}"><b>Download PPTX</b></button>
-        <button class="dl-opt prime" onClick="{{ downloadWebPkg }}"><b>Download Web Page</b></button>
+        <button class="dl-opt prime" data-cos-keep="" onClick="{{ downloadPrint }}"><b>Download PDF</b></button>
+        <button class="dl-opt prime" data-cos-keep="" onClick="{{ downloadPptx }}"><b>Download PPTX</b></button>
+        <button class="dl-opt prime" data-cos-keep="" onClick="{{ downloadWebPkg }}"><b>Download Web Page</b></button>
       </div>
     </div>
     <sc-if value="{{ dlBusyOn }}" hint-placeholder-val="{{ false }}"><div class="no-print" style="position:fixed;left:50%;bottom:72px;transform:translateX(-50%);z-index:9999;background:#081A53;color:#FFFFFF;padding:10px 16px;border-radius:10px;font:700 12.5px 'Inter',sans-serif;box-shadow:0 10px 28px rgba(8,26,83,.3);">{{ dlBusyText }}</div></sc-if>
-    <button class="{{ saveCls }}" onClick="{{ saveAll }}" style="height:40px;box-sizing:border-box;padding:0 26px;font-size:14px;border-radius:9px;min-width:180px;justify-content:center;white-space:nowrap;flex:none;display:inline-flex;align-items:center;gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M5 3h11l3 3v15H5z"></path><path d="M8 3v5h7V3M8 21v-7h8v7"></path></svg><span>{{ saveText }}</span></button></div>
+    <button class="{{ saveCls }}" data-cos-primary="" onClick="{{ saveAll }}" style="height:40px;box-sizing:border-box;padding:0 26px;font-size:14px;border-radius:9px;min-width:180px;justify-content:center;white-space:nowrap;flex:none;display:inline-flex;align-items:center;gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M5 3h11l3 3v15H5z"></path><path d="M8 3v5h7V3M8 21v-7h8v7"></path></svg><span>{{ saveText }}</span></button></div>
   </div>
   </div>
 
@@ -2515,7 +2537,7 @@ class Component extends DCLogic {
     this._mgWatch = setInterval(() => { try { this.kitPalMeasure(); if (this._npBlankLy && this.state.projectOpen && !this.state.tplGal && Date.now() - (this._npBlankT || 0) > 900) { const td0 = this.state.textDoc; if (td0 && td0.ly) this._npBlankLy = false; else if (Date.now() - this._npBlankT > 20000) this._npBlankLy = false; else if (!this._lyStarting) { this._lyStarting = true; this._npBlankLy = false; Promise.resolve(this.lyStart({ split: .6, fresh: true })).finally(() => { this._lyStarting = false; }); } } this.docActSync(); { const td = this.state.textDoc; const hide = !!(td && td.ly && !td.ly.manual); document.querySelectorAll('#pgzoom-layer [data-ly-hide]').forEach(b => { const d = hide ? 'none' : ''; if (b.style.display !== d) b.style.display = d; }); } this.blankStarterSync(); this.bookCenter(); this.lyPadSync(); this.lyDiscClean(); } catch (e) {} this.marginReflow(); this.hfReflow(); this.tdReflow(); if (!(this._noN = ((this._noN || 0) + 1) % 2)) this.blocksNoOverlap(); }, 600);
     this._bcRetry = setInterval(() => { const c = window.CosCtx && window.CosCtx.get && window.CosCtx.get(); if (!c || !c.clientId || this._cosFetching) return; const b = this.state.brandLink || {}; if (!b.profile || b.clientId !== c.clientId) { this._bcAppliedOnce = null; this._cosSync && this._cosSync(); } }, 2500);
     try { if (localStorage.getItem('cbPoTbMini') === '1') this.setState({ poTbMini: true }); } catch (e) {}
-    try { const q = new URLSearchParams(location.search).get('restore'); if (q) { this._restoredAt = Date.now(); const i = this.loadVersions().findIndex(v => String(v.t) === q); history.replaceState(null, '', location.pathname); if (i < 0) setTimeout(() => { this.setState({ booting: false }); window.alert('This saved document isn\u2019t in this browser yet. Go back, open Saved Documents, wait a moment, then open it again.'); }, 600); if (i >= 0) { setTimeout(() => this.restoreVersion(i), 600); setTimeout(() => this.refreshThumbSoon(500), 4200); } else this.refreshThumbSoon(4000); } else this.refreshThumbSoon(4000); } catch (e) {}
+    try { const q = new URLSearchParams(location.search).get('restore'); if (q) { this._restoredAt = Date.now(); const i = this.loadVersions().findIndex(v => String(v.t) === q); history.replaceState(null, '', location.pathname); if (i < 0) setTimeout(async () => { try { await this.cloudMergeVersions(); } catch (e) {} const j = this.loadVersions().findIndex(v => String(v.t) === q); if (j >= 0) { this.restoreVersion(j); setTimeout(() => this.refreshThumbSoon(500), 3600); return; } this.setState({ booting: false }); window.alert('This saved document isn\u2019t in this browser yet. Go back, open Saved Documents, wait a moment, then open it again.'); }, 600); if (i >= 0) { setTimeout(() => this.restoreVersion(i), 600); setTimeout(() => this.refreshThumbSoon(500), 4200); } else this.refreshThumbSoon(4000); } else this.refreshThumbSoon(4000); } catch (e) {}
     this._ftrClick = e => { if (!e.target.closest || !e.target.closest('.ftr-clone')) return; if (!e.target.closest('[data-field]')) e.preventDefault(); this.setState(st => ({ hfMin: false }), () => { const hd = [...document.querySelectorAll('.panel .pb > .sec > h4')].find(x => /Footer Gallery/.test(x.textContent)); if (!hd) return; const sec = hd.parentElement; sec.parentElement.querySelectorAll(':scope > .sec').forEach(x => x.classList.add('closed')); sec.classList.remove('closed'); const pb = document.querySelector('.panel .pb'); if (pb) pb.scrollTop = sec.offsetTop - 10; this.fitPreview(); }); };
     document.addEventListener('click', this._ftrClick, true);
     this._ftrBlur = e => { const el = e.target; if (!el.closest || !el.closest('.ftr-clone') || !el.hasAttribute('data-field')) return; const k = el.getAttribute('data-field'); const v = (el.innerText || '').replace(/\s*\n\s*/g, ' ').trim(); if (v !== (this.ftr()[k] || '')) this.setFtr({ [k]: v }); };
@@ -2887,6 +2909,10 @@ class Component extends DCLogic {
   vdbClear() { return this.vdbOp('readwrite', st => st.clear()).catch(() => {}); }
   async fbMod() { if (!this._fb) this._fb = import(new URL('./firebase-sync.js', location.href).href); return this._fb; }
   cosCtx() { return (window.CosCtx && window.CosCtx.get && window.CosCtx.get()) || {}; }
+  // Shared Saved Files bar (every app's files for this client): index entries only; documents are saved exactly as before.
+  sfMod() { if (!this._sfm) this._sfm = import(new URL('./saved-index.js', location.href).href); return this._sfm; }
+  sfRecord(v, clientId) { if (!v || v.demo) return; this.sfMod().then(m => m.recordVersion(v, { clientId: clientId || '' })).catch(() => {}); }
+  sfRemove(v) { if (!v) return; this.sfMod().then(m => m.removeVersion(v)).catch(() => {}); }
   async cloudSaveVersion(t) {
     if (this.isDemo()) return;
     try {
@@ -2897,7 +2923,7 @@ class Component extends DCLogic {
       const L = this.loadVersions(); const x = L.find(y => y.t === t); if (x) { x.cloud = ref; this.storeVersions(L); this.setState({ versions: L }); }
     } catch (e) { console.warn('Version save to database failed', e); }
   }
-  async cloudDeleteVersion(v) { if (v) { try { const D = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); if (!D.includes(v.t)) { D.push(v.t); localStorage.setItem('cbDeletedVersions', JSON.stringify(D.slice(-500))); } localStorage.removeItem('cbThumb:' + v.t); } catch (e) {} } if (!v || !v.cloud) return true; try { const fb = await this.fbMod(); await fb.deleteDocVersion(v.cloud); return true; } catch (e) { console.warn('Version delete from database failed', e); return false; } }
+  async cloudDeleteVersion(v) { if (v) { try { const D = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); if (!D.includes(v.t)) { D.push(v.t); localStorage.setItem('cbDeletedVersions', JSON.stringify(D.slice(-500))); } localStorage.removeItem('cbThumb:' + v.t); } catch (e) {} } if (!v || !v.cloud) { this.sfRemove(v); return true; } try { const fb = await this.fbMod(); await fb.deleteDocVersion(v.cloud); this.sfRemove(v); return true; } catch (e) { console.warn('Version delete from database failed', e); return false; } }
   async cloudMergeVersions() {
     if (this.isDemo()) return;
     try {
@@ -2981,6 +3007,7 @@ class Component extends DCLogic {
     if (!put()) { for (let k = 1; k < list.length; k++) { const x = list[k]; if (x.kind === 'existing' && x.ex) x.ex = Object.assign({}, x.ex, { pdfPages: (x.ex.pdfPages || []).map(p => Object.assign({}, p, { thumbUrl: '' })), pageBlocks: (x.ex.pageBlocks || []).map(q => q && Object.assign({}, q, { artworkSrc: '' })) }); } if (!put()) { for (let k = 1; k < list.length; k++) { if (list[k].exIdb) { delete list[k].ex; delete list[k].app; delete list[k].photos; } } if (!put()) { for (let k = 1; k < list.length; k++) list[k].thumb = ''; if (!put()) { console.warn('Version list could not be stored in full'); list.length = Math.min(list.length, 40); put(); } } } }
     this.setCurV(v0.t);
     this.setState({ versions: list });
+    this.sfRecord(v0, extra.clientId);
     setTimeout(() => this.captureThumb(v0.t), 150);
   }
   setCurV(t) { this._curVT = t || null; this._userEdited = false; try { if (t) localStorage.setItem('cbCurVersionNew', String(t)); else localStorage.removeItem('cbCurVersionNew'); } catch (e) {} }
@@ -2991,6 +3018,7 @@ class Component extends DCLogic {
     const isCur = list[i].t === this._curVT && list[i].kind !== 'existing';
     this.setState(isCur && title.trim() ? { versions: list, docName: title } : { versions: list });
     if (list[i].cloud) this.fbMod().then(fb => fb.saveDocVersionMeta && fb.saveDocVersionMeta(list[i].cloud, { title })).catch(() => {});
+    const rv = list[i]; clearTimeout(this._sfRnT); this._sfRnT = setTimeout(() => this.sfRecord(rv), 1200);
   }
 
   async captureThumb(t, light) {
@@ -3044,6 +3072,7 @@ class Component extends DCLogic {
     const list = this.loadVersions(); const k = list.findIndex(x => x.t === target.t); if (k >= 0) list.splice(k, 1);
     if (target.exIdb === true && !list.some(x => x.exIdb === target.t)) this.vdbDel(target.t);
     this.storeVersions(list);
+    if (!target.cloud) this.sfRemove(target);
     this.setState({ versions: list, vConfirm: null });
   }
 

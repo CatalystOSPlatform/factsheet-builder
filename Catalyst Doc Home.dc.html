@@ -19,6 +19,18 @@
   @media (max-width:860px){[data-cos="agency-wrap"]{display:none!important}}
 </style>
 <script>(function(){var h=location.hostname;if(!/vercel\.app$/i.test(h)&&!/[?&]auth=1/.test(location.search)){window.COS_AUTH_SKIPPED=true;return;}var s=document.createElement('script');s.src='https://pilot-dash-ten.vercel.app/cos-app-auth.js';['data-require','data-no-back','data-no-button'].forEach(function(a){s.setAttribute(a,'')});s.setAttribute('data-home','https://pilot-dash-ten.vercel.app/COS.dc.html');document.head.appendChild(s);})();</script>
+<link rel="stylesheet" href="https://pilot-dash-ten.vercel.app/catalyst-ui.css">
+<script src="https://pilot-dash-ten.vercel.app/saved-bar.js"></script>
+<style>
+  /* CatalystOS saved row: shared Saved Files bar (all apps) + this app's Saved Documents list, same look */
+  [data-cb-saved-row]{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#FFFFFF;border-bottom:1px solid rgba(8,26,83,0.08);padding:0 24px 0 0;min-height:54px}
+  [data-cb-saved-row] [data-cos="saved-mount"]{display:flex}
+  [data-cb-saved-row] .cos-savedbar{border-bottom:0!important;background:transparent!important;padding:10px 0 10px 24px!important}
+  .cb-saved-docs:focus-visible,.cos-savedbar-btn:focus-visible{outline:3px solid #FFD23F!important;outline-offset:2px}
+  [data-cos-taskbar] button,[data-cos-taskbar] a{text-transform:none!important;letter-spacing:0!important}
+  [data-cos-taskbar] > .tb-spacer,[data-cos-taskbar] > div:empty{display:none!important}
+  [data-cos-taskbar] button[data-cos-primary]{min-width:0!important;width:auto!important}
+</style>
 <script src="./catalyst-context.js"></script>
 </helmet>
 <div style="min-height:100vh;display:flex;flex-direction:column;background:#F5F7FA;font-family:'Inter',sans-serif;color:#3a4159;">
@@ -35,14 +47,15 @@
   <div data-cos="account" style="margin-left:auto;display:none;align-items:center;gap:8px;align-self:center;font-family:'Manrope',sans-serif;"><span data-cos="email" style="font-size:12px;font-weight:600;color:#C9CFE8;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span><a data-cos="signout" href="#" style="display:flex;align-items:center;gap:6px;background:#FFFFFF;color:#081A53;font-weight:800;font-size:12px;border-radius:999px;padding:5px 13px 5px 10px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.25);text-decoration:none;" style-hover="background:#FFD23F;color:#081A53;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sign out</a></div>
 </div>
 <div class="no-print" style="background:#F1F2F5;border-bottom:1px solid rgba(8,26,83,0.08);padding:7px 24px;display:flex;align-items:center;justify-content:center;gap:12px;color:#081A53;">
-  <span style="font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#8A93A8;">Client:</span>
+  <span style="font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#5E6475;">Client:</span>
   <div style="position:relative;display:inline-flex;align-items:center;background:#E3E6EC;border:1px solid rgba(8,26,83,0.14);border-radius:10px;height:36px;box-sizing:border-box;">
     <span data-cos="picker-mount" style="display:flex;height:100%;"></span>
     <span style="position:absolute;right:0;top:0;bottom:0;width:40px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(8,26,83,0.14);pointer-events:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#081A53" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
   </div>
 </div>
-<div class="no-print" style="background:#FFFFFF;border-bottom:1px solid rgba(8,26,83,0.08);padding:16px 24px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
-  <button onClick="{{ openVersions }}" title="Browse saved documents" style="display:inline-flex;align-items:center;gap:6px;height:40px;box-sizing:border-box;padding:0 16px;border-radius:9px;border:0;background:linear-gradient(135deg,#22C55E 0%,#15803D 100%);color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(21,128,61,0.35);" style-hover="filter:brightness(1.08);box-shadow:0 6px 18px rgba(21,128,61,0.45)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>{{ savedLabel }}<span title="Saved document versions" style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#C2410C;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;gap:4px;"><span>PDF</span><span>{{ nPdf }}</span></span><span title="Word documents" style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#6818F8;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;gap:4px;"><span>Word</span><span>{{ nWord }}</span></span><span title="My Templates" style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;background:#FFFFFF;color:#15803D;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:18px;gap:4px;"><span>Templates</span><span>{{ nTpl }}</span></span></button>
+<div class="no-print" data-cb-saved-row="">
+  <div data-cos="saved-mount" data-cos-app="factsheets"></div>
+  <button onClick="{{ openVersions }}" title="Browse this app’s saved documents, Word files and templates" type="button" class="cb-saved-docs" style="display:inline-flex;align-items:center;gap:8px;height:34px;box-sizing:border-box;padding:0 8px 0 12px;border-radius:10px;border:0;background:#1A6B2E;color:#FFFFFF;font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 4px 12px rgba(26,107,46,0.22);" style-hover="background:#155A26"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>{{ savedLabel }}<span title="Saved document versions" style="display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#C2410C;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;gap:4px;"><span>PDF</span><span>{{ nPdf }}</span></span><span title="Word documents" style="display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#6818F8;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;gap:4px;"><span>Word</span><span>{{ nWord }}</span></span><span title="My Templates" style="display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;background:#FFFFFF;color:#15803D;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;line-height:20px;gap:4px;"><span>Templates</span><span>{{ nTpl }}</span></span></button>
 </div>
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:48px 24px 64px;">
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
@@ -271,6 +284,7 @@ class Component extends DCLogic {
     try { const D = JSON.parse(localStorage.getItem('cbDeletedVersions') || '[]'); if (!D.includes(t)) { D.push(t); localStorage.setItem('cbDeletedVersions', JSON.stringify(D.slice(-500))); } } catch (e) {}
     const L = this.loadV().filter(x => x.t !== t); try { localStorage.setItem('cbVersions', JSON.stringify(L)); localStorage.removeItem('cbThumb:' + t); } catch (e) {}
     const k = v.exIdb === true ? t : null; if (k && !L.some(x => x.exIdb === t)) { try { const r = indexedDB.open('cbVersionData', 1); r.onsuccess = () => { try { r.result.transaction('ex', 'readwrite').objectStore('ex').delete(String(k)); } catch (e) {} }; } catch (e) {} }
+    import(new URL('./saved-index.js', location.href).href).then(m => m.removeVersion(v)).catch(() => {});
     this._rows = null; this.setState(s => ({ vBusy: null, vTick: s.vTick + 1 }));
   }
   inWs(v) { if (!v) return false; if (v.sharedFrom || (v.cloud && v.cloud.shared)) return true; const o = (window.CosCtx && window.CosCtx.get && window.CosCtx.get().orgId) || ''; const vo = v.org || (v.cloud && v.cloud.orgId) || ''; return !vo || !o || vo === o; }
