@@ -43,6 +43,8 @@
   [data-cos-taskbar] > .ex-actions{flex:0 1 auto!important;max-width:100%}
   @media (max-width:520px){[data-cb-saved-left] .cb-saved-docs{flex-wrap:wrap;height:auto!important;min-height:34px;padding:6px 10px!important;white-space:normal!important;row-gap:4px}}
   .cb-saved-docs:focus-visible,.cos-savedbar-btn:focus-visible{outline:3px solid #FFD23F!important;outline-offset:2px}
+  /* Everything is in Your Saved Files now, so the app's own saved-documents button is hidden (its list still opens from Your Saved Projects → Open File). */
+  .cb-saved-docs{display:none!important}
   [data-cos-taskbar] button,[data-cos-taskbar] a{text-transform:none!important;letter-spacing:0!important}
   [data-cos-taskbar] > .tb-spacer,[data-cos-taskbar] > div:empty{display:none!important}
   [data-cos-taskbar] button[data-cos-primary]{min-width:0!important;width:auto!important}
