@@ -501,20 +501,8 @@ export const TEMPLATES = [
   { key: 'fs-qual', group: 'Financial Fact Sheet', name: 'Qualitative', desc: 'Proposition, philosophy, process, team and timeline', size: 'letter', pages: [
     [{ k: 'v3-prop', col: 'TOP' }, { k: 'v3-glance', col: 'L' }, { k: 'v3-fit', col: 'L' }, { k: 'v3-highlights', col: 'R' }, { k: 'v3-philosophy', col: 'R' }, { k: 'v3-asset', col: 'L' }],
     [{ k: 'v3-process', col: 'TOP' }, { k: 'v3-construction', col: 'L' }, { k: 'v3-risks', col: 'L' }, { k: 'v3-criteria', col: 'R' }, { k: 'v3-leaders', col: 'F' }, { k: 'v3-timeline', col: 'F' }, { k: 'v3-disc', col: 'F' }]] },
-  { key: 'sell-sheet', name: 'Sell Sheet', desc: 'Value proposition, benefits, proof and one CTA', size: 'letter', pages: [
-    [{ k: 'b3-ss-value', col: 'TOP' }, { k: 'b3-ss-overview', col: 'L' }, { k: 'b3-ss-usecases', col: 'L' }, { k: 'b3-ss-benefits', col: 'R' }, { k: 'b3-ss-how', col: 'R' }, { k: 'b3-ss-proof', col: 'F' }],
-    [{ k: 'b3-ss-chart', col: 'TOP' }, { k: 'b3-ss-diff', col: 'L' }, { k: 'b3-about', col: 'L' }, { k: 'b3-ss-features', col: 'R' }, { k: 'b3-cta', col: 'F' }, { k: 'b3-legal', col: 'F' }]] },
-  { key: 'case-study', name: 'Case Study', desc: 'Outcome headline, challenge, solution, results', size: 'letter', pages: [
-    [{ k: 'b3-cs-head', col: 'TOP' }, { k: 'b3-cs-results-snap', col: 'TOP' }, { k: 'b3-cs-customer', col: 'L' }, { k: 'b3-cs-objectives', col: 'L' }, { k: 'b3-cs-quote', col: 'L' }, { k: 'b3-cs-challenge', col: 'R' }, { k: 'b3-cs-solution', col: 'R' }],
-    [{ k: 'b3-cs-approach', col: 'TOP' }, { k: 'b3-cs-takeaways', col: 'L' }, { k: 'b3-cs-results', col: 'R' }, { k: 'b3-cs-chart', col: 'R' }, { k: 'b3-cta', col: 'F' }, { k: 'b3-legal', col: 'F' }]] },
-  { key: 'white-paper', name: 'White Paper', desc: 'Summary, findings, evidence, framework, recommendations', size: 'letter', pages: [
-    [{ k: 'b3-wp-cover', col: 'TOP' }, { k: 'b3-wp-summary', col: 'TOP' }, { k: 'b3-wp-findings', col: 'F' }, { k: 'b3-wp-context', col: 'F' }],
-    [{ k: 'b3-wp-analysis', col: 'L' }, { k: 'b3-wp-implications', col: 'L' }, { k: 'b3-wp-framework', col: 'R' }, { k: 'b3-wp-example', col: 'R' }, { k: 'b3-wp-data', col: 'F' }],
-    [{ k: 'b3-wp-chart', col: 'TOP' }, { k: 'b3-wp-recs', col: 'L' }, { k: 'b3-about', col: 'L' }, { k: 'b3-wp-implement', col: 'R' }, { k: 'b3-wp-conclusion', col: 'R' }, { k: 'b3-cta', col: 'F' }, { k: 'b3-wp-sources', col: 'F' }]] },
-  { key: 'proposal', name: 'Proposal', desc: 'Needs, solution, scope, timeline, investment, acceptance', size: 'letter', pages: [
-    [{ k: 'b3-pr-cover', col: 'TOP' }, { k: 'b3-pr-summary', col: 'TOP' }, { k: 'b3-pr-needs', col: 'L' }, { k: 'b3-pr-objectives', col: 'R' }],
-    [{ k: 'b3-pr-solution', col: 'TOP' }, { k: 'b3-pr-scope', col: 'L' }, { k: 'b3-pr-approach', col: 'R' }],
-    [{ k: 'b3-pr-roles', col: 'L' }, { k: 'b3-pr-timeline', col: 'R' }, { k: 'b3-pr-investment', col: 'TOP' }, { k: 'b3-pr-budget', col: 'R' }, { k: 'b3-pr-value', col: 'L' }],
-    [{ k: 'b3-pr-why', col: 'L' }, { k: 'b3-pr-team', col: 'R' }, { k: 'b3-pr-assume', col: 'L' }, { k: 'b3-pr-terms', col: 'R' }, { k: 'b3-pr-accept', col: 'F' }]] }
+  { key: 'fs-hybrid', group: 'Financial Fact Sheet', name: 'Hybrid', desc: 'Story and numbers: firm, strategy, performance, holdings and risk', size: 'letter', pages: [
+    [{ k: 'hy-firm-facts', col: 'L' }, { k: 'hy-advisor', col: 'L' }, { k: 'hy-strategy', col: 'R' }, { k: 'hy-fund-details', col: 'R' }, { k: 'hy-performance', col: 'F' }],
+    [{ k: 'hy-top10', col: 'L' }, { k: 'hy-contributors', col: 'L' }, { k: 'hy-sectors', col: 'R' }, { k: 'hy-risk', col: 'R' }, { k: 'hy-role', col: 'F' }, { k: 'hy-disclosures', col: 'F' }]] }
 ];
 

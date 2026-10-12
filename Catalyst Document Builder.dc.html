@@ -1647,6 +1647,15 @@
         </div>
         <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#6818F8;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">2 pages</span><span style="white-space:nowrap;">Use template →</span></div>
       </div>
+      <div onClick="{{ tplPicks.fs_hybrid }}" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:16px;background:#fff;border:1.5px solid #e3e1ee;border-radius:14px;box-shadow:0 2px 10px rgba(8,26,83,.06);color:#1d2340;" style-hover="border-color:#C2410C;box-shadow:0 10px 30px rgba(104,24,248,.16);color:#1d2340">
+        <div style="height:96px;border-radius:9px;background:#FFF1E9;display:flex;align-items:center;justify-content:center;"><div style="width:56px;height:74px;background:#fff;border-radius:3px;box-shadow:0 4px 12px rgba(8,26,83,.14);padding:8px 7px;display:flex;flex-direction:column;gap:4px;overflow:hidden;"><div style="height:5px;width:65%;background:#C2410C;border-radius:2px;"></div><div style="height:3px;width:95%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:85%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:90%;background:#d8dbe6;border-radius:2px;"></div><div style="height:3px;width:60%;background:#d8dbe6;border-radius:2px;"></div><div style="display:flex;gap:3px;margin-top:3px;"><i style="width:12px;height:12px;border-radius:50%;background:#d9cbfd"></i><i style="width:12px;height:12px;border-radius:50%;background:#d9cbfd"></i><i style="width:12px;height:12px;border-radius:50%;background:#d9cbfd"></i></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#C2410C;">Financial Fact Sheet</div>
+          <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#081A53;">Hybrid</div>
+          <div style="font-size:12.5px;line-height:1.45;color:#5a6178;text-wrap:pretty;">Story and numbers: strategy, performance, holdings and risk.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#C2410C;"><span style="color:#6b7190;font-weight:600;white-space:nowrap;">2 pages</span><span style="white-space:nowrap;">Use template →</span></div>
+      </div>
       </div>
     </div>
       </div>
@@ -4922,7 +4931,7 @@ class Component extends DCLogic {
     if (kind === 'table') { const rows = payload; const h = Math.min(4, .22 * rows.length + .05); this.poCreate('table', { rows, w: Math.min(3.3, .85 * (rows[0] || []).length + .3), h }); }
     else { const t = String(payload || ''); this.poCreate('text', { text: t, h: Math.min(3, .25 + .16 * Math.ceil(t.length / 40)) }); }
   }
-  async fsLib() { if (!this._fsLib) this._fsLib = import(new URL('./fact-sheet-sections.js?v=20261002c', location.href).href); return this._fsLib; }
+  async fsLib() { if (!this._fsLib) this._fsLib = import(new URL('./fact-sheet-sections.js?v=20261012a', location.href).href); return this._fsLib; }
   fsOpenAt(at, cat, fromPanel) { this.setState({ fs: { at, cat: cat || 'All', fromPanel: !!fromPanel }, poAdd: null }); if (!this.state.fsLibData) this.fsLib().then(m => this.setState({ fsLibData: { cats: m.CATEGORIES, sections: m.SECTIONS, templates: m.TEMPLATES || [] } })).catch(() => this.setState({ fsLibErr: true })); }
   // Fill a fact-sheet section with Brand Command content where we know it; everything stays editable on the page.
   fsBrand(key, sec) {
@@ -7319,7 +7328,7 @@ class Component extends DCLogic {
       openNewProject: () => this.quickStart(null),
       tplOpen: !!s.tplOpen, openTplPicker: () => this.setState({ tplOpen: true }), closeTplPicker: () => this.setState({ tplOpen: false }),
       tplPickOpenFile: () => { this.setState({ tplOpen: false, versionsOpen: true, versions: this.loadVersions() }); this.cloudMergeVersions(); }, tplPickBlank: () => { this.setState({ tplOpen: false }); this.quickStart(null); },
-      tplPicks: (() => { const o = {}; ['fs-quant', 'fs-qual', 'sell-sheet', 'case-study', 'white-paper', 'proposal'].forEach(k => { o[k.replace(/-/g, '_')] = () => this.pickTplKey(k, true); }); return o; })(),
+      tplPicks: (() => { const o = {}; ['fs-quant', 'fs-qual', 'fs-hybrid', 'sell-sheet', 'case-study', 'white-paper', 'proposal'].forEach(k => { o[k.replace(/-/g, '_')] = () => this.pickTplKey(k, true); }); return o; })(),
       tplPickList: ((s.fsLibData && s.fsLibData.templates) || []).map(t => ({ title: t.group ? t.group + ' \u00b7 ' + t.name : t.name, desc: t.desc + ' \u00b7 ' + t.pages.length + (t.pages.length === 1 ? ' page' : ' pages'), pick: () => this.pickTplKey(t.key, true) })),
       openNewProjectModal: () => this.setState({ newOpen: true, npName: '', npSize: 'letter', npKind: 'blank', npTpl: null, npPages: 2, npW: 5.5, npH: 8.5, dirty: this.isDirty(), npNeedsSave: !!this.state.projectOpen && (this.isDirty() || !this.inGallery()) }),
       closeNewProject: () => this.setState({ newOpen: false }),
