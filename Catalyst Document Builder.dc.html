@@ -2507,7 +2507,7 @@ class Component extends DCLogic {
     this._tbRaf = requestAnimationFrame(tbLoop);
     setTimeout(() => this.poInit(), 0);
     this.setState({ versions: this.loadVersions() });
-    try { const q0 = location.search; this._goHomeOk = !/[?&](start|restore|resume|txt|new)\b/.test(q0);
+    try { const q0 = location.search; this._goHomeOk = !/[?&](start|restore|resume|txt|new|cos_auto)\b/.test(q0);
       if (/[?&]resume\b/.test(q0)) { history.replaceState(null, '', location.pathname + location.hash); setTimeout(() => this.openProject(), 50); }
       setTimeout(() => { if (this._goHomeOk && !this.state.projectOpen && !this.state.newOpen) location.replace('Catalyst Doc Home.dc.html'); }, 600); } catch (e) {}
     try { const utplQ = new URLSearchParams(location.search).get('utpl'); if (utplQ) { history.replaceState(null, '', location.pathname + location.hash); setTimeout(() => this.startUserTpl(utplQ), 300); } const tplQ = new URLSearchParams(location.search).get('tpl'); if (/[?&]start\b/.test(location.search)) { try { localStorage.setItem('cbProjectOpen', '0'); } catch (err) {} history.replaceState(null, '', location.pathname + location.hash); this.setState({ projectOpen: false, versionsOpen: false, newOpen: false }); setTimeout(() => this.quickStart(tplQ), 0); } } catch (e) {}
@@ -4445,6 +4445,7 @@ class Component extends DCLogic {
   // "Let CatalystOS create this": the shared CatalystOS panel (catalyst-create.js). It knows the open document's type and
   // the active campaign, so it never asks; Writing, Design or Both; Undo / Regenerate restore the snapshot taken first.
   cosCreateMount() {
+    if (this.cosAuto() && !window.__cosAutoQuiet) { window.__cosAutoQuiet = true; window.alert = (m) => console.warn('[auto]', m); window.confirm = () => true; window.prompt = (m, d) => (d == null ? '' : String(d)); }
     const go = () => {
       if (!window.CatalystCreate) { if ((this._ccTry = (this._ccTry || 0) + 1) < 60) setTimeout(go, 250); return; }
       window.CatalystCreate.mount({
@@ -4456,16 +4457,71 @@ class Component extends DCLogic {
         restore: (snap) => { try { const x = JSON.parse(snap); this._hfPrev = null; this._designUndo = null; this.setState({ pageObjs: x.pageObjs || {}, header: x.header || undefined, footer: x.footer || undefined, saved: false, teamReview: null, designUndoOn: false, designNote: '', aiMsg: '' }); } catch (e) {} },
         run: async (mode) => {
           await this.teamLoadCamps();
-          if (mode !== 'design') { let n = await this.teamWrite('', false); if (!n) n = await this.teamWrite('', true); }
+          if (mode !== 'design') { const nb = this._cosBrief || ''; let n = await this.teamWrite(nb, false); if (!n) n = await this.teamWrite(nb, true); }
           if (mode !== 'writing') await this.teamDesign();
           const r = this.state.teamReview || {}; const notes = [];
           (r.missing || []).forEach(t => notes.push('Missing: ' + t)); (r.unverified || []).forEach(t => notes.push('Verify: ' + t)); (r.needsApproval || []).forEach(t => notes.push('Needs approval: ' + t)); (r.compliance || []).forEach(t => notes.push('Compliance: ' + t));
           return { notes };
         },
         keep: () => { if (this.aiPendingCount() > 0) this.aiResolve(true); this._designUndo = null; this.setState({ designUndoOn: false, aiMsg: '' }); },
+        // Hands-off runs (the CatalystOS runner opens this page with ?cos_auto=1&client=…&kind=…&title=…&campaign=…).
+        autoKinds: ['fact-sheet'],
+        autoReady: () => this.cosAutoReady(),
+        autoPrepare: (p) => this.cosAutoPrepare(p),
+        autoSave: (p) => this.cosAutoSave(p),
       });
     };
     go();
+  }
+  cosAuto() { try { return new URLSearchParams(location.search).get('cos_auto') === '1'; } catch (e) { return false; } }
+  // Which starter template makes each kind (the same templates as Start from a Template).
+  cosAutoTpl(kind, brief) {
+    if (kind === 'fact-sheet') { const b = String(brief || '').toLowerCase(); const keys = ((this.state.fsLibData && this.state.fsLibData.templates) || []).map(t => t.key);
+      const pick = /qualitative|story|narrative/.test(b) ? 'fs-qual' : /quantitative|performance|returns|numbers/.test(b) ? 'fs-quant' : 'fs-hybrid';
+      return !keys.length || keys.includes(pick) ? pick : (keys.find(k => /^fs-/.test(k)) || 'fs-quant'); }
+    return { 'case-study': 'case-study', 'sell-sheet': 'sell-sheet', 'white-paper': 'white-paper', proposal: 'proposal' }[kind] || '';
+  }
+  // Ready when the page has loaded, the person is signed in and the client's Brand Command is loaded.
+  cosAutoReady() {
+    if (window.__cbApp !== this || this.state.booting) return false;
+    try { if (!window.COS_AUTH_SKIPPED && window.CatalystAuth && window.CatalystAuth.user && !window.CatalystAuth.user()) return false; } catch (e) {}
+    const c = this.cosCtx(); if (!c.clientId) return false;
+    const b = this.state.brandLink || {}; if (b.profile && b.clientId === c.clientId) return true;
+    return /no brand profile/i.test(this.state.bcStatus || '');
+  }
+  // Starts a new piece of that kind for that client, names it and assigns the campaign. Never asks anything.
+  async cosAutoPrepare(p) {
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    try { const m = await this.fsLib(); this.setState({ fsLibData: { cats: m.CATEGORIES, sections: m.SECTIONS, templates: m.TEMPLATES || [] } }); } catch (e) {}
+    const tpl = this.cosAutoTpl(p.kind, p.brief); if (!tpl) throw Object.assign(new Error('This app can’t make “' + p.kind + '” yet.'), { code: 'not-supported' });
+    this._cosBrief = String(p.brief || '').slice(0, 2000);
+    if (p.client && window.CosCtx && this.cosCtx().clientId !== p.client) window.CosCtx.setClient(p.client);
+    try { localStorage.setItem('cbProjectOpen', '0'); } catch (e) {}
+    this.setState({ projectOpen: false, versionsOpen: false, newOpen: false, tplGal: false, tplView: false, leaveOn: false, saveAsk: null, saved: false });
+    await wait(50); await this.quickStart(tpl);
+    const has = () => { const P = this.state.pageObjs || {}; return this.state.projectOpen && Object.keys(P).some(k => (P[k] || []).some(o => o.type === 'text')); };
+    for (let i = 0; i < 300 && !has(); i++) await wait(100);
+    if (!has()) throw new Error('The new document didn’t open.');
+    for (let i = 0; i < 100 && !this.cosAutoReady(); i++) await wait(100); // the brand reloads for the new document
+    await wait(1500); // header and footer settle
+    this.setState(st => ({ docName: String(p.title || '').trim() || st.docName || 'Untitled document', docMeta: Object.assign({}, st.docMeta || {}, { type: p.kind, at: Date.now() }, p.campaign ? { campaignIds: [p.campaign] } : {}) }));
+    await wait(50); await this.teamLoadCamps(true);
+  }
+  // Saves exactly like Save Document (a new saved version, its thumbnail, the database copy and the Saved Files entry).
+  async cosAutoSave(p) {
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    if (this.aiPendingCount() > 0) this.aiResolve(true); this._designUndo = null;
+    this.setState(st => ({ designUndoOn: false, aiMsg: '', docName: String(p.title || '').trim() || st.docName, docMeta: Object.assign({}, st.docMeta || {}, p.campaign ? { campaignIds: [p.campaign] } : {}) }));
+    await wait(400);
+    const before = this._curVT; this.saveAll('new');
+    let t = null; for (let i = 0; i < 150 && !t; i++) { await wait(100); if (this._curVT && this._curVT !== before && this.loadVersions().some(x => x.t === this._curVT)) t = this._curVT; }
+    if (!t) throw new Error('The document couldn’t be saved.');
+    const cur = () => this.loadVersions().find(x => x.t === t);
+    for (let i = 0; i < 200; i++) { const v = cur(); if (v && v.cloud) break; await wait(100); } // thumbnail, then the database copy
+    const v = cur(); if (!v) throw new Error('The document couldn’t be saved.');
+    const m = await this.sfMod(); const cid = m.clientOf(v, this.teamCid());
+    await m.recordVersion(v, { clientId: cid });
+    return { app: m.APP, ref: String(v.t), title: v.title, thumb: m.thumbOf(v), openUrl: m.openUrlFor(v, cid) };
   }
   aiResolve(approve) { const P = Object.assign({}, this.poAll()); Object.keys(P).forEach(pid => { P[pid] = (P[pid] || []).map(o => { if (o.aiPending == null && !o.aiPendingRows) return o; const n = Object.assign({}, o); if (!approve) { if (o.aiPending != null) n.text = o.aiPending; if (o.aiPendingRows) { n.rows = o.aiPendingRows; n.sample = o.aiPendingSample; } } delete n.aiPending; delete n.aiPendingRows; delete n.aiPendingSample; return n; }); }); const hfPrev = this._hfPrev; this._hfPrev = null; const extra = {}; if (!approve && hfPrev) { try { const x = JSON.parse(hfPrev); extra.header = x.header || undefined; extra.footer = x.footer || undefined; } catch (e) {} } this.setState(Object.assign({ pageObjs: P, saved: false, aiMsg: approve ? 'Approved. Changes are part of your document.' : 'Reverted to the original text and data.' }, extra)); }
   async aiData(file) {
