@@ -4460,7 +4460,7 @@ class Component extends DCLogic {
     if (this.cosAuto() && !window.__cosAutoQuiet) { window.__cosAutoQuiet = true; window.alert = (m) => console.warn('[auto]', m); window.confirm = () => true; window.prompt = (m, d) => (d == null ? '' : String(d)); }
     const go = () => {
       if (!window.CatalystCreate) { if ((this._ccTry = (this._ccTry || 0) + 1) < 60) setTimeout(go, 250); return; }
-      window.CatalystCreate.mount({
+      window.CatalystCreate.mount({ designRoots: function () { return document.querySelectorAll(".book .media:not(.pg-deleted) > .pg"); },
         enabled: () => !!this.state.projectOpen,
         noun: () => { const k = this.teamDocType(); const t = (this.teamTypes().find(x => x[0] === k) || [])[1]; return k === 'other' || !t ? 'document' : t.toLowerCase(); },
         context: () => { const k = this.teamDocType(); const t = (this.teamTypes().find(x => x[0] === k) || [])[1] || 'Document'; const tc = this.state.teamCamps; const ids = (this.state.docMeta && this.state.docMeta.campaignIds) || []; const c = tc && tc.list ? tc.list.find(x => ids.includes(x.id)) : null; return { kind: t, campaign: c ? (c.name || 'Untitled campaign') : '' }; },
