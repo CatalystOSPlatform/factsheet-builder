@@ -3919,6 +3919,15 @@ class Component extends DCLogic {
     finally { this.setState({ dlBusy: null }); } }
   dlGuard(kind) { if (this.state.saved && this._savedSnap && this._savedSnap === this.snapKey()) return true; if (this._curVT && !this._userEdited) return true; this.setState({ dlOpen: false, dlSave: kind }); return false; }
   dlRun(kind) { if (kind === 'pdf') this.downloadPdf(true); else if (kind === 'pptx') this.downloadPptx(true); else if (kind === 'web') this.downloadWebPkg(true); }
+  // The document as a PDF Blob (no printer's marks) and its first page as a thumbnail, for hands-off runs.
+  async pdfBlob() {
+    await this.loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); const J = window.jspdf && window.jspdf.jsPDF; if (!J) throw new Error('The PDF tool didn’t load.');
+    const imgs = await this.rasterPages(1, 'jpeg'); if (!imgs.length) throw new Error('There are no pages to export.');
+    const DW = +(3.5 * (this._pageScale || 1)).toFixed(3), DH = +(4.75 * (this._pageScale || 1) * (this._pgvh || 1)).toFixed(3); const OR = DW > DH ? 'landscape' : 'portrait';
+    const doc = new J({ unit: 'in', format: [DW, DH], orientation: OR, compress: true }); doc.setProperties({ title: this.state.docName || 'Document' });
+    imgs.forEach((im, i) => { if (i) doc.addPage([DW, DH], OR); doc.addImage(im.url, 'JPEG', 0, 0, DW, DH, undefined, 'FAST'); });
+    return { blob: doc.output('blob'), thumb: imgs[0].url };
+  }
   async downloadPdf(ok) {
     if (!ok && !this.dlGuard('pdf')) return;
     this.setState({ dlOpen: false, dlBusy: 'Building PDF…' });
@@ -4472,6 +4481,7 @@ class Component extends DCLogic {
         autoReady: () => this.cosAutoReady(),
         autoPrepare: (p) => this.cosAutoPrepare(p),
         autoSave: (p) => this.cosAutoSave(p),
+        autoPdf: () => this.pdfBlob(),
       });
     };
     go();
