@@ -1180,6 +1180,7 @@
 <script>(function(){var h=location.hostname;if(!/vercel\.app$/i.test(h)&&!/[?&]auth=1/.test(location.search)){window.COS_AUTH_SKIPPED=true;return;}var s=document.createElement('script');s.src='https://catalystos-dashboard-staging.vercel.app/cos-app-auth.js';['data-require','data-no-back','data-no-button'].forEach(function(a){s.setAttribute(a,'')});s.setAttribute('data-home','https://catalystos-dashboard-staging.vercel.app/COS.dc.html');document.head.appendChild(s);})();</script>
 <link rel="stylesheet" href="https://catalystos-dashboard-staging.vercel.app/catalyst-ui.css">
 <script src="https://catalystos-dashboard-staging.vercel.app/saved-bar.js"></script>
+<script src="https://catalystos-dashboard-staging.vercel.app/catalyst-create.js"></script>
 <style>
   /* CatalystOS task bar (style guide): Saved Files and this app's Saved Documents at the far left; every other action right-aligned, Save last */
   [data-cb-saved-left]{display:flex!important;align-items:center;gap:8px;margin-right:auto!important;flex:none}
@@ -2454,6 +2455,7 @@ class Component extends DCLogic {
   state = { booting: (() => { try { return /[?&](start|restore|utpl|tpl)\b/.test(location.search); } catch (e) { return false; } })(), projectOpen: (() => { try { if (/[?&]start\b/.test(location.search) || /start/.test(location.hash)) return false; return localStorage.getItem('cbProjectOpen') === '1'; } catch (e) { return false; } })(), docName: '', pages: [], blanks: 0, view: 'single', bleed: false, crop: false, marks: false, bars: false, edges: false, margins: false, activeSection: null, panelOpen: true, panelMin: true, pmPanelMin: true, hfMin: true, showBirdControls: false, birdMin: true, hidden: {}, saved: false, dlOpen: false, linked: false, cloudStatus: '' };
 
   componentDidMount() {
+    this.cosCreateMount();
     window.__cbSfUrl = location.href; // read by saved-actions.js (Saved Files Duplicate / Make Template link) before the link is cleared below
     import(new URL('./saved-actions.js', location.href).href).catch(e => console.warn('Saved Files actions', e)); this._sfc = () => { this._vCache = null; this.setState({ versions: this.loadVersions() }); }; window.addEventListener('cb-saved-changed', this._sfc);
     setTimeout(() => this.rteInit(), 0);
@@ -4440,6 +4442,31 @@ class Component extends DCLogic {
   }
   teamDesignUndo() { if (!this._designUndo) return; try { this.setState({ pageObjs: JSON.parse(this._designUndo), saved: false, designUndoOn: false, designNote: '', aiMsg: 'Your design is back the way it was.' }); } catch (e) {} this._designUndo = null; }
   aiPendingCount() { const P = this.poAll(); let n = this._hfPrev ? 1 : 0; Object.keys(P).forEach(pid => (P[pid] || []).forEach(o => { if (o.aiPending != null || o.aiPendingRows) n++; })); return n; }
+  // "Let CatalystOS create this": the shared CatalystOS panel (catalyst-create.js). It knows the open document's type and
+  // the active campaign, so it never asks; Writing, Design or Both; Undo / Regenerate restore the snapshot taken first.
+  cosCreateMount() {
+    const go = () => {
+      if (!window.CatalystCreate) { if ((this._ccTry = (this._ccTry || 0) + 1) < 60) setTimeout(go, 250); return; }
+      window.CatalystCreate.mount({
+        enabled: () => !!this.state.projectOpen,
+        noun: () => { const k = this.teamDocType(); const t = (this.teamTypes().find(x => x[0] === k) || [])[1]; return k === 'other' || !t ? 'document' : t.toLowerCase(); },
+        context: () => { const k = this.teamDocType(); const t = (this.teamTypes().find(x => x[0] === k) || [])[1] || 'Document'; const tc = this.state.teamCamps; const ids = (this.state.docMeta && this.state.docMeta.campaignIds) || []; const c = tc && tc.list ? tc.list.find(x => ids.includes(x.id)) : null; return { kind: t, campaign: c ? (c.name || 'Untitled campaign') : '' }; },
+        modes: ['writing', 'design', 'both'],
+        snapshot: () => JSON.stringify({ pageObjs: this.poAll(), header: this.state.header || null, footer: this.state.footer || null }),
+        restore: (snap) => { try { const x = JSON.parse(snap); this._hfPrev = null; this._designUndo = null; this.setState({ pageObjs: x.pageObjs || {}, header: x.header || undefined, footer: x.footer || undefined, saved: false, teamReview: null, designUndoOn: false, designNote: '', aiMsg: '' }); } catch (e) {} },
+        run: async (mode) => {
+          await this.teamLoadCamps();
+          if (mode !== 'design') { let n = await this.teamWrite('', false); if (!n) n = await this.teamWrite('', true); }
+          if (mode !== 'writing') await this.teamDesign();
+          const r = this.state.teamReview || {}; const notes = [];
+          (r.missing || []).forEach(t => notes.push('Missing: ' + t)); (r.unverified || []).forEach(t => notes.push('Verify: ' + t)); (r.needsApproval || []).forEach(t => notes.push('Needs approval: ' + t)); (r.compliance || []).forEach(t => notes.push('Compliance: ' + t));
+          return { notes };
+        },
+        keep: () => { if (this.aiPendingCount() > 0) this.aiResolve(true); this._designUndo = null; this.setState({ designUndoOn: false, aiMsg: '' }); },
+      });
+    };
+    go();
+  }
   aiResolve(approve) { const P = Object.assign({}, this.poAll()); Object.keys(P).forEach(pid => { P[pid] = (P[pid] || []).map(o => { if (o.aiPending == null && !o.aiPendingRows) return o; const n = Object.assign({}, o); if (!approve) { if (o.aiPending != null) n.text = o.aiPending; if (o.aiPendingRows) { n.rows = o.aiPendingRows; n.sample = o.aiPendingSample; } } delete n.aiPending; delete n.aiPendingRows; delete n.aiPendingSample; return n; }); }); const hfPrev = this._hfPrev; this._hfPrev = null; const extra = {}; if (!approve && hfPrev) { try { const x = JSON.parse(hfPrev); extra.header = x.header || undefined; extra.footer = x.footer || undefined; } catch (e) {} } this.setState(Object.assign({ pageObjs: P, saved: false, aiMsg: approve ? 'Approved. Changes are part of your document.' : 'Reverted to the original text and data.' }, extra)); }
   async aiData(file) {
     if (!file) return; 
@@ -7275,7 +7302,7 @@ class Component extends DCLogic {
       pmPanelStyle: `display:flex;top:${(s.chromeB || 160) + 20}px`, cleanTop: String(s.chromeB || 160), cleanOn: this.props.cleanButton !== false && !!s.projectOpen, tplBtnOn: !!s.projectOpen, goHomeStart: () => this.clearToBlank(true),
       startOverPage: () => { const a = this.curPageAdd(); if (!a) return; const L = this.poList(a.pid); if (!L.length) { window.alert('This page has nothing added to it yet.'); return; } if (!window.confirm('Start this page over? Everything you added to it (text, tables, charts, images, shapes) will be removed. The header and footer stay. You can use Undo to bring it back.')) return; this.poSetList(a.pid, []); this.setState({ poSel: null, saved: false }); try { this.histRecord && setTimeout(() => this.histRecord(), 50); } catch (e) {} }, cleanCurPage: () => { const a = this.curPageAdd(); if (!a) return; if (!this.poList(a.pid).some(o => o.type !== 'color')) { window.alert('Add some content to this page first, then clean its layout.'); return; } this.cleanPage(a.pid); },
       pmPanelArrowCls: 'parrow' + (s.pmPanelMin ? '' : ' up'),
-      aiPanelCls: 'panel no-print ai-panel' + (s.aiMin !== false ? ' min' : ''), aiArrowCls: 'parrow' + (s.aiMin !== false ? '' : ' up'), aiPanelStyle: `display:${s.projectOpen ? 'flex' : 'none'};top:${(s.chromeB || 160) + 20}px`,
+      aiPanelCls: 'panel no-print ai-panel' + (s.aiMin !== false ? ' min' : ''), aiArrowCls: 'parrow' + (s.aiMin !== false ? '' : ' up'), aiPanelStyle: `display:none;top:${(s.chromeB || 160) + 20}px`,
       aiHeadClick: () => { const open = this.state.aiMin !== false; this.setState({ aiMin: !open }, () => this.fitPreview && this.fitPreview()); if (open) this.teamLoadCamps(); },
       aiBrief: s.aiBrief || '', aiOnBrief: e => this.setState({ aiBrief: e.target.value }), aiAll: !!s.aiAll, aiOnAll: e => this.setState({ aiAll: e.target.checked }), aiBusy: !!s.aiBusy, aiMsgOn: !!s.aiMsg && !s.aiBusy, aiMsg: s.aiMsg || '', ...this.aiProgressVals(), aiGoText: s.aiBusy ? 'Working…' : 'Write It for Me', aiReviewOn: this.aiPendingCount() > 0 && !s.aiBusy, aiReviewText: (() => { const n = this.aiPendingCount(); return n + ' area' + (n === 1 ? '' : 's') + ' written by us. Review them on the page, then approve or revert.'; })(), aiApprove: () => this.aiResolve(true), aiRevert: () => this.aiResolve(false), aiDataUp: e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; this.aiData(f); },
       aiGoSt: 'width:100%;height:36px;display:flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:999px;background:#081A53;color:#fff;font:800 12px Manrope,sans-serif;cursor:pointer;' + (s.aiBusy ? 'opacity:.6;' : ''),
