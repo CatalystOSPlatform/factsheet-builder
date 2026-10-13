@@ -25,6 +25,21 @@ export function kindOf(v) {
   if (/case[- ]?stud/.test(t)) return 'Case study'; if (/sell[- ]?sheet|one[- ]?pager/.test(t)) return 'Sell sheet'; if (/white[- ]?paper/.test(t)) return 'White paper'; if (/proposal|\brfp\b/.test(t)) return 'Proposal'; if (/fact[- ]?sheet/.test(t)) return 'Fact sheet';
   return v.kind === 'existing' ? 'Rebuilt' : 'Custom';
 }
+// For the client's knowledge base: the document's words, and a short description of its look (pages, colors, fonts, photos).
+export function designOf(data, v) {
+  const cols = {}, fonts = {}; let imgs = 0, pages = 0;
+  const hex = (x) => { const m = String(x || '').match(/#[0-9a-f]{6}\b/i); return m ? m[0].toUpperCase() : ''; };
+  const walk = (o, depth) => { if (!o || depth > 9) return; if (Array.isArray(o)) { o.forEach((x) => walk(x, depth + 1)); return; } if (typeof o !== 'object') return;
+    for (const k of Object.keys(o)) { const val = o[k];
+      if (typeof val === 'string') { if (/color|bg|background|fill/i.test(k)) { const h = hex(val); if (h) cols[h] = (cols[h] || 0) + 1; } else if (/font(Family)?$/i.test(k) && val.trim() && val.length < 60 && !/^data:/.test(val)) fonts[val] = (fonts[val] || 0) + 1; else if (/^(src|img|image|photo)$/i.test(k) && /^(https?:|data:image)/.test(val)) imgs++; }
+      else if (val && typeof val === 'object' && !/^(thumb|aiPending)$/i.test(k)) walk(val, depth + 1); } };
+  const P = data && data.app && data.app.pageObjs; if (P && typeof P === 'object') pages = Object.keys(P).length; walk(data && (data.app || data.ex || data), 0);
+  const top = (m, n) => Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, n).map((x) => x[0]);
+  const parts = [kindOf(v) + (pages ? ', ' + pages + ' page' + (pages === 1 ? '' : 's') : '')];
+  if (top(cols, 5).length) parts.push('main colors ' + top(cols, 5).join(', ')); if (top(fonts, 3).length) parts.push('fonts ' + top(fonts, 3).join(', ')); parts.push(imgs ? imgs + ' photo' + (imgs === 1 ? '' : 's') : 'no photos');
+  if (v && v.tpl) parts.push('template ' + v.tpl);
+  return parts.join('; ') + '.';
+}
 export async function recordVersion(v, { clientId = '' } = {}) {
   try {
     if (!v || v.t == null || v.demo) return null;
@@ -33,6 +48,7 @@ export async function recordVersion(v, { clientId = '' } = {}) {
     const thumb = thumbOf(v);
     const rec = { clientId: cid, app: APP, ref: String(v.t), title: v.title || 'Untitled document', campaignIds: Array.isArray(v.campaignIds) ? v.campaignIds.slice() : [], openUrl: openUrlFor(v, cid), thumb, kind: kindOf(v), orgId: (v.cloud && v.cloud.orgId) || v.org || ctx().orgId || '' };
     if (v.approved !== undefined) rec.approved = !!v.approved;
+    if (cid) { try { const dm = await import(new URL('./doc-meta.js', import.meta.url).href); const data = await dm.snapshotFor(v); rec.text = dm.textOf(data); rec.design = designOf(data, v); } catch (e) { console.warn('knowledge base text', e); } }
     return await (await SF()).recordSave(rec);
   } catch (e) { console.warn('Saved Files', e); return null; }
 }

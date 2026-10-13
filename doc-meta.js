@@ -60,14 +60,13 @@ export async function setApproved(v, on, { app = 'Document Builder', clientId = 
     if (on) {
       const text = textOf(await snapshotFor(list[i]));
       await fb.approveVersion(cid, slot, v.title || 'Untitled document', { type: 'document', title: v.title || 'Untitled document', text, pages: v.sub || '', docId: String(v.t), campaignIds: list[i].campaignIds || [] }, app);
-      const rec = await file(list[i], list, i, app, cid).catch((e) => { console.warn('knowledge base', e); return undefined; });
-      if (rec === null) return 'Approved. You chose not to add it to the knowledge base.';
-      if (!rec) return 'Approved. We couldn’t add it to the knowledge base right now. Turn the switch off and on to try again.';
-      return 'Approved and added to the knowledge base for ' + (rec.scope === 'campaign' ? (rec.campaignIds.length === 1 ? 'one campaign' : rec.campaignIds.length + ' campaigns') : 'the whole brand') + '.';
+      // The knowledge base entry follows Saved Files (recorded above as approved); the older separate entry is retired.
+      await (await akMod()).removeApproved(cid, slot).catch(() => {});
+      return 'Approved. The knowledge base now treats it as approved work.';
     }
     if (fb.unapproveVersion) await fb.unapproveVersion(cid, slot);
     await (await akMod()).removeApproved(cid, slot).catch(() => {});
-    return 'No longer approved. Removed from the knowledge base.';
+    return 'No longer approved. It stays in the knowledge base as saved work.';
   } catch (e) { console.warn(e); return on ? 'Approved here, but Brand Command couldn’t be updated. Try again in a moment.' : 'Couldn’t update Brand Command. Try again in a moment.'; }
 }
 
