@@ -1,7 +1,8 @@
 // Vercel serverless function: POST /api/ai  { prompt } -> { text }
 // Keeps the Anthropic API key on the server. Set ANTHROPIC_API_KEY in Vercel → Project → Settings → Environment Variables.
 export default async function handler(req, res) {
-  if (req.method !== 'POST') { res.status(405).json({ error: 'POST only' }); return; }
+  const G = await import('./_guard.js'); const ok = await (G.guard || G.default.guard)(req, res, { name: 'ai', perMinute: 40 });
+  if (!ok) return;
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) { res.status(500).json({ error: 'ANTHROPIC_API_KEY is not set on the server.' }); return; }
   try {
