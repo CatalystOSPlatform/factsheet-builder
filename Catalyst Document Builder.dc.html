@@ -2903,7 +2903,8 @@ class Component extends DCLogic {
   sfMod() { if (!this._sfm) this._sfm = import(new URL('./saved-index.js', location.href).href); return this._sfm; }
   sfRecord(v, clientId) { if (!v || v.demo) return; this.sfMod().then(m => m.recordVersion(v, { clientId: clientId || '' })).catch(() => {}); }
   sfRemove(v) { if (!v) return; this.sfMod().then(m => m.removeVersion(v)).catch(() => {}); }
-  async cloudSaveVersion(t) {
+  cloudSaveVersion(t) { this._cloudP = this._cloudP || {}; if (this._cloudP[t]) return this._cloudP[t]; const p = this.cloudSaveVersion0(t).finally(() => { if (this._cloudP[t] === p) delete this._cloudP[t]; }); this._cloudP[t] = p; return p; }
+  async cloudSaveVersion0(t) {
     if (this.isDemo()) return;
     try {
       const v = this.loadVersions().find(x => x.t === t); if (!v) return;
@@ -2992,13 +2993,14 @@ class Component extends DCLogic {
     const data = { app: this.collectState(), photos };
     this.setState({ versions: [v0, ...prev.filter(x => x.t !== v0.t)].slice(0, 60) });
     try { await this.vdbPut(v0.t, data); v0.exIdb = true; } catch (e) { console.warn('IndexedDB save failed, using localStorage', e); v0.app = data.app; v0.photos = data.photos; }
-    const list = [v0, ...prev.filter(x => x.t !== v0.t)].slice(0, 200);
+    const list = [v0, ...this.loadVersions().filter(x => x.t !== v0.t)].slice(0, 200); // re-read: another window of this app may have saved meanwhile
     const put = () => { try { localStorage.setItem('cbVersions', JSON.stringify(list)); return true; } catch (e) { return false; } };
     if (!put()) { for (let k = 1; k < list.length; k++) { const x = list[k]; if (x.kind === 'existing' && x.ex) x.ex = Object.assign({}, x.ex, { pdfPages: (x.ex.pdfPages || []).map(p => Object.assign({}, p, { thumbUrl: '' })), pageBlocks: (x.ex.pageBlocks || []).map(q => q && Object.assign({}, q, { artworkSrc: '' })) }); } if (!put()) { for (let k = 1; k < list.length; k++) { if (list[k].exIdb) { delete list[k].ex; delete list[k].app; delete list[k].photos; } } if (!put()) { for (let k = 1; k < list.length; k++) list[k].thumb = ''; if (!put()) { console.warn('Version list could not be stored in full'); list.length = Math.min(list.length, 40); put(); } } } }
     this.setCurV(v0.t);
     this.setState({ versions: list });
     this.sfRecord(v0, extra.clientId);
-    setTimeout(() => this.captureThumb(v0.t), 150);
+    this._thumbP = this.cosSleep(150).then(() => this.captureThumb(v0.t)); // thumbnail, then the database copy
+    return v0;
   }
   setCurV(t) { this._curVT = t || null; this._userEdited = false; try { if (t) localStorage.setItem('cbCurVersionNew', String(t)); else localStorage.removeItem('cbCurVersionNew'); } catch (e) {} }
 
@@ -3013,16 +3015,18 @@ class Component extends DCLogic {
 
   async captureThumb(t, light) {
     try {
-      if (!window.htmlToImage) await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js'; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); });
-      const vis = Array.from(document.querySelectorAll('.book .media:not(.pg-deleted) > .pg')).filter(el => { const rr = el.getBoundingClientRect(); return rr.width > 20 && rr.height > 20 && getComputedStyle(el).visibility !== 'hidden'; }); const pg = vis.find(el => el.children.length) || vis[0]; if (!pg) { if (!light) this.cloudSaveVersion(t); return; }
+      if (!window.htmlToImage) { const ld = await this.cosWithin(new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js'; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); }), 20000); if (!ld.ok || !window.htmlToImage) throw new Error('The thumbnail tool didn’t load.'); }
+      const vis = Array.from(document.querySelectorAll('.book .media:not(.pg-deleted) > .pg')).filter(el => { const rr = el.getBoundingClientRect(); return rr.width > 20 && rr.height > 20 && getComputedStyle(el).visibility !== 'hidden'; }); const pg = vis.find(el => el.children.length) || vis[0]; if (!pg) { if (!light) return this.cloudSaveVersion(t); return; }
       const r = pg.getBoundingClientRect();
       const okUrl = u => typeof u === 'string' && /^data:image\/(jpeg|png);base64,/.test(u) && u.length > 1500;
       const filter = n => !(n.classList && (n.classList.contains('photoctl') || n.classList.contains('edge-line')));
       const pr = Math.max(0.5, Math.min(1.5, 320 / Math.max(1, r.width)));
       let url = '';
       const ph = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII='; const tries = [{ quality: 0.72, pixelRatio: pr, cacheBust: false, filter, backgroundColor: '#ffffff', imagePlaceholder: ph }, { quality: 0.72, pixelRatio: pr, cacheBust: true, filter, backgroundColor: '#ffffff', skipFonts: true, imagePlaceholder: ph }, { quality: 0.72, pixelRatio: pr, filter: n => filter(n) && !(n.tagName === 'IMG'), backgroundColor: '#ffffff', skipFonts: true }];
-      for (const o of tries) { try { const u = await window.htmlToImage.toJpeg(pg, o); if (okUrl(u)) { url = u; break; } } catch (err) {} }
-      if (!url) { console.warn('thumbnail: no valid capture'); if (!light) this.cloudSaveVersion(t); return; }
+      // Each try has a time limit (a capture can wait forever on a picture or font that never loads); no thumbnail beats no save.
+      const tEnd = Date.now() + 30000;
+      for (const o of tries) { if (Date.now() > tEnd) break; try { const u = await this.cosWithin(window.htmlToImage.toJpeg(pg, o), 15000); if (u.ok && okUrl(u.v)) { url = u.v; break; } } catch (err) {} }
+      if (!url) { console.warn('thumbnail: no valid capture'); if (!light) return this.cloudSaveVersion(t); return; }
       try { localStorage.setItem('cbThumb:' + t, url); } catch (e) {}
       const list = this.loadVersions(); const v = list.find(x => x.t === t); if (!v) return; v.thumb = url;
       if (!this.storeVersions(list)) { list.forEach(x => { if (x.t !== t && x.thumb && localStorage.getItem('cbThumb:' + x.t)) x.thumb = ''; }); this.storeVersions(list); }
@@ -3030,7 +3034,7 @@ class Component extends DCLogic {
       if (!light) this.sfRecord(v); // Saved Files card shows this thumbnail
       if (light) { if (v.cloud) this.fbMod().then(fb => fb.saveDocVersionMeta && fb.saveDocVersionMeta(v.cloud, { thumb: url.length < 300000 ? url : '' })).catch(() => {}); return; }
     } catch (e) { console.warn('thumbnail failed', e); }
-    if (!light) this.cloudSaveVersion(t);
+    if (!light) return this.cloudSaveVersion(t);
   }
   refreshThumbSoon(ms) { clearTimeout(this._rtT); this._rtT = setTimeout(() => { if (this.state.projectOpen && this._curVT && !this.isDemo()) this.captureThumb(this._curVT, true); }, ms || 3500); }
 
@@ -3083,7 +3087,7 @@ class Component extends DCLogic {
     if (!mode) { if (cur) { this.setState({ saveAsk: { title: cur.title || 'this document' } }); return; } else mode = 'new'; }
     if (this.state.saveAsk) this.setState({ saveAsk: null });
     this.lsSafeSet('cbAppState', JSON.stringify(this.collectState()));
-    this.addVersion(mode, sig); this._lastSaveMode = mode;
+    this._addVP = this.addVersion(mode, sig); this._lastSaveMode = mode;
     try {
       const map = JSON.parse(localStorage.getItem('cbPhotoPos') || '{}');
       localStorage.setItem('cbPhotoPos', JSON.stringify(map));
@@ -3901,12 +3905,12 @@ class Component extends DCLogic {
   loadScript(src) { this._ls = this._ls || {}; if (this._ls[src]) return this._ls[src]; return (this._ls[src] = new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => { this._ls[src] = null; rej(new Error('load ' + src)); }; document.head.appendChild(s); })); }
   async rasterPages(scale, fmt) {
     await this.loadScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js'); const H = window.htmlToImage; if (!H) throw new Error('renderer');
-    const prev = { margins: this.state.margins, poSel: this.state.poSel, poUnit: this.state.poUnit }; const bookEl = document.querySelector('.book'); if (bookEl) bookEl.classList.add('rz'); await new Promise(r => this.setState({ margins: false, poSel: null, poUnit: null }, () => setTimeout(r, 300))); await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const prev = { margins: this.state.margins, poSel: this.state.poSel, poUnit: this.state.poUnit }; const bookEl = document.querySelector('.book'); if (bookEl) bookEl.classList.add('rz'); await new Promise(r => this.setState({ margins: false, poSel: null, poUnit: null }, () => this.cosSleep(300).then(r))); await Promise.race([new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))), this.cosSleep(250)]); // no animation frames in a background tab
     document.querySelectorAll('.book img[data-lazy-src]').forEach(im => { const u = im.getAttribute('data-lazy-src'); if (u && im.getAttribute('src') !== u) im.setAttribute('src', u); }); await Promise.all([...document.querySelectorAll('.book img')].filter(im => !im.complete).map(im => new Promise(r => { im.onload = im.onerror = r; setTimeout(r, 3000); })));
     const skip = n => !(n.classList && ['snap-gx', 'snap-gy', 'no-print', 'po-h', 'po-sample', 'bleed-guide', 'edge-line', 'pgdel-btn', 'wand-btn', 'clean-btn', 'pgzoom'].some(c => n.classList.contains(c)));
     const pages = [...document.querySelectorAll('.book .media:not(.pg-deleted) > .pg')]; const out = [];
     try { for (const pg of pages) { const cs = getComputedStyle(pg); const w = parseFloat(cs.width), h = parseFloat(cs.height); let pr = 2550 / w; const PH = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; const base = { quality: .92, width: w, height: h, backgroundColor: '#FFFFFF', filter: skip, imagePlaceholder: PH, style: { zoom: '1', transform: 'none', margin: '0', boxShadow: 'none' } }; const fn = fmt === 'jpeg' ? H.toJpeg : H.toPng; let url = null, lastErr = null;
-      for (const opt of [{ cacheBust: true, pixelRatio: pr }, { cacheBust: false, pixelRatio: pr, skipFonts: true }, { cacheBust: false, pixelRatio: pr * .6, skipFonts: true }]) { try { url = await fn(pg, Object.assign({}, base, opt)); if (url && url.length > 2000) { pr = opt.pixelRatio; break; } } catch (er) { lastErr = er; console.warn('page render retry', er); } }
+      for (const opt of [{ cacheBust: true, pixelRatio: pr }, { cacheBust: false, pixelRatio: pr, skipFonts: true }, { cacheBust: false, pixelRatio: pr * .6, skipFonts: true }]) { try { const u = await this.cosWithin(fn(pg, Object.assign({}, base, opt)), 90000); if (!u.ok) throw u.timeout ? new Error('A page took too long to render.') : u.e; url = u.v; if (url && url.length > 2000) { pr = opt.pixelRatio; break; } } catch (er) { url = null; lastErr = er; console.warn('page render retry', er); } }
       if (!url) throw lastErr || new Error('Could not render page'); out.push({ url, wIn: 8.5, hIn: +(8.5 * h / w).toFixed(4), px: [2550, Math.round(h * pr)] }); } }
     finally { if (bookEl) bookEl.classList.remove('rz'); this.setState(prev); }
     return out; }
@@ -4506,7 +4510,7 @@ class Component extends DCLogic {
   }
   // Starts a new piece of that kind for that client, names it and assigns the campaign. Never asks anything.
   async cosAutoPrepare(p) {
-    const wait = ms => new Promise(r => setTimeout(r, ms));
+    const wait = ms => this.cosSleep(ms);
     try { const m = await this.fsLib(); this.setState({ fsLibData: { cats: m.CATEGORIES, sections: m.SECTIONS, templates: m.TEMPLATES || [] } }); } catch (e) {}
     let spec = {}; try { spec = JSON.parse(p.spec || '{}') || {}; } catch (e) {} this._cosSpecStyle = String(spec.fsStyle || '').toLowerCase();
     const tpl = this.cosAutoTpl(p.kind, p.brief); if (!tpl) throw Object.assign(new Error('This app can’t make “' + p.kind + '” yet.'), { code: 'not-supported' });
@@ -4524,21 +4528,33 @@ class Component extends DCLogic {
     await wait(50); await this.teamLoadCamps(true);
   }
   // Saves exactly like Save Document (a new saved version, its thumbnail, the database copy and the Saved Files entry).
+  // Hands-off runs usually happen in a background tab, where the browser runs timers about once a minute and draws no
+  // animation frames. So each step is awaited directly with a time limit (no polling counted in timer ticks), the
+  // thumbnail is skipped if it can't be made, and the save always finishes.
   async cosAutoSave(p) {
-    const wait = ms => new Promise(r => setTimeout(r, ms));
     if (this.aiPendingCount() > 0) this.aiResolve(true); this._designUndo = null;
-    this.setState(st => ({ designUndoOn: false, aiMsg: '', docName: String(p.title || '').trim() || st.docName, docMeta: Object.assign({}, st.docMeta || {}, p.campaign ? { campaignIds: [p.campaign] } : {}) }));
-    await wait(400);
-    const before = this._curVT; this.saveAll('new');
-    let t = null; for (let i = 0; i < 150 && !t; i++) { await wait(100); if (this._curVT && this._curVT !== before && this.loadVersions().some(x => x.t === this._curVT)) t = this._curVT; }
-    if (!t) throw new Error('The document couldn’t be saved.');
-    const cur = () => this.loadVersions().find(x => x.t === t);
-    for (let i = 0; i < 200; i++) { const v = cur(); if (v && v.cloud) break; await wait(100); } // thumbnail, then the database copy
-    const v = cur(); if (!v) throw new Error('The document couldn’t be saved.');
-    const m = await this.sfMod(); const cid = m.clientOf(v, this.teamCid());
-    await m.recordVersion(v, { clientId: cid });
+    await this.cosWithin(new Promise(r => this.setState(st => ({ designUndoOn: false, aiMsg: '', docName: String(p.title || '').trim() || st.docName, docMeta: Object.assign({}, st.docMeta || {}, p.campaign ? { campaignIds: [p.campaign] } : {}) }), () => r())), 1500);
+    await this.cosSleep(400); // the new name and campaign settle
+    this._addVP = null; this._thumbP = null; this.saveAll('new');
+    const added = await this.cosWithin(this._addVP, 30000); const v0 = added.ok ? added.v : null;
+    if (!v0 || v0.t == null) throw new Error('The document couldn’t be saved.');
+    const t = v0.t; const cur = () => this.loadVersions().find(x => x.t === t);
+    if (!cur()) { const L = this.loadVersions().filter(x => x.t !== t); L.unshift(v0); this.storeVersions(L); } // another window of this app rewrote the list
+    await this.cosWithin(this._thumbP, 90000); // thumbnail (time-limited inside), then the database copy
+    if (!(cur() || {}).cloud) await this.cosWithin(this.cloudSaveVersion(t), 45000); // joins the copy still going, or makes it
+    const v = cur() || v0;
+    const mm = await this.cosWithin(this.sfMod(), 20000); if (!mm.ok) throw new Error('The document couldn’t be saved.');
+    const m = mm.v; const cid = m.clientOf(v, this.teamCid());
+    await this.cosWithin(m.recordVersion(v, { clientId: cid }), 30000);
     return { app: m.APP, ref: String(v.t), title: v.title, thumb: m.thumbOf(v), openUrl: m.openUrlFor(v, cid) };
   }
+  // A wait that keeps time in background tabs (a tiny worker's timer; the page's own timers can slow to once a minute there).
+  cosSleep(ms) {
+    if (this._cosTW === undefined) { this._cosTW = null; try { const w = new Worker(URL.createObjectURL(new Blob(['onmessage=function(e){setTimeout(function(){postMessage(e.data)},e.data.ms)}'], { type: 'text/javascript' }))); this._cosTWn = 0; this._cosTWcb = {}; w.onmessage = e => { const f = this._cosTWcb[e.data.id]; delete this._cosTWcb[e.data.id]; if (f) f(); }; w.onerror = () => { this._cosTW = null; }; this._cosTW = w; } catch (e) {} }
+    return new Promise(r => { let done = false; const fin = () => { if (!done) { done = true; r(); } }; setTimeout(fin, ms + (this._cosTW ? 1000 : 0)); if (this._cosTW) { const id = ++this._cosTWn; this._cosTWcb[id] = fin; try { this._cosTW.postMessage({ id, ms }); } catch (e) {} } });
+  }
+  // { ok: true, v } when the promise settles in time, else { ok: false, e } (failed) or { ok: false, timeout: true }.
+  cosWithin(pr, ms) { return Promise.race([Promise.resolve(pr).then(v => ({ ok: true, v }), e => ({ ok: false, e })), this.cosSleep(ms).then(() => ({ ok: false, timeout: true }))]); }
   aiResolve(approve) { const P = Object.assign({}, this.poAll()); Object.keys(P).forEach(pid => { P[pid] = (P[pid] || []).map(o => { if (o.aiPending == null && !o.aiPendingRows) return o; const n = Object.assign({}, o); if (!approve) { if (o.aiPending != null) n.text = o.aiPending; if (o.aiPendingRows) { n.rows = o.aiPendingRows; n.sample = o.aiPendingSample; } } delete n.aiPending; delete n.aiPendingRows; delete n.aiPendingSample; return n; }); }); const hfPrev = this._hfPrev; this._hfPrev = null; const extra = {}; if (!approve && hfPrev) { try { const x = JSON.parse(hfPrev); extra.header = x.header || undefined; extra.footer = x.footer || undefined; } catch (e) {} } this.setState(Object.assign({ pageObjs: P, saved: false, aiMsg: approve ? 'Approved. Changes are part of your document.' : 'Reverted to the original text and data.' }, extra)); }
   async aiData(file) {
     if (!file) return; 
