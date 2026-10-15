@@ -16,6 +16,16 @@ export async function listClients() {
   } catch (e) { return []; }
 }
 
+// The client's Brand Command images as apps read them: usable check and Keep kept, newest-added first.
+function liveImages(c) {
+  const at = (i) => { const t = Number(i.at) || Number(i.addedAt) || Date.parse(i.addedAt || '') || 0; if (t) return t; const m = /(1[5-9]\d{11})/.exec(String(i.id || '')); return m ? Number(m[1]) : 0; };
+  return (c.brandImages || []).filter((i) => i && i.url).map((i, k) => ({ i, k, t: at(i) })).sort((a, b) => (b.t - a.t) || (a.k - b.k)).map(({ i }) => {
+    const o = { id: i.id, url: i.url, sourceUrl: i.sourceUrl || '', category: i.category || '', tags: i.tags || {} };
+    ['unusable', 'unusableWhy', 'keep', 'resChecked', 'at', 'scene', 'description', 'alt'].forEach((k) => { if (i[k] !== undefined) o[k] = i[k]; });
+    return o;
+  });
+}
+
 // Flattened, walled-off brand profile for one client (colors, fonts, voice, writing).
 // Falls back to building a same-shaped profile from the raw local cache if Firestore
 // is unreachable, so consuming apps never need to branch on which source answered.
@@ -36,6 +46,9 @@ export async function getBrandProfile(clientId) {
           if (!profile.customFonts) profile.customFonts = ((c.fonts && c.fonts.custom) || []).map((x) => ({ name: x.name, dataUrl: x.dataUrl || '' }));
         }
       }
+      // The saved profile is only rebuilt when Brand Command saves: its images always come from the live client record
+      // (with Brand Command's Not usable / Keep marks), newest-added first.
+      try { const cl = (await listClients()).find((x) => x.id === clientId); if (cl) profile.images = liveImages(cl); } catch (e) {}
       return profile;
     }
     const clients = await listClients();
