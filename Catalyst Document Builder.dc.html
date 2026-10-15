@@ -722,7 +722,7 @@
   .hm-main{position:relative;min-height:var(--hdr-minh,9em);display:flex;align-items:stretch}
   .hm-grid{position:relative;z-index:1;flex:1;display:grid;grid-template-columns:1fr auto;align-items:start;gap:1em;padding:1.3em 1.5em 1.4em;padding-right:var(--hm-pr,1.5em)}
   .hm-tt{align-self:end;min-width:0}
-  .hm-band{position:relative;z-index:1;background:var(--h-secondary);color:#fff;padding:.55em 1.5em;font-style:italic;font-family:var(--hdr-ffh,var(--ff-name,'Newsreader')),serif;font-size:1.02em;padding-right:var(--hm-pr,1.5em)}
+  .hm-band{position:relative;z-index:1;background:var(--h-secondary);color:#fff;padding:.55em 1.5em;font-family:var(--hdr-ffh,var(--ff-name,'Newsreader')),serif;font-size:1.02em;padding-right:var(--hm-pr,1.5em)}
   .hm-logo{position:absolute;right:0;bottom:0;z-index:2;background:#fff;color:var(--h-primary);display:flex;align-items:center;gap:.5em;padding:.8em 1.1em;max-width:40%}
   .hdr-banner{background:var(--h-primary);color:#fff}
   .hb-disc{background:var(--h-text);color:#fff;font-weight:700;font-size:.62em;letter-spacing:.24em;text-transform:uppercase;padding:.55em 1.8em;line-height:1.2}
@@ -730,7 +730,7 @@
   .hb-l,.hb-r{position:relative;z-index:1;min-width:0;display:flex;flex-direction:column;gap:.45em}
   .hb-l{align-self:stretch;justify-content:space-between}
   .hb-r{text-align:right;align-items:flex-end}
-  .hb-r .h-period{margin-top:.4em;color:var(--h-accent)}
+  .hb-r .h-period{margin-top:.4em;color:var(--h-acc-on,var(--h-accent))}
   .hb-l .h-tag{opacity:.85;max-width:18em}
   .hb-wm{position:absolute;right:-6%;top:50%;transform:translateY(-50%);height:190%;width:auto;opacity:.08;pointer-events:none;z-index:0;color:#fff}
   img.hb-wm{filter:brightness(0) invert(1)}
@@ -4483,7 +4483,7 @@ class Component extends DCLogic {
     let pids = live(); if (!pids.length) return 0; const M0 = this.poMargins(pids[0]); if (!M0) return 0;
     const PS = M0.pw / 8.5; // one inch of the printed page, in page units
     const GAP_SEC = .3 * PS, GAP_HEAD = .12 * PS, GAP_ITEM = .1 * PS, SAFE = .32 * PS, PADH = .18 * PS, PADV = .13 * PS;
-    const P = JSON.parse(JSON.stringify(this.poAll())); pids = pids.filter(pid => Array.isArray(P[pid]));
+    let P = JSON.parse(JSON.stringify(this.poAll())); pids = pids.filter(pid => Array.isArray(P[pid]));
     const plain = t => String(t || '').replace(/<[^>]+>/g, ' ');
     const PH = /\[(?:client to verify|insert|add |enter |todo)[^\]]*\]|\[[A-Z][A-Za-z /&-]{1,40}\]|\bX{2,}(?:[.,]X+)*%?(?![a-z])|\bX\.XX\b|\benter (?:a |an |the |your )?(?:value|description|metric|result|objective|introduction|summary|text|consideration|measure|problem|principle|action|milestone|source)\b|lorem ipsum|\bMM\/DD\/YYYY\b|\bXX\/XX\/XXXX\b|\b20XX\b|\bmonth (?:DD, )?YYYY\b|\bfull name\b|\bname, title\b|\bcompany name\b|\btitle here\b|\bsample data\b|replace with (?:your|the customer)/i;
     const isPh = t => PH.test(plain(t));
@@ -4508,7 +4508,7 @@ class Component extends DCLogic {
         if (o.style === 'body' && !o.fill) { const long = Math.max(1, ...plain(o.text).split(/\s+/).map(w => w.length)); const fit = (o.w - .02) * 72 / (long * .56); o.fs = +Math.min(B, Math.max(fit, .75 * B)).toFixed(2); o.lh = 1.45; } // one body size, unless a word would not fit a narrow card
         if (o.style === 'caption' && !o.fill) o.fs = C;
         if (!o.fill && (o.align === 'justify' || (o.align === 'center' && +o.fs < 1.3 * B))) o.align = 'left'; }
-      if (o.type === 'table') { o.fs = B; o.bw = o.w; o.bh = o.h; if (Array.isArray(o.rows)) o.rows = o.rows.map(r => (r || []).map(c => { const u = unbullet(c); return u === c ? c : u.replace(/\n/g, ' '); })); }
+      if (o.type === 'table') { const nc = Math.max(1, ...(o.rows || []).map(r => (r || []).length)); const long = Math.max(1, ...(o.rows || []).flat().join(' ').split(/\s+/).map(w => w.length)); o.fs = +Math.min(B, Math.max(.8 * B, (o.w / nc - .12) * 72 / (long * .66))).toFixed(2); o.bw = o.w; o.bh = o.h; if (Array.isArray(o.rows)) o.rows = o.rows.map(r => (r || []).map(c => { const u = unbullet(c); return u === c ? c : u.replace(/\n/g, ' '); })); }
     }));
     // 2. Hands-off: nothing with placeholder or sample data stays in a finished document.
     let removed = 0;
@@ -4547,11 +4547,13 @@ class Component extends DCLogic {
     pids.forEach(pid => { const L = P[pid]; L.forEach(o => { if (o.type !== 'text' || o.style !== 'body' || o.fill || !o.grp || boxOf(o, L, pid)) return;
       const right = Math.max(...L.filter(v => v.grp === o.grp && v !== o && !boxOf(v, L, pid) && v.x < o.x + o.w && v.x + v.w > o.x).map(v => v.x + v.w), 0); if (right > o.x + o.w + .02) o.w = +(right - o.x).toFixed(3); }); });
     await new Promise(r => this.setState({ pageObjs: P, saved: false }, r)); await wait(150);
-    // 4. Measure the real height of every text box (with its padding) and table.
-    const H = {}; pids.forEach(pid => { const pg = document.querySelector('.book .media[data-pid="' + pid + '"] > .pg'); if (!pg) return;
+    // 4. Measure the real height of every text box (with its padding) and table, with a little slack so the PDF
+    // renderer's font metrics never clip a line.
+    let H = {}; const measure = () => { H = {}; pids.forEach(pid => { const pg = document.querySelector('.book .media[data-pid="' + pid + '"] > .pg'); if (!pg) return;
       P[pid].forEach(o => { const d = pg.querySelector('.po[data-oid="' + o.id + '"]'); if (!d || !d.offsetHeight) return; let el = null, prop = '';
         if (o.type === 'text') { el = d.querySelector('.po-t'); prop = 'minHeight'; } else if (o.type === 'table') { el = d.querySelector('table'); prop = 'height'; } if (!el) return;
-        const was = el.style[prop]; el.style[prop] = prop === 'height' ? 'auto' : '0'; const nat = el.offsetHeight; el.style[prop] = was; if (nat > 0) H[o.id] = +(o.h * nat / d.offsetHeight + .004).toFixed(3); }); });
+        const was = el.style[prop]; el.style[prop] = prop === 'height' ? 'auto' : '0'; const nat = el.offsetHeight; el.style[prop] = was; if (nat > 0) H[o.id] = +(o.h * nat / d.offsetHeight * (o.type === 'table' ? 1.05 : 1.01) + .006).toFixed(3); }); }); };
+    measure();
     // 5. Lay each page out again from top to bottom: same gaps everywhere, boxes grow around their text, nothing overlaps.
     const ftrTop = pid => { const pg = document.querySelector('.book .media[data-pid="' + pid + '"] > .pg'); const M = this.poMargins(pid) || M0; let y = M.ph - M.b; const f = pg && pg.querySelector('.ftr-clone, .ftr'); if (f && f.offsetHeight) { const pr = pg.getBoundingClientRect(), fr = f.getBoundingClientRect(); if (pr.height > 0 && fr.top > pr.top + pr.height / 2) y = (fr.top - pr.top) / pr.height * M.ph; } return y; };
     const build = (pid, L) => { // items: leaves and boxes (with their children); thin rules ride along with the text they underline
@@ -4575,7 +4577,7 @@ class Component extends DCLogic {
       const bot = Math.max(...done.map(k => k.y0 + k.h)) + pad - it.y0; it.h = o.type === 'color' ? bot : Math.max(it.h, bot); };
     const equal = items => { const g = {}; items.filter(i => i.o.type === 'color' && i.kids.length).forEach(i => { const k = (i.grp || '-') + Math.round(i.y0 * 25) + ':' + Math.round(i.o.h * 25); (g[k] = g[k] || []).push(i); }); Object.values(g).forEach(a => { if (a.length < 2) return; const h = Math.max(...a.map(i => i.h)); a.forEach(i => { i.h = h; }); }); };
     const headIt = i => i.bar || (i.o.type === 'text' && ['label', 'sub', 'eyebrow'].includes(i.o.style) && plain(i.o.text).trim().length < 60 && !/\n/.test(i.o.text || ''));
-    const placed = {}; let carry = [];
+    const flowAll = async () => { const placed = {}; let carry = [];
     for (let pi = 0; pi < pids.length || carry.length; pi++) {
       if (pi >= pids.length) { // one more page for what is left over
         const n0 = live().length; this.setState(st => ({ blanks: (st.blanks || n0) + 1, saved: false })); for (let w = 0; w < 40 && live().length <= n0; w++) await wait(100); const np = live().filter(p => !pids.includes(p))[0]; if (!np) { const lp = pids[pids.length - 1]; carry.forEach(i => { shift(i, i.ny - i.y0); (placed[lp] = placed[lp] || []).push(i); }); carry = []; break; } pids.push(np); P[np] = []; await wait(300); }
@@ -4596,7 +4598,38 @@ class Component extends DCLogic {
     pids.forEach(pid => { (placed[pid] || []).forEach(it => put(pid, it)); const seen = new Set(out[pid]); (P[pid] || []).forEach(o => { if (o.lyBg || (o.type === 'color' && !thin(o) && !isBox(o, pid))) { if (!seen.has(o)) out[pid].push(o); } }); });
     // keep the original drawing order (backgrounds first) on each page
     const ord = {}; pids.forEach(pid => (this.poAll()[pid] || []).forEach((o, i) => { ord[o.id] = i; })); const rank = o => o.type === 'color' ? 0 : o.type === 'image' || o.type === 'chart' ? 1 : 2; pids.forEach(pid => out[pid].sort((a, b) => rank(a) - rank(b) || (ord[a.id] ?? 1e6) - (ord[b.id] ?? 1e6)));
-    await new Promise(r => this.setState({ pageObjs: out, saved: false }, r)); await wait(120);
+    P = out; await new Promise(r => this.setState({ pageObjs: out, saved: false }, r)); await wait(120); };
+    await flowAll();
+    // 6. Fill free space before using another page: the first section of a page moves up into room left on the page before
+    // (either column, keeping the footer gap) when it fits there. Card rows stay where they are.
+    const backfill = async () => {
+      for (let k = 1; k < pids.length; k++) { const prev = pids[k - 1], cur = pids[k]; if (!(P[cur] || []).length || !(P[prev] || []).length) continue;
+        const roots = build(cur, P[cur]); if (!roots.length) continue; const key = r => r.grp || r.o.id;
+        const first = roots.slice().sort((a, b) => a.y0 - b.y0 || a.x - b.x)[0]; const sec = roots.filter(r => key(r) === key(first));
+        if (!first.grp) roots.forEach(r => { if (!r.grp && r !== first && r.y0 >= first.y0 + first.h - .01 && r.y0 - (first.y0 + first.h) < .12 && ovX(r, first) > .05) sec.push(r); }); // a photo keeps its caption
+        if (sec.some(r => r.kids.length)) continue;
+        const objs = []; const add = it => { objs.push(it.o); it.rides.forEach(q => objs.push(q.o)); it.kids.forEach(add); }; sec.forEach(add);
+        const sx0 = Math.min(...objs.map(o => o.x)), sx1 = Math.max(...objs.map(o => o.x + o.w)), sy0 = Math.min(...objs.map(o => o.y));
+        const M = this.poMargins(prev) || M0; const L0 = M.l, R0 = M.pw - M.r; const LIM = ftrTop(prev) - SAFE; const top = content(prev).top;
+        const pr = build(prev, P[prev]); const cols = [[L0, R0]];
+        pr.forEach(r => { const a = r.sx, b = r.sx + r.sw; if (b - a < .7 * (R0 - L0) && !cols.some(c => Math.abs(c[0] - a) < .05 && Math.abs(c[1] - b) < .05)) cols.push([a, b]); });
+        const cand = cols.map(([a, b]) => { const hits = pr.filter(r => ovX({ x: r.sx, w: r.sw }, { x: a, w: b - a }) > .02); const bot = hits.length ? Math.max(...hits.map(r => r.y0 + r.h)) + GAP_SEC : top; return { a, b, y: bot, room: LIM - bot }; })
+          .filter(c => c.b - c.a >= Math.min(sx1 - sx0, 3.2 * PS) - .01 && c.room > .15).sort((p, q) => q.room - p.room);
+        for (const c of cand) {
+          const snap = objs.map(o => ({ o, x: o.x, y: o.y, w: o.w, h: o.h, bw: o.bw, bh: o.bh })); const k2 = Math.min(1, (c.b - c.a) / Math.max(.1, sx1 - sx0));
+          objs.forEach(o => { const nx = c.a + (o.x - sx0) * k2; let nw; if (o.type === 'chart' || o.type === 'image') { nw = o.w * k2; o.h = +(o.h * k2).toFixed(3); } else nw = Math.min(o.w, c.b - nx);
+            o.x = +nx.toFixed(3); o.w = +Math.max(.15, nw).toFixed(3); if (o.type === 'table') o.bw = o.w; o.y = +(c.y + (o.y - sy0)).toFixed(3); });
+          const ids = new Set(objs.map(o => o.id)); const moveTo = (from, to) => { P = Object.assign({}, P, { [from]: P[from].filter(o => !ids.has(o.id)), [to]: P[to].concat(objs) }); };
+          moveTo(cur, prev); await new Promise(r => this.setState({ pageObjs: P, saved: false }, r)); await wait(150); measure();
+          const rr = build(prev, P[prev]); rr.forEach(size); equal(rr); const d = stack(rr, top, false, () => top);
+          if (d.every(i => i.ny + i.h <= LIM + .005)) return true;
+          snap.forEach(q => Object.assign(q.o, { x: q.x, y: q.y, w: q.w, h: q.h, bw: q.bw, bh: q.bh })); P = Object.assign({}, P, { [prev]: P[prev].filter(o => !ids.has(o.id)), [cur]: P[cur].concat(objs) });
+          await new Promise(r => this.setState({ pageObjs: P, saved: false }, r)); await wait(60); measure(); } }
+      return false; };
+    for (let n = 0; n < 12 && await backfill(); n++) await flowAll();
+    // pages left empty go away
+    const empty = pids.filter((pid, i) => i > 0 && !(P[pid] || []).length);
+    if (empty.length) { await new Promise(r => this.setState(st => ({ deletedPages: [...(st.deletedPages || []), ...empty], saved: false }), r)); await wait(150); pids = pids.filter(pid => !empty.includes(pid)); }
     try { this.fixContrast(pids); } catch (e) { console.warn(e); }
     return removed;
   }
@@ -6678,10 +6711,10 @@ class Component extends DCLogic {
       hdrOn: on, hdrIsMast: t === 'masthead', hdrIsBanner: t === 'banner', hdrIsSplit: t === 'split', hdrIsMin: t === 'minimal',
       hdrCls: 'hdr hdr-' + t + ' hal-' + (H.align || 'left') + (narrow ? ' hdr-narrow' : '') + (H.minIn ? ' hdr-fixh' : ''),
       hdrContCls: 'hdr hdr-cont' + ((t === 'masthead' || t === 'banner') ? ' hc-dark' : ''),
-      hdrVars: `--h-primary:${c.primary};--h-secondary:${c.secondary};--h-accent:${c.accent};--h-bg:${c.background};--h-text:${this.aa(c.text, c.background)};--hdr-fs:${(8 * (H.scale || 1) / z).toFixed(3)}pt;--hdr-title:${(ttlPt * (H.scale || 1)).toFixed(3)}pt;--hdr-logo:${(H.logoSize * (H.scale || 1) / z).toFixed(3)}pt;--hdr-minh:${H.minIn ? '0' : (minh[H.height] || minh.auto || '0')};--hdr-h:${((H.minIn || 0) / z).toFixed(3)}in` + (H.fontH ? `;--hdr-ffh:${H.fontH}` : '') + (H.fontB ? `;--hdr-ffb:${H.fontB}` : '') + (t === 'masthead' && (hasLogo || o.showOrganizationName) ? ';--hm-pr:40%' : ''),
+      hdrVars: `--h-primary:${c.primary};--h-secondary:${c.secondary};--h-accent:${c.accent};--h-acc-on:${this.aa(c.accent, c.primary, 4.5)};--h-bg:${c.background};--h-text:${this.aa(c.text, c.background)};--hdr-fs:${(8 * (H.scale || 1) / z).toFixed(3)}pt;--hdr-title:${(ttlPt * (H.scale || 1)).toFixed(3)}pt;--hdr-logo:${(H.logoSize * (H.scale || 1) / z).toFixed(3)}pt;--hdr-minh:${H.minIn ? '0' : (minh[H.height] || minh.auto || '0')};--hdr-h:${((H.minIn || 0) / z).toFixed(3)}in` + (H.fontH ? `;--hdr-ffh:${H.fontH}` : '') + (H.fontB ? `;--hdr-ffb:${H.fontB}` : '') + (t === 'masthead' && (hasLogo || o.showOrganizationName) ? ';--hm-pr:40%' : ''),
       hdrHasLogo: hasLogo, hdrLogoSrc: logoSrc, hdrShowOrgTxt: !!(o.showOrganizationName && val(H.organizationName)) || (!hasLogo && !!val(H.organizationName)), hdrOrg: val(H.organizationName),
       hdrShowTitle: !!(o.showTitle && val(H.documentTitle)), hdrTitle: val(H.documentTitle), hdrShowSub: !!(o.showSubtitle && val(H.documentSubtitle)), hdrSub: val(H.documentSubtitle),
-      hdrShowPeriod: !!(o.showPeriod && val(H.period)), hdrPeriod: val(H.period), hdrShowEyebrow: !!val(H.eyebrow), hdrEyebrow: val(H.eyebrow),
+      hdrShowPeriod: !!(o.showPeriod && val(H.period)) && ![o.showSubtitle && H.documentSubtitle, H.eyebrow, o.showTitle && H.documentTitle].some(v => { const a = String(val(v) || '').toLowerCase().replace(/\s+/g, ' '), b = String(val(H.period) || '').toLowerCase().replace(/\s+/g, ' ').trim(); return !!b && a.includes(b); }), hdrPeriod: val(H.period), hdrShowEyebrow: !!val(H.eyebrow), hdrEyebrow: val(H.eyebrow),
       hdrShowTag: !!(o.showTagline && plainTag), hdrTag: plainTag, hdrTagParts: tagParts,
       hdrShowDisc: !!(o.showDisclosure && val(H.disclosureLine)), hdrDisc: val(H.disclosureLine),
       hdrHasHero: hasHero, hdrHero: H.heroImage || '', hdrHeroPos: pos, hdrOverlay: 'opacity:' + (hasHero ? ovA : 0),
