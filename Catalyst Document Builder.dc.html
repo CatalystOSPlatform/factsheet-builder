@@ -3018,15 +3018,16 @@ class Component extends DCLogic {
     try {
       if (!window.htmlToImage) { const ld = await this.cosWithin(new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js'; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); }), 20000); if (!ld.ok || !window.htmlToImage) throw new Error('The thumbnail tool didn’t load.'); }
       const vis = Array.from(document.querySelectorAll('.book .media:not(.pg-deleted) > .pg')).filter(el => { const rr = el.getBoundingClientRect(); return rr.width > 20 && rr.height > 20 && getComputedStyle(el).visibility !== 'hidden'; }); const pg = vis.find(el => el.children.length) || vis[0]; if (!pg) { if (!light) return this.cloudSaveVersion(t); return; }
-      const r = pg.getBoundingClientRect();
+      const r = pg.getBoundingClientRect(); const pcs = getComputedStyle(pg); const pw = parseFloat(pcs.width) || r.width, phh = parseFloat(pcs.height) || r.height;
+      const fix = { width: pw, height: phh, style: { zoom: '1', transform: 'none', margin: '0', boxShadow: 'none' } }; const need = this.cosPageHasInk(pg);
       const okUrl = u => typeof u === 'string' && /^data:image\/(jpeg|png);base64,/.test(u) && u.length > 1500;
       const filter = n => !(n.classList && (n.classList.contains('photoctl') || n.classList.contains('edge-line')));
-      const pr = Math.max(0.5, Math.min(1.5, 320 / Math.max(1, r.width)));
+      const pr = Math.max(0.5, Math.min(1.5, 320 / Math.max(1, pw)));
       let url = '';
       const ph = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII='; const tries = [{ quality: 0.72, pixelRatio: pr, cacheBust: false, filter, backgroundColor: '#ffffff', imagePlaceholder: ph }, { quality: 0.72, pixelRatio: pr, cacheBust: true, filter, backgroundColor: '#ffffff', skipFonts: true, imagePlaceholder: ph }, { quality: 0.72, pixelRatio: pr, filter: n => filter(n) && !(n.tagName === 'IMG'), backgroundColor: '#ffffff', skipFonts: true }];
       // Each try has a time limit (a capture can wait forever on a picture or font that never loads); no thumbnail beats no save.
       const tEnd = Date.now() + 30000;
-      for (const o of tries) { if (Date.now() > tEnd) break; try { const u = await this.cosWithin(window.htmlToImage.toJpeg(pg, o), 15000); if (u.ok && okUrl(u.v)) { url = u.v; break; } } catch (err) {} }
+      for (let ti = 0; ti < tries.length; ti++) { const o = tries[ti]; if (Date.now() > tEnd) break; try { const u = await this.cosWithin(window.htmlToImage.toJpeg(pg, Object.assign({}, o, fix)), 15000); if (u.ok && okUrl(u.v)) { if (need && await this.cosBlankImg(u.v)) { console.warn('thumbnail came out blank, trying again'); if (!o.again) tries.splice(ti + 1, 0, Object.assign({}, o, { again: true })); await this.cosSleep(500); continue; } url = u.v; break; } } catch (err) {} }
       if (!url) { console.warn('thumbnail: no valid capture'); if (!light) return this.cloudSaveVersion(t); return; }
       try { localStorage.setItem('cbThumb:' + t, url); } catch (e) {}
       const list = this.loadVersions(); const v = list.find(x => x.t === t); if (!v) return; v.thumb = url;
@@ -3919,10 +3920,38 @@ class Component extends DCLogic {
     const skip = n => !(n.classList && ['snap-gx', 'snap-gy', 'no-print', 'po-h', 'po-sample', 'bleed-guide', 'edge-line', 'pgdel-btn', 'wand-btn', 'clean-btn', 'pgzoom'].some(c => n.classList.contains(c)));
     const pages = [...document.querySelectorAll('.book .media:not(.pg-deleted) > .pg')]; const out = [];
     try { for (const pg of pages) { const cs = getComputedStyle(pg); const w = parseFloat(cs.width), h = parseFloat(cs.height); let pr = 2550 / w; const PH = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; const base = { quality: .92, width: w, height: h, backgroundColor: '#FFFFFF', filter: skip, imagePlaceholder: PH, style: { zoom: '1', transform: 'none', margin: '0', boxShadow: 'none' } }; const fn = fmt === 'jpeg' ? H.toJpeg : H.toPng; let url = null, lastErr = null;
-      for (const opt of [{ cacheBust: true, pixelRatio: pr }, { cacheBust: false, pixelRatio: pr, skipFonts: true }, { cacheBust: false, pixelRatio: pr * .6, skipFonts: true }]) { try { const u = await this.cosWithin(fn(pg, Object.assign({}, base, opt)), 90000); if (!u.ok) throw u.timeout ? new Error('A page took too long to render.') : u.e; url = u.v; if (url && url.length > 2000) { pr = opt.pixelRatio; break; } } catch (er) { url = null; lastErr = er; console.warn('page render retry', er); } }
+      const need = this.cosPageHasInk(pg); const tries = [{ cacheBust: true, pixelRatio: pr }, { cacheBust: false, pixelRatio: pr, skipFonts: true }, { cacheBust: false, pixelRatio: pr * .6, skipFonts: true }];
+      for (let ti = 0; ti < tries.length; ti++) { const opt = tries[ti]; try { const u = await this.cosWithin(fn(pg, Object.assign({}, base, opt)), 90000); if (!u.ok) throw u.timeout ? new Error('A page took too long to render.') : u.e; url = u.v;
+        if (url && url.length > 2000 && need && await this.cosBlankImg(url)) { console.warn('page render came out blank, trying again'); url = null; lastErr = new Error('A page came out blank.'); if (!opt.again) tries.splice(ti + 1, 0, Object.assign({}, opt, { cacheBust: false, again: true })); await this.cosSleep(700); continue; }
+        if (url && url.length > 2000) { pr = opt.pixelRatio; break; } } catch (er) { url = null; lastErr = er; console.warn('page render retry', er); } }
+      if (!url && need) { try { url = await this.cosRasterFallback(pg, w, h, pr, fmt, skip); } catch (er) { lastErr = er; console.warn('page render fallback', er); } }
       if (!url) throw lastErr || new Error('Could not render page'); out.push({ url, wIn: 8.5, hIn: +(8.5 * h / w).toFixed(4), px: [2550, Math.round(h * pr)] }); } }
     finally { if (bookEl) bookEl.classList.remove('rz'); this.setState(prev); }
     return out; }
+  // True when a rendered page picture has no marks at all. The page renderer can hand back an all-white picture when the
+  // browser hasn't finished decoding the page's photos and fonts (it happened to hands-off case studies and fact sheets),
+  // so callers render again instead of saving a blank thumbnail or PDF.
+  async cosBlankImg(url) {
+    try { const im = new Image(); await new Promise(r => { im.onload = im.onerror = r; im.src = url; }); try { await im.decode(); } catch (e) {} if (!im.naturalWidth) return true;
+      const W = 120, H = Math.max(1, Math.round(W * im.naturalHeight / im.naturalWidth)); const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'); x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, W, H); x.drawImage(im, 0, 0, W, H);
+      const d = x.getImageData(0, 0, W, H).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i] < 245 || d[i + 1] < 245 || d[i + 2] < 245) { if (++n >= 6) return false; } return true; } catch (e) { return false; } }
+  // Whether a page shows anything (words, a picture, a chart), so an all-white picture of it is a failed render.
+  cosPageHasInk(pg) { if (!pg) return false; if (String(pg.textContent || '').replace(/\s+/g, '').length > 8) return true; return !!pg.querySelector('img[src], canvas, svg'); }
+  // Last resort for one page: a copy of it at its true size (no zoom), outside the view, drawn with html2canvas.
+  async cosRasterFallback(pg, w, h, pr, fmt, keep) {
+    await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'); if (!window.html2canvas) throw new Error('renderer');
+    const book = document.querySelector('.book'), media = pg.parentElement; if (!book || !media) throw new Error('renderer');
+    const bk = book.cloneNode(false), md = media.cloneNode(false), cp = pg.cloneNode(true); bk.classList.add('rz'); bk.removeAttribute('id');
+    bk.style.cssText += ';position:fixed;left:0;top:0;zoom:1;transform:none;z-index:-2147483647;pointer-events:none;width:auto;height:auto;padding:0;margin:0;display:block;overflow:visible';
+    md.style.cssText += ';zoom:1;transform:none;margin:0'; cp.style.zoom = '1'; cp.style.transform = 'none'; cp.style.margin = '0'; cp.style.boxShadow = 'none';
+    [...pg.querySelectorAll('canvas')].forEach((c0, i) => { const c1 = cp.querySelectorAll('canvas')[i]; if (c1) { try { c1.width = c0.width; c1.height = c0.height; c1.getContext('2d').drawImage(c0, 0, 0); } catch (e) {} } });
+    md.appendChild(cp); bk.appendChild(md); document.body.appendChild(bk);
+    try { try { if (window.CatalystCreate && window.CatalystCreate.inlineImages) await window.CatalystCreate.inlineImages([cp]); } catch (e) {}
+      await Promise.all([...cp.querySelectorAll('img')].map(im => im.complete ? null : new Promise(r => { im.onload = im.onerror = r; setTimeout(r, 4000); })));
+      const c = await this.cosWithin(window.html2canvas(cp, { scale: pr, width: w, height: h, useCORS: true, backgroundColor: '#FFFFFF', logging: false, ignoreElements: n => !keep(n) }), 90000);
+      if (!c.ok) throw c.timeout ? new Error('A page took too long to render.') : c.e;
+      const url = c.v.toDataURL(fmt === 'jpeg' ? 'image/jpeg' : 'image/png', .92); if (await this.cosBlankImg(url)) throw new Error('A page came out blank.'); return url; }
+    finally { bk.remove(); } }
   docSlug() { return String(this.state.docName || 'document').trim().replace(/[^A-Za-z0-9 _-]+/g, '').replace(/\s+/g, '-').slice(0, 60) || 'document'; }
   async downloadPptx(ok) {
     if (!ok && !this.dlGuard('pptx')) return;
@@ -6688,6 +6717,8 @@ class Component extends DCLogic {
   inkOn(bg) { return this.cRatio('#ffffff', bg) >= this.cRatio('#0f1630', bg) ? '#ffffff' : '#0f1630'; }
   lum(hex) { const n = String(hex || '#000').replace('#', ''); const r = parseInt(n.slice(0, 2), 16) / 255, g = parseInt(n.slice(2, 4), 16) / 255, b = parseInt(n.slice(4, 6), 16) / 255; const f = v => v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); }
 
+  // A logo file that can't be see-through (JPEG): turning it white would leave a solid white box.
+  logoOpaque(src) { const u = String(src || ''); if (/^data:image\/jpe?g/i.test(u)) return true; let d = u; try { d = decodeURIComponent(u); } catch (e) {} return /\.jpe?g(?:[?#&]|$)/i.test(d); }
   hdrVals() {
     const H = this.hdr(); const t = H.template; const on = t && t !== 'none'; const c = H.colors; const o = H.options; const val = s => (s || '').trim();
     const z = (this._fit && this._fit.z) || 1; const vw = (this._fit && this._fit.vw) || 1; const printW = (3.75 * vw - 0.36) * z; const narrow = printW < 4.6;
@@ -6713,7 +6744,7 @@ class Component extends DCLogic {
       hdrCls: 'hdr hdr-' + t + ' hal-' + (H.align || 'left') + (narrow ? ' hdr-narrow' : '') + (H.minIn ? ' hdr-fixh' : ''),
       hdrContCls: 'hdr hdr-cont' + ((t === 'masthead' || t === 'banner') ? ' hc-dark' : ''),
       hdrVars: `--h-primary:${c.primary};--h-secondary:${c.secondary};--h-accent:${c.accent};--h-acc-on:${this.aa(c.accent, c.primary, 4.5)};--h-bg:${c.background};--h-text:${this.aa(c.text, c.background)};--hdr-fs:${(8 * (H.scale || 1) / z).toFixed(3)}pt;--hdr-title:${(ttlPt * (H.scale || 1)).toFixed(3)}pt;--hdr-logo:${(H.logoSize * (H.scale || 1) / z).toFixed(3)}pt;--hdr-minh:${H.minIn ? '0' : (minh[H.height] || minh.auto || '0')};--hdr-h:${((H.minIn || 0) / z).toFixed(3)}in` + (H.fontH ? `;--hdr-ffh:${H.fontH}` : '') + (H.fontB ? `;--hdr-ffb:${H.fontB}` : '') + (t === 'masthead' && (hasLogo || o.showOrganizationName) ? ';--hm-pr:40%' : ''),
-      hdrHasLogo: hasLogo, hdrLogoSrc: logoSrc, hdrLogoMastSrc: baseLogo || logoSrc, hdrLogoInvCls: (darkBg && logoSrc !== H.logoRev) ? 'h-logo-inv' : '', hdrShowOrgTxt: !!(o.showOrganizationName && val(H.organizationName)) || (!hasLogo && !!val(H.organizationName)), hdrOrg: val(H.organizationName),
+      hdrHasLogo: hasLogo, hdrLogoSrc: logoSrc, hdrLogoMastSrc: baseLogo || logoSrc, hdrLogoInvCls: (darkBg && logoSrc !== H.logoRev && !this.logoOpaque(logoSrc)) ? 'h-logo-inv' : '', hdrShowOrgTxt: !!(o.showOrganizationName && val(H.organizationName)) || (!hasLogo && !!val(H.organizationName)), hdrOrg: val(H.organizationName),
       hdrShowTitle: !!(o.showTitle && val(H.documentTitle)), hdrTitle: val(H.documentTitle), hdrShowSub: !!(o.showSubtitle && val(H.documentSubtitle)), hdrSub: val(H.documentSubtitle),
       hdrShowPeriod: !!(o.showPeriod && val(H.period)) && ![o.showSubtitle && H.documentSubtitle, H.eyebrow, o.showTitle && H.documentTitle].some(v => { const a = String(val(v) || '').toLowerCase().replace(/\s+/g, ' '), b = String(val(H.period) || '').toLowerCase().replace(/\s+/g, ' ').trim(); return !!b && a.includes(b); }), hdrPeriod: val(H.period), hdrShowEyebrow: !!val(H.eyebrow), hdrEyebrow: val(H.eyebrow),
       hdrShowTag: !!(o.showTagline && plainTag), hdrTag: plainTag, hdrTagParts: tagParts,
