@@ -713,7 +713,8 @@
   .h-period{font-weight:700;font-size:.95em;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
   .h-eyebrow{font-weight:700;font-size:.72em;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.5em;opacity:.9}
   .h-id{display:flex;align-items:center;gap:.6em;min-width:0}
-  .h-logo{height:var(--hdr-logo,22pt);width:auto;max-width:12em;object-fit:contain;display:block;flex:none}
+  .h-logo{height:var(--hdr-logo,36pt);width:auto;max-width:calc(var(--hdr-logo,36pt) * 5);object-fit:contain;display:block;flex:none}
+  .h-logo.h-logo-inv{filter:brightness(0) invert(1)}
   .h-org{font-weight:700;font-size:1.05em;overflow-wrap:anywhere;line-height:1.15}
   .h-tag{font-size:.98em;line-height:1.3}
   .h-hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
@@ -759,7 +760,7 @@
   .hdr-cont{border-bottom:1px solid var(--h-div,#d9dfdc)}
   .hc-row{display:flex;align-items:center;gap:1.1em;min-height:3.2em;padding:.5em 0}
   .hc-title{flex:1;min-width:0;font-family:var(--hdr-ffh,var(--ff-name,'Newsreader')),serif;font-weight:600;font-size:1.15em;color:var(--h-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .hdr-cont .h-logo{height:calc(var(--hdr-logo,22pt) * .62)}
+  .hdr-cont .h-logo{height:calc(var(--hdr-logo,36pt) * .62)}
   .hdr-cont .h-org{color:var(--h-primary);font-size:.95em}
   .hdr-cont .h-period{color:var(--h-text);opacity:.75;font-size:.85em}
   .hdr-cont.hc-dark{background:var(--h-primary);border-bottom:0;color:#fff;padding:0 1.2em}
@@ -1470,13 +1471,13 @@
             <div class="hm-grid"><div class="hm-tt"><sc-if value="{{ hdrShowEyebrow }}" hint-placeholder-val="{{ false }}"><div class="h-eyebrow" data-hfield="eyebrow">{{ hdrEyebrow }}</div></sc-if><sc-if value="{{ hdrShowTitle }}" hint-placeholder-val="{{ true }}"><div class="h-title" data-hfield="documentTitle">{{ hdrTitle }}</div></sc-if><sc-if value="{{ hdrShowSub }}" hint-placeholder-val="{{ false }}"><div class="h-sub" data-hfield="documentSubtitle">{{ hdrSub }}</div></sc-if></div><sc-if value="{{ hdrShowPeriod }}" hint-placeholder-val="{{ true }}"><div class="h-period" data-hfield="period">{{ hdrPeriod }}</div></sc-if></div>
           </div>
           <sc-if value="{{ hdrShowTag }}" hint-placeholder-val="{{ true }}"><div class="hm-band" data-hfield="tagline">{{ hdrTag }}</div></sc-if>
-          <sc-if value="{{ hdrShowLogoBlock }}" hint-placeholder-val="{{ false }}"><div class="hm-logo"><sc-if value="{{ hdrHasLogo }}" hint-placeholder-val="{{ false }}"><img class="h-logo " data-lazy-src="{{ hdrLogoSrc }}" alt="{{ hdrOrg }}"></sc-if><sc-if value="{{ hdrShowOrgTxt }}" hint-placeholder-val="{{ true }}"><span class="h-org" data-hfield="organizationName">{{ hdrOrg }}</span></sc-if></div></sc-if>
+          <sc-if value="{{ hdrShowLogoBlock }}" hint-placeholder-val="{{ false }}"><div class="hm-logo"><sc-if value="{{ hdrHasLogo }}" hint-placeholder-val="{{ false }}"><img class="h-logo " data-lazy-src="{{ hdrLogoMastSrc }}" alt="{{ hdrOrg }}"></sc-if><sc-if value="{{ hdrShowOrgTxt }}" hint-placeholder-val="{{ true }}"><span class="h-org" data-hfield="organizationName">{{ hdrOrg }}</span></sc-if></div></sc-if>
         </sc-if>
         <sc-if value="{{ hdrIsBanner }}" hint-placeholder-val="{{ false }}">
           <sc-if value="{{ hdrShowDisc }}" hint-placeholder-val="{{ false }}"><div class="hb-disc" data-hfield="disclosureLine">{{ hdrDisc }}</div></sc-if>
           <div class="hb-main">
             <sc-if value="{{ hdrShowWm }}" hint-placeholder-val="{{ true }}"><sc-if value="{{ hdrWmLogo }}" hint-placeholder-val="{{ false }}"><img class="hb-wm" data-lazy-src="{{ hdrLogoSrc }}" alt="" aria-hidden="true"></sc-if><sc-if value="{{ hdrWmShape }}" hint-placeholder-val="{{ true }}"><svg class="hb-wm hb-wm-svg" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" stroke-width="10"></circle><circle cx="100" cy="100" r="58" fill="none" stroke="currentColor" stroke-width="10"></circle><circle cx="100" cy="100" r="24" fill="currentColor"></circle></svg></sc-if></sc-if>
-            <div class="hb-l"><div class="h-id"><sc-if value="{{ hdrHasLogo }}" hint-placeholder-val="{{ false }}"><img class="h-logo " data-lazy-src="{{ hdrLogoSrc }}" alt="{{ hdrOrg }}"></sc-if><sc-if value="{{ hdrShowOrgTxt }}" hint-placeholder-val="{{ true }}"><span class="h-org" data-hfield="organizationName">{{ hdrOrg }}</span></sc-if></div><sc-if value="{{ hdrShowTag }}" hint-placeholder-val="{{ true }}"><div class="h-tag" data-hfield="tagline">{{ hdrTag }}</div></sc-if></div>
+            <div class="hb-l"><div class="h-id"><sc-if value="{{ hdrHasLogo }}" hint-placeholder-val="{{ false }}"><img class="h-logo {{ hdrLogoInvCls }}" data-lazy-src="{{ hdrLogoSrc }}" alt="{{ hdrOrg }}"></sc-if><sc-if value="{{ hdrShowOrgTxt }}" hint-placeholder-val="{{ true }}"><span class="h-org" data-hfield="organizationName">{{ hdrOrg }}</span></sc-if></div><sc-if value="{{ hdrShowTag }}" hint-placeholder-val="{{ true }}"><div class="h-tag" data-hfield="tagline">{{ hdrTag }}</div></sc-if></div>
             <div class="hb-r"><sc-if value="{{ hdrShowEyebrow }}" hint-placeholder-val="{{ false }}"><div class="h-eyebrow" data-hfield="eyebrow">{{ hdrEyebrow }}</div></sc-if><sc-if value="{{ hdrShowTitle }}" hint-placeholder-val="{{ true }}"><div class="h-title" data-hfield="documentTitle">{{ hdrTitle }}</div></sc-if><sc-if value="{{ hdrShowSub }}" hint-placeholder-val="{{ false }}"><div class="h-sub" data-hfield="documentSubtitle">{{ hdrSub }}</div></sc-if><sc-if value="{{ hdrShowPeriod }}" hint-placeholder-val="{{ true }}"><div class="h-period" data-hfield="period">{{ hdrPeriod }}</div></sc-if></div>
           </div>
         </sc-if>
@@ -1495,7 +1496,7 @@
         </sc-if>
       </header>
       <header class="{{ hdrContCls }}" style="{{ hdrVars }}" data-hkind="cont">
-        <div class="hc-row"><div class="h-id"><sc-if value="{{ hdrHasLogo }}" hint-placeholder-val="{{ false }}"><img class="h-logo " data-lazy-src="{{ hdrLogoSrc }}" alt="{{ hdrOrg }}"></sc-if><sc-if value="{{ hdrShowOrgTxt }}" hint-placeholder-val="{{ true }}"><span class="h-org" data-hfield="organizationName">{{ hdrOrg }}</span></sc-if></div><div class="hc-title" data-hfield="documentTitle">{{ hdrTitle }}</div><sc-if value="{{ hdrShowPeriod }}" hint-placeholder-val="{{ true }}"><div class="h-period" data-hfield="period">{{ hdrPeriod }}</div></sc-if></div>
+        <div class="hc-row"><div class="h-id"><sc-if value="{{ hdrHasLogo }}" hint-placeholder-val="{{ false }}"><img class="h-logo {{ hdrLogoInvCls }}" data-lazy-src="{{ hdrLogoSrc }}" alt="{{ hdrOrg }}"></sc-if><sc-if value="{{ hdrShowOrgTxt }}" hint-placeholder-val="{{ true }}"><span class="h-org" data-hfield="organizationName">{{ hdrOrg }}</span></sc-if></div><div class="hc-title" data-hfield="documentTitle">{{ hdrTitle }}</div><sc-if value="{{ hdrShowPeriod }}" hint-placeholder-val="{{ true }}"><div class="h-period" data-hfield="period">{{ hdrPeriod }}</div></sc-if></div>
       </header>
     </sc-if>
   </div>
@@ -6082,7 +6083,7 @@ class Component extends DCLogic {
     const SZ = [.85, .55, 'banner', 'classic'];
     const H0 = Object.assign(this.hdrDefault(), this.state.header || {}); const F0 = Object.assign(this.ftrDefault(), this.state.footer || {});
     const qr = this.bcQr && this.bcQr();
-    this.setMarginsAll(.12); this.setHdrSys({ template: SZ[2], colors: this.tplHdrColors(), minIn: SZ[0], scale: 1, bleed: false, height: 'auto' });
+    this.setMarginsAll(.12); this.setHdrSys({ template: SZ[2], colors: this.tplHdrColors(), minIn: SZ[0], scale: 1, bleed: false, height: 'auto', logoSize: 36 });
     this.setFtrSys({ template: SZ[3] === 'contactqr' && !qr ? 'classic' : SZ[3], minIn: SZ[1], scale: 1, bleed: false });
     this._hfUserUntil = 0; clearTimeout(this._tfT); this._tfT = setTimeout(() => this.tplFitPages(), 1300);
   }
@@ -6670,7 +6671,7 @@ class Component extends DCLogic {
     this.persistSoon && this.persistSoon(); this.forceUpdate();
   }
   hdrDefault() { return { template: 'none', logo: '', logoRev: '', organizationName: 'Organization Name', documentTitle: 'Strategy / Fund / Fact Sheet Name', documentSubtitle: 'Institutional Share Class', period: 'Q2 2026', tagline: 'Proven success. *Strategic growth.* Real returns.', eyebrow: '', disclosureLine: 'For institutional use only', heroImage: '', colors: this.hdrBrand(), fontH: '', fontB: '',
-    posMode: 'center', x: 50, y: 50, overlay: 'medium', height: 'auto', align: 'left', titleSize: 20, logoSize: 22, mode: 'every',
+    posMode: 'center', x: 50, y: 50, overlay: 'medium', height: 'auto', align: 'left', titleSize: 20, logoSize: 36, mode: 'every',
     options: { showLogo: true, showOrganizationName: true, showTitle: true, showSubtitle: true, showPeriod: true, showTagline: true, showHeroImage: true, showDisclosure: false, showWatermark: true, showRule: true } }; }
   hdr() { const d = this.hdrDefault(); const s = Object.assign({}, this.state.header || {}); const bl = this.bcLogos(); if (s.logoPick) s.logo = s.logoPick; else if (bl.color) s.logo = bl.color; if (bl.white) s.logoRev = bl.white; return Object.assign(d, s, { options: Object.assign({}, d.options, s.options || {}), colors: Object.assign({}, d.colors, s.colors || {}) }); }
   hfLockKeys(cur, patch) { const L = new Set(cur.userKeys || []); Object.keys(patch || {}).forEach(k => { if (k === 'userKeys') return; const v = patch[k]; if ((k === 'colors' || k === 'options' || k === 'slots' || k === 'pieces') && v && typeof v === 'object' && !Array.isArray(v)) { Object.keys(v).forEach(sk => { if (JSON.stringify(v[sk]) !== JSON.stringify((cur[k] || {})[sk])) L.add(k + '.' + sk); }); } else L.add(k); }); return [...L]; }
@@ -6712,7 +6713,7 @@ class Component extends DCLogic {
       hdrCls: 'hdr hdr-' + t + ' hal-' + (H.align || 'left') + (narrow ? ' hdr-narrow' : '') + (H.minIn ? ' hdr-fixh' : ''),
       hdrContCls: 'hdr hdr-cont' + ((t === 'masthead' || t === 'banner') ? ' hc-dark' : ''),
       hdrVars: `--h-primary:${c.primary};--h-secondary:${c.secondary};--h-accent:${c.accent};--h-acc-on:${this.aa(c.accent, c.primary, 4.5)};--h-bg:${c.background};--h-text:${this.aa(c.text, c.background)};--hdr-fs:${(8 * (H.scale || 1) / z).toFixed(3)}pt;--hdr-title:${(ttlPt * (H.scale || 1)).toFixed(3)}pt;--hdr-logo:${(H.logoSize * (H.scale || 1) / z).toFixed(3)}pt;--hdr-minh:${H.minIn ? '0' : (minh[H.height] || minh.auto || '0')};--hdr-h:${((H.minIn || 0) / z).toFixed(3)}in` + (H.fontH ? `;--hdr-ffh:${H.fontH}` : '') + (H.fontB ? `;--hdr-ffb:${H.fontB}` : '') + (t === 'masthead' && (hasLogo || o.showOrganizationName) ? ';--hm-pr:40%' : ''),
-      hdrHasLogo: hasLogo, hdrLogoSrc: logoSrc, hdrShowOrgTxt: !!(o.showOrganizationName && val(H.organizationName)) || (!hasLogo && !!val(H.organizationName)), hdrOrg: val(H.organizationName),
+      hdrHasLogo: hasLogo, hdrLogoSrc: logoSrc, hdrLogoMastSrc: baseLogo || logoSrc, hdrLogoInvCls: (darkBg && logoSrc !== H.logoRev) ? 'h-logo-inv' : '', hdrShowOrgTxt: !!(o.showOrganizationName && val(H.organizationName)) || (!hasLogo && !!val(H.organizationName)), hdrOrg: val(H.organizationName),
       hdrShowTitle: !!(o.showTitle && val(H.documentTitle)), hdrTitle: val(H.documentTitle), hdrShowSub: !!(o.showSubtitle && val(H.documentSubtitle)), hdrSub: val(H.documentSubtitle),
       hdrShowPeriod: !!(o.showPeriod && val(H.period)) && ![o.showSubtitle && H.documentSubtitle, H.eyebrow, o.showTitle && H.documentTitle].some(v => { const a = String(val(v) || '').toLowerCase().replace(/\s+/g, ' '), b = String(val(H.period) || '').toLowerCase().replace(/\s+/g, ' ').trim(); return !!b && a.includes(b); }), hdrPeriod: val(H.period), hdrShowEyebrow: !!val(H.eyebrow), hdrEyebrow: val(H.eyebrow),
       hdrShowTag: !!(o.showTagline && plainTag), hdrTag: plainTag, hdrTagParts: tagParts,
@@ -7666,7 +7667,7 @@ class Component extends DCLogic {
       hdrFontH: this.hdr().fontH || '', hdrOnFontH: e => { const v = e.target.value; if (v) this.loadGoogleFont(this.fontLabel(v)); this.setHdr({ fontH: v }); },
       hdrFontB: this.hdr().fontB || '', hdrOnFontB: e => { const v = e.target.value; if (v) this.loadGoogleFont(this.fontLabel(v)); this.setHdr({ fontB: v }); },
       hdrTitleSize: this.hdr().titleSize || 20, hdrOnTitleSize: e => this.setHdr({ titleSize: +e.target.value || 20 }),
-      hdrLogoSize: this.hdr().logoSize || 22, hdrOnLogoSize: e => this.setHdr({ logoSize: +e.target.value || 22 }),
+      hdrLogoSize: this.hdr().logoSize || 36, hdrOnLogoSize: e => this.setHdr({ logoSize: +e.target.value || 36 }),
       hdrAlignV: this.hdr().align || 'left', hdrOnAlign: e => this.setHdr({ align: e.target.value }),
       hdrModeV: this.hdr().mode || 'every', hdrOnMode: e => this.setHdr({ mode: e.target.value }),
       tsSkip: () => this.setState({ txtStart: null }),
