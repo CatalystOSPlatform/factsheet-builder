@@ -79,7 +79,7 @@ export const SECTIONS = {
     { k: 'e', text: 'PRODUCT / SERVICE' }, { k: 'h1', text: 'Product or Service Name' }, { k: 'p', text: 'One-sentence value statement — what it does and who it is for.' }, { k: 'img', w: 1, h: 1.6 }] },
   'sell-benefits': { cat: 'Marketing', label: 'Key Benefits', desc: 'Three benefits with short descriptions.', blocks: [
     { k: 'h', text: 'Key Benefits' }, { k: 'c', cols: 3, items: [['Benefit', 'Enter description'], ['Benefit', 'Enter description'], ['Benefit', 'Enter description']] }] },
-  'sell-features': { cat: 'Marketing', label: 'Features & Specs', desc: 'Feature–detail table.', blocks: [{k: 'h',text: 'Features'},{k: 'p',text: '• Feature\n• Feature\n• Feature\n• Feature'}] },
+  'sell-features': { cat: 'Marketing', label: 'Features & Specs', desc: 'Feature–detail table.', blocks: [{k: 'h',text: 'Features'},{k: 'p',text: 'Feature\nFeature\nFeature\nFeature'}] },
   'sell-cta': { cat: 'Marketing', label: 'Call to Action', desc: 'Next step with contact details.', blocks: [
     { k: 'h', text: 'Ready to get started?' }, { k: 'p', text: 'Enter call to action.\nwww.company.com  ·  (XXX) XXX-XXXX' }] },
   'cs-header': { cat: 'Case Study', label: 'Case Study Header', desc: 'Client name, headline and result summary.', blocks: [
@@ -159,9 +159,9 @@ export const SECTIONS = {
     { k: 'h', text: 'Investment Strategy' }, { k: 'p', text: 'Enter a description of the investment strategy: what you invest in, why, and what sets the approach apart.' }] },
   'ql-process': { cat: 'Strategy', styled: true, label: 'Investment Process', desc: 'Process narrative with key steps.', blocks: [
     { k: 'h', text: 'Investment Process' }, { k: 'p', text: 'Enter an overview of the investment process.' },
-    { k: 'p', text: '•  Step — Enter description\n•  Step — Enter description\n•  Step — Enter description\n•  Step — Enter description' }] },
+    { k: 'p', text: 'Step — Enter description\nStep — Enter description\nStep — Enter description\nStep — Enter description' }] },
   'ql-role': { cat: 'Strategy', styled: true, label: 'Role in Portfolio', desc: 'How the fund fits an investor portfolio.', blocks: [
-    { k: 'h', text: 'Role in Portfolio' }, { k: 'p', text: '•  Enter role\n•  Enter role\n•  Enter role\n•  Enter role\n•  Enter role' }] },
+    { k: 'h', text: 'Role in Portfolio' }, { k: 'p', text: 'Enter role\nEnter role\nEnter role\nEnter role\nEnter role' }] },
   'ql-firm-facts': { cat: 'About', styled: true, label: 'Firm Facts (Sidebar)', desc: 'Label–value firm facts.', blocks: [
     { k: 'h', text: 'Firm Facts' }, { k: 'kv', rows: kv(['Data point', 'XX.XX'], ['Data point', 'XX.XX'], ['Data point', 'XX.XX'], ['Data point', 'XX.XX'], ['Data point', 'XX.XX'], ['Data point', 'XX.XX']) }] },
   'ql-founders': { cat: 'About', styled: true, label: 'Founders', desc: 'Founders with title, experience and short bio.', blocks: [
@@ -239,7 +239,7 @@ export const SECTIONS = {
     { k: 'h', text: 'Top 10 Holdings' }, { k: 'chart', chart: 'treemap', rows: [['Company','% of Net Assets'],['Company 1','4.80'],['Company 2','4.10'],['Company 3','3.60'],['Company 4','3.20'],['Company 5','2.90'],['Company 6','2.60'],['Company 7','2.30'],['Company 8','2.10'],['Company 9','1.90'],['Company 10','1.70']] }, { k: 'cap', text: '% of net assets. Sample data.' }] },
   'v3-leaders': { cat: 'About', styled: true, label: 'Leadership', desc: '1–4 leaders with photo, name, title and highlights.', blocks: [
     { k: 'h', text: 'Leadership' }, { k: 'ppl', cols: 4, items: [['Name, CFA', 'Chief Investment Officer'], ['Name, CFA', 'Portfolio Manager'], ['Name, CFP', 'Head of Research'], ['Name', 'Client Portfolio Manager']] },
-    { k: 'c', cols: 4, items: [['Highlights', '• XX years of experience\n• Joined the firm in 20XX\n• Leads investment strategy'], ['Highlights', '• XX years of experience\n• Manages the core strategy\n• Previously at Firm Name'], ['Highlights', '• XX years of experience\n• Leads the research team\n• Sector focus: Enter'], ['Highlights', '• XX years of experience\n• Primary client contact\n• Enter a credential']] }] },
+    { k: 'c', cols: 4, items: [['Highlights', 'XX years of experience\nJoined the firm in 20XX\nLeads investment strategy'], ['Highlights', 'XX years of experience\nManages the core strategy\nPreviously at Firm Name'], ['Highlights', 'XX years of experience\nLeads the research team\nSector focus: Enter'], ['Highlights', 'XX years of experience\nPrimary client contact\nEnter a credential']] }] },
   'v3-perf-wide': { cat: 'Performance', styled: true, label: 'Performance Chart + Table (Full Width)', desc: 'Large growth line chart with returns table below.', blocks: [
     { k: 'h', text: 'Performance: Growth of $10,000' }, { k: 'chart', chart: 'line', rows: [['Year','Fund','Benchmark'],['2017','10000','10000'],['2018','10420','10310'],['2019','11890','11560'],['2020','12960','12480'],['2021','14820','14090'],['2022','13410','13050'],['2023','15280','14610'],['2024','17030','16120'],['2025','18640','17480'],['2026','19520','18230']], h: 2.4 },
     { k: 't', rows: [['', 'YTD', '1 Yr', '3 Yr', '5 Yr', '10 Yr', 'Since Incep.'], ['Fund', 'X.XX', 'X.XX', 'X.XX', 'X.XX', 'X.XX', 'X.XX'], ['Benchmark', 'X.XX', 'X.XX', 'X.XX', 'X.XX', 'X.XX', 'X.XX'], ['Difference', 'X.XX', 'X.XX', 'X.XX', 'X.XX', 'X.XX', 'X.XX']] },
@@ -249,7 +249,7 @@ export const SECTIONS = {
   'v3-construction': { cat: 'Portfolio', styled: true, label: 'Portfolio Construction', desc: 'How ideas become the portfolio.', blocks: [
     { k: 'h', text: 'Portfolio Construction' }, { k: 'kv', rows: kv(['Number of Holdings', 'XX\u2013XX'], ['Typical Position Size', 'X\u2013X%'], ['Buy Discipline', 'Enter approach'], ['Sell Discipline', 'Enter approach'], ['Time Horizon', 'X\u2013X years'], ['Risk Management', 'Enter approach']) }] },
   'v3-diff': { cat: 'Strategy', styled: true, label: 'Differentiators', desc: 'What makes the approach distinctive.', blocks: [
-    { k: 'h', text: 'What Sets Us Apart' }, { k: 'p', text: '\u2022 Proprietary research process\n\u2022 Experienced, stable team\n\u2022 Repeatable, disciplined approach\n\u2022 Alignment of interests' }] },
+    { k: 'h', text: 'What Sets Us Apart' }, { k: 'p', text: 'Proprietary research process\nExperienced, stable team\nRepeatable, disciplined approach\nAlignment of interests' }] },
   'v3-team': { cat: 'Team', styled: true, label: 'Investment Team', desc: 'Team members with photo, role and experience.', blocks: [
     { k: 'h', text: 'Investment Team' }, { k: 'ppl', cols: 2, items: [['Full Name, CFA', 'Role \u00b7 XX years experience'], ['Full Name', 'Role \u00b7 XX years experience']] }] },
   'v3-fit': { cat: 'Strategy', styled: true, label: 'Strategy Fit', desc: 'Investment objective the strategy addresses.', blocks: [
@@ -279,8 +279,8 @@ export const SECTIONS = {
   'b3-ss-usecases': { cat: 'Marketing', styled: true, label: 'Use Cases', desc: 'Three use cases.', blocks: [
     { k: 'h', text: 'Use Cases' }, { k: 'kv', rows: kv(['Use Case One', 'Problem and solution in one line'], ['Use Case Two', 'Problem and solution in one line'], ['Use Case Three', 'Problem and solution in one line']) }] },
   'b3-ss-diff': { cat: 'Marketing', styled: true, label: 'Why Choose Us', desc: 'Differentiators.', blocks: [
-    { k: 'h', text: 'Why Choose Us' }, { k: 'p', text: '\u2022 Enter a specific differentiator\n\u2022 Enter a specific differentiator\n\u2022 Enter a specific differentiator' }] },
-  'b3-ss-features': { cat: 'Marketing', styled: true, label: 'Feature Summary', desc: 'Compact feature table.', blocks: [{k: 'h',text: 'Features at a Glance'},{k: 'p',text: '• Feature One: ✓\n• Feature Two: ✓\n• Feature Three: ✓\n• Feature Four: ✓\n• Feature Five: ✓'}] },
+    { k: 'h', text: 'Why Choose Us' }, { k: 'p', text: 'Enter a specific differentiator\nEnter a specific differentiator\nEnter a specific differentiator' }] },
+  'b3-ss-features': { cat: 'Marketing', styled: true, label: 'Feature Summary', desc: 'Compact feature table.', blocks: [{k: 'h',text: 'Features at a Glance'},{k: 'p',text: 'Feature One: ✓\nFeature Two: ✓\nFeature Three: ✓\nFeature Four: ✓\nFeature Five: ✓'}] },
   'b3-cta': { cat: 'Document', styled: true, label: 'Call to Action', desc: 'One primary next step with contact.', blocks: [
     { k: 'h', text: 'Book a Demo' }, { k: 'p', text: 'One sentence inviting the next step. Visit www.company.com, email info@company.com or call XXX-XXX-XXXX.' }] },
   'b3-legal': { cat: 'Document', styled: true, label: 'Legal / Sources', desc: 'Disclaimer, sources and copyright.', blocks: [
@@ -296,8 +296,8 @@ export const SECTIONS = {
   'b3-cs-challenge': { cat: 'Case Study', styled: true, label: 'The Challenge', desc: 'Business pain and impact.', blocks: [
     { k: 'h', text: 'The Challenge' }, { k: 'p', text: 'What was happening, why it was a problem, the business impact and why the existing approach fell short.' }] },
   'b3-cs-objectives': { cat: 'Case Study', styled: true, label: 'Objectives', desc: 'What the customer needed.', blocks: [
-    { k: 'h', text: 'Objectives' }, { k: 'p', text: '\u2022 Enter objective\n\u2022 Enter objective\n\u2022 Enter objective' }] },
-  'b3-cs-solution': { cat: 'Case Study', styled: true, label: 'The Solution', desc: 'What was implemented and why.', blocks: [{k: 'h',text: 'The Solution'},{k: 'p',text: '• What was implemented\n• Why this approach was chosen\n• Products or services involved\n• How it was rolled out'}] },
+    { k: 'h', text: 'Objectives' }, { k: 'p', text: 'Enter objective\nEnter objective\nEnter objective' }] },
+  'b3-cs-solution': { cat: 'Case Study', styled: true, label: 'The Solution', desc: 'What was implemented and why.', blocks: [{k: 'h',text: 'The Solution'},{k: 'p',text: 'What was implemented\nWhy this approach was chosen\nProducts or services involved\nHow it was rolled out'}] },
   'b3-cs-approach': { cat: 'Case Study', styled: true, label: 'Implementation', desc: 'Four-phase approach.', blocks: [
     { k: 'h', text: 'Implementation' }, { k: 'c', cols: 4, items: [['Discovery', 'Week X'], ['Setup', 'Week X'], ['Launch', 'Week X'], ['Optimization', 'Ongoing']] }] },
   'b3-cs-results': { cat: 'Case Study', styled: true, label: 'Results (Before / After)', desc: 'Before/after table and impact chart.', blocks: [
@@ -305,7 +305,7 @@ export const SECTIONS = {
     { k: 'chart', chart: 'bar', rows: [['Metric', 'Before', 'After'], ['Metric A', '40', '72'], ['Metric B', '55', '80'], ['Metric C', '30', '64']] }, { k: 'cap', text: 'Sample data, replace with the customer\u2019s verified results.' }] },
   'b3-cs-quote': { cat: 'Case Study', styled: true, label: 'Customer Quote', desc: 'One strong quote.', blocks: [
     { k: 'q', text: '\u201cAdd one customer-approved quote that reinforces the result.\u201d \u2014 Name, Title, Company' }] },
-  'b3-cs-takeaways': { cat: 'Case Study', styled: true, label: 'Why It Worked', desc: 'Key takeaways.', blocks: [{k: 'h',text: 'Why It Worked'},{k: 'p',text: '• Takeaway One: Short explanation.\n• Takeaway Two: Short explanation.\n• Takeaway Three: Short explanation.'}] },
+  'b3-cs-takeaways': { cat: 'Case Study', styled: true, label: 'Why It Worked', desc: 'Key takeaways.', blocks: [{k: 'h',text: 'Why It Worked'},{k: 'p',text: 'Takeaway One: Short explanation.\nTakeaway Two: Short explanation.\nTakeaway Three: Short explanation.'}] },
   'b3-wp-cover': { cat: 'White Paper', styled: true, label: 'White Paper Cover', desc: 'Title, subtitle, author and date.', blocks: [
     { k: 'img', w: 1, h: 1.3 },
     { k: 'e', text: 'White Paper \u00b7 Month YYYY' }, { k: 'h1', text: 'A Clear Title That States the Subject' }, { k: 'p', text: 'A descriptive subtitle that explains the scope and the question this paper answers.' }, { k: 'kv', rows: kv(['Author', 'Name, Title'], ['Organization', 'Company Name']) }] },
@@ -313,8 +313,8 @@ export const SECTIONS = {
     { k: 'h', text: 'Executive Summary' }, { k: 'p', text: 'Summarize the issue, why it matters, the key findings and the main recommendation so a reader can stop here and still understand the paper.' }] },
   'b3-wp-findings': { cat: 'White Paper', styled: true, label: 'Key Findings', desc: 'Three findings with evidence.', blocks: [
     { k: 'h', text: 'Key Findings' }, { k: 'c', cols: 3, items: [['Finding One', 'Evidence and short interpretation.'], ['Finding Two', 'Evidence and short interpretation.'], ['Finding Three', 'Evidence and short interpretation.']] }] },
-  'b3-wp-context': { cat: 'White Paper', styled: true, label: 'The Business Issue', desc: 'What is changing and why now.', blocks: [{k: 'h',text: 'The Business Issue'},{k: 'p',text: 'Define what is changing, why it matters now, who is affected and what the consequences are.'},{k: 'p',text: '• What is happening today\n• Who is affected and how\n• The cost of leaving it unchanged'}] },
-  'b3-wp-analysis': { cat: 'White Paper', styled: true, label: 'Problem Analysis', desc: 'Current state in depth.', blocks: [{k: 'h',text: 'Current State'},{k: 'p',text: 'Explain the problem in depth: market conditions, existing workflows, cost pressures or technology changes.'},{k: 'p',text: '• What is happening today\n• Who is affected and how\n• The cost of leaving it unchanged'}] },
+  'b3-wp-context': { cat: 'White Paper', styled: true, label: 'The Business Issue', desc: 'What is changing and why now.', blocks: [{k: 'h',text: 'The Business Issue'},{k: 'p',text: 'Define what is changing, why it matters now, who is affected and what the consequences are.'},{k: 'p',text: 'What is happening today\nWho is affected and how\nThe cost of leaving it unchanged'}] },
+  'b3-wp-analysis': { cat: 'White Paper', styled: true, label: 'Problem Analysis', desc: 'Current state in depth.', blocks: [{k: 'h',text: 'Current State'},{k: 'p',text: 'Explain the problem in depth: market conditions, existing workflows, cost pressures or technology changes.'},{k: 'p',text: 'What is happening today\nWho is affected and how\nThe cost of leaving it unchanged'}] },
   'b3-wp-data': { cat: 'White Paper', styled: true, label: 'Evidence & Data', desc: 'Chart, table and source.', blocks: [
     { k: 'h', text: 'What the Data Shows' }, { k: 'chart', chart: 'bar', rows: [['Category', 'Value'], ['Category A', '42'], ['Category B', '31'], ['Category C', '18'], ['Category D', '9']] },
     { k: 't', rows: [['Measure', 'Value', 'Source'], ['Enter measure', 'XX%', 'Source'], ['Enter measure', 'XX%', 'Source'], ['Enter measure', 'XX%', 'Source']] }, { k: 'cap', text: 'Sample data. Source: add citation.' }] },
@@ -345,9 +345,9 @@ export const SECTIONS = {
     { k: 'h', text: 'Our Understanding of Your Needs' }, { k: 'kv', rows: kv(['Current Situation', 'Enter in the client\u2019s words'], ['Challenges', 'Enter challenges'], ['Constraints', 'Enter constraints'], ['Opportunity', 'Enter opportunity']) }] },
   'b3-pr-objectives': { cat: 'Proposal', styled: true, label: 'Objectives & Success Criteria', desc: 'Measurable objectives.', blocks: [
     { k: 'h', text: 'Objectives & Success Criteria' }, { k: 't', rows: [['Objective', 'Success Measure'], ['Enter objective', 'Enter measure'], ['Enter objective', 'Enter measure'], ['Enter objective', 'Enter measure']] }] },
-  'b3-pr-solution': { cat: 'Proposal', styled: true, label: 'Proposed Solution', desc: 'Approach, components and rationale.', blocks: [{k: 'h',text: 'Proposed Solution'},{k: 'p',text: '• Component one, tied to a client need\n• Component two, tied to a client need\n• Component three, tied to a client need\n• How the pieces work together'}] },
-  'b3-pr-scope': { cat: 'Proposal', styled: true, label: 'Scope & Deliverables', desc: 'Deliverables table.', blocks: [{k: 'h',text: 'Scope & Deliverables'},{k: 'p',text: 'What this engagement covers and what you will receive at each stage.'},{k: 'p',text: '• Deliverable one and its outcome\n• Deliverable two and its outcome\n• Deliverable three and its outcome\n• What is out of scope'}] },
-  'b3-pr-approach': { cat: 'Proposal', styled: true, label: 'Approach', desc: 'Five-phase methodology.', blocks: [{k: 'h',text: 'Our Approach'},{k: 'p',text: 'How we will work with you, from kickoff to launch, and how we keep the project on track.'},{k: 'p',text: '• Discover: align on goals and success measures\n• Design: shape the solution with your team\n• Deliver: build, test and launch\n• Support: measure results and refine'}] },
+  'b3-pr-solution': { cat: 'Proposal', styled: true, label: 'Proposed Solution', desc: 'Approach, components and rationale.', blocks: [{k: 'h',text: 'Proposed Solution'},{k: 'p',text: 'Component one, tied to a client need\nComponent two, tied to a client need\nComponent three, tied to a client need\nHow the pieces work together'}] },
+  'b3-pr-scope': { cat: 'Proposal', styled: true, label: 'Scope & Deliverables', desc: 'Deliverables table.', blocks: [{k: 'h',text: 'Scope & Deliverables'},{k: 'p',text: 'What this engagement covers and what you will receive at each stage.'},{k: 'p',text: 'Deliverable one and its outcome\nDeliverable two and its outcome\nDeliverable three and its outcome\nWhat is out of scope'}] },
+  'b3-pr-approach': { cat: 'Proposal', styled: true, label: 'Approach', desc: 'Five-phase methodology.', blocks: [{k: 'h',text: 'Our Approach'},{k: 'p',text: 'How we will work with you, from kickoff to launch, and how we keep the project on track.'},{k: 'p',text: 'Discover: align on goals and success measures\nDesign: shape the solution with your team\nDeliver: build, test and launch\nSupport: measure results and refine'}] },
   'b3-pr-timeline': { cat: 'Proposal', styled: true, label: 'Timeline & Milestones', desc: 'Phases and dates.', blocks: [
     { k: 'h', text: 'Timeline & Milestones' }, { k: 't', rows: [['Phase', 'Milestone', 'Date'], ['Phase 1', 'Enter milestone', 'MM/DD'], ['Phase 2', 'Enter milestone', 'MM/DD'], ['Phase 3', 'Enter milestone', 'MM/DD'], ['Launch', 'Go live', 'MM/DD']] }] },
   'b3-pr-roles': { cat: 'Proposal', styled: true, label: 'Roles & Responsibilities', desc: 'Your team, client team, third parties.', blocks: [
@@ -357,11 +357,11 @@ export const SECTIONS = {
   'b3-pr-value': { cat: 'Proposal', styled: true, label: 'Expected Value', desc: 'Estimated ROI metrics.', blocks: [
     { k: 'h', text: 'Expected Value' }, { k: 'm', items: [['XX%', 'Estimated time saved'], ['$XX K', 'Estimated annual savings'], ['XX\u00d7', 'Estimated capacity']] }, { k: 'cap', text: 'Estimates, not guaranteed outcomes.' }] },
   'b3-pr-why': { cat: 'Proposal', styled: true, label: 'Why Us', desc: 'Relevant proof and a related case.', blocks: [
-    { k: 'h', text: 'Why Company Name' }, { k: 'p', text: '\u2022 Relevant expertise\n\u2022 Similar work\n\u2022 Specialized capability' }, { k: 'kv', rows: kv(['Challenge', 'Related client challenge'], ['Solution', 'What we did'], ['Result', 'Measured outcome']) }] },
+    { k: 'h', text: 'Why Company Name' }, { k: 'p', text: 'Relevant expertise\nSimilar work\nSpecialized capability' }, { k: 'kv', rows: kv(['Challenge', 'Related client challenge'], ['Solution', 'What we did'], ['Result', 'Measured outcome']) }] },
   'b3-pr-team': { cat: 'Proposal', styled: true, label: 'Engagement Team', desc: 'People on the engagement.', blocks: [
     { k: 'h', text: 'Your Team' }, { k: 'ppl', cols: 3, items: [['Full Name', 'Role \u00b7 Expertise'], ['Full Name', 'Role \u00b7 Expertise'], ['Full Name', 'Role \u00b7 Expertise']] }] },
   'b3-pr-assume': { cat: 'Proposal', styled: true, label: 'Assumptions & Exclusions', desc: 'Assumptions and what is not included.', blocks: [
-    { k: 'h', text: 'Assumptions & Exclusions' }, { k: 'p', text: '\u2022 Enter assumption\n\u2022 Enter client dependency\n\u2022 Not included: enter exclusion\n\u2022 Revisions: enter limit' }] },
+    { k: 'h', text: 'Assumptions & Exclusions' }, { k: 'p', text: 'Enter assumption\nEnter client dependency\nNot included: enter exclusion\nRevisions: enter limit' }] },
   'b3-pr-terms': { cat: 'Proposal', styled: true, label: 'Terms', desc: 'Payment, validity and legal terms.', blocks: [
     { k: 'h', text: 'Terms' }, { k: 'cap', text: 'Payment terms, proposal validity, cancellation, intellectual property, confidentiality and change requests.' }] },
   'b3-pr-accept': { cat: 'Proposal', styled: true, label: 'Next Steps & Acceptance', desc: 'Next action with signature fields.', blocks: [
@@ -371,7 +371,7 @@ export const SECTIONS = {
     { k: 'h', text: 'Investment Objective' }, { k: 'p', text: 'Enter the fund\u2019s investment objective in two or three sentences.' }] },
   'qn-overview': { cat: 'Fund / Product', styled: true, label: 'Fund Overview + Highlights', desc: 'Fund facts with highlight bullets.', blocks: [
     { k: 'h', text: 'Fund Overview' }, { k: 'kv', rows: kv(['Asset Class', 'Enter asset class'], ['Portfolio Benchmark', 'Enter benchmark'], ['Portfolio AUM', '$XX.XX']) },
-    { k: 'sub', text: 'Highlights' }, { k: 'p', text: '\u2022 Enter a fund highlight\n\u2022 Enter a fund highlight\n\u2022 Enter a fund highlight' }] },
+    { k: 'sub', text: 'Highlights' }, { k: 'p', text: 'Enter a fund highlight\nEnter a fund highlight\nEnter a fund highlight' }] },
   'qn-fees': { cat: 'Fund / Product', styled: true, label: 'Fund Fees by Class', desc: 'Share classes with CUSIP and expense ratios.', blocks: [
     { k: 'h', text: 'Fund Fees' }, { k: 't', rows: [['Class', 'Ticker', 'CUSIP', 'Gross / Net'], ['Class A', 'ABCDE', 'XXXXXX-XX-X', 'XX% / XX%'], ['Class B', 'ABCDE', 'XXXXXX-XX-X', 'XX% / XX%'], ['Class C', 'ABCDE', 'XXXXXX-XX-X', 'XX% / XX%']] }] },
   'qn-returns': { cat: 'Performance', styled: true, label: 'Average Annual Total Returns', desc: 'Returns by class vs. benchmarks.', blocks: [
@@ -413,7 +413,7 @@ export const SECTIONS = {
   'qn-masthead2': { cat: 'Document', styled: true, label: 'Fund Masthead (Short)', desc: 'Compact brand band with fund name.', blocks: [
     { k: 'h1', text: 'Investment Fund Name', band: true }, { k: 'e', text: 'Q1 2026', band: true }] },
   'qn-firm-overview': { cat: 'About', styled: true, label: 'Firm Overview (Bullets)', desc: 'Firm highlights as bullets.', blocks: [
-    { k: 'h', text: 'Firm Overview' }, { k: 'p', text: '•  Enter firm highlight\n•  Enter firm highlight\n•  Enter firm highlight\n•  Enter firm highlight\n•  Enter firm highlight' }] },
+    { k: 'h', text: 'Firm Overview' }, { k: 'p', text: 'Enter firm highlight\nEnter firm highlight\nEnter firm highlight\nEnter firm highlight\nEnter firm highlight' }] },
   'qn-fund-overview': { cat: 'Fund / Product', styled: true, label: 'Fund Overview', desc: 'Asset class, style, benchmark, AUM and highlights.', blocks: [
     { k: 'h', text: 'Fund Overview' }, { k: 'kv', rows: kv(['Asset Class', 'Enter asset class'], ['Investment Style', 'Enter style'], ['Portfolio Benchmark', 'Benchmark'], ['Portfolio AUM', '$XX.XXM']) }, { k: 'p', text: 'Highlights: Enter fund highlights.' }] },
   'qn-objective': { cat: 'Strategy', styled: true, label: 'Investment Objective (Sidebar)', desc: 'Objective statement.', blocks: [
@@ -454,10 +454,10 @@ export const SECTIONS = {
   'hy-masthead': { cat: 'Document', styled: true, label: 'Hybrid Masthead', desc: 'Brand band: title, fund name, period and asset class.', blocks: [
     { k: 'e', text: 'Q1 2026  ·  THE ASSET CLASS THAT IS OUR AREA OF EXPERTISE', band: true }, { k: 'h1', text: 'Title of Fact Sheet', band: true }, { k: 'p', text: 'Investment Fund (TICKR)', band: true }] },
   'hy-firm-facts': { cat: 'About', styled: true, label: 'Firm Facts (What We Do)', desc: 'What we do plus firm highlights.', blocks: [
-    { k: 'h', text: 'Firm Facts' }, { k: 'p', text: 'What we do. Enter a short description of the firm.' }, { k: 'p', text: '•  Enter highlight\n•  Enter highlight\n•  Enter highlight' }] },
+    { k: 'h', text: 'Firm Facts' }, { k: 'p', text: 'What we do. Enter a short description of the firm.' }, { k: 'p', text: 'Enter highlight\nEnter highlight\nEnter highlight' }] },
   'hy-advisor': { cat: 'About', styled: true, label: 'Investment Advisor', desc: 'Advisor profile with experience list.', blocks: [
     { k: 'h', text: 'Investment Advisor' }, { k: 'img', w: .5, h: .6 }, { k: 'sub', text: 'Full Name' }, { k: 'e', text: 'TITLE HERE' }, { k: 'p', text: 'XX years investment management & finance experience' },
-    { k: 'p', text: '•  Experience line item\n•  Experience line item\n•  Experience line item\n•  Experience line item\n•  Experience line item' }] },
+    { k: 'p', text: 'Experience line item\nExperience line item\nExperience line item\nExperience line item\nExperience line item' }] },
   'hy-strategy': { cat: 'Strategy', styled: true, label: 'Investment Strategy (Hybrid)', desc: 'Strategy narrative.', blocks: [
     { k: 'h', text: 'Investment Strategy' }, { k: 'p', text: 'Enter a description of the investment strategy.' }] },
   'hy-fund-details': { cat: 'Fund / Product', styled: true, label: 'Fund Details · Characteristics · Pricing', desc: 'Three-part fund data table.', blocks: [
