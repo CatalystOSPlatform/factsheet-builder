@@ -3,6 +3,39 @@
 // is the source of truth; the Brand Command Center's localStorage cache is only a fast,
 // offline-friendly fallback for the client list.
 
+// Brand Command → Typography → Case (Erika's rule: every type style except body copy defaults to Title Case).
+// Source of truth: the dashboard's type-case.js (pilot-dash; its brand-sdk.js adds the same typeCaseFor/applyTypeCase as
+// below). Loaded from the dashboard so every builder follows the same rules (AP or Chicago per brand; names, trademarks
+// and acronyms kept). Builders change the TEXT when rendering and exporting (never CSS text-transform, never the saved
+// content). If the rules can't load, text stays as written.
+const TC_HOST = 'https://catalystos-dashboard-staging.vercel.app/';
+let TC = null;
+export const typeCaseReady = import(TC_HOST + 'type-case.js').then((t) => { TC = t; return true; })
+  .catch((e) => { console.warn('Brand Command type case rules could not load; text stays as written.', e); return false; });
+async function withTypeCase(profile, client) {
+  if (!profile || !(await typeCaseReady)) return profile;
+  try {
+    const raw = (client && client.typography) || profile.typography || [];
+    const byId = Object.fromEntries(raw.map((t) => [t.id, t]));
+    profile.typography = (profile.typography || raw.map((t) => ({ id: t.id, label: t.label || '', printLabel: t.printLabel || '', fontFamily: t.fontFamily || '', weight: t.weight || 400 })))
+      .map((t) => ({ ...t, textCase: TC.effectiveCase({ label: t.label, textCase: (byId[t.id] || t).textCase }) }));
+    profile.typeCase = TC.typeCaseMap(profile.typography);
+    if (client && client.styleGuide && !profile.styleGuide) profile.styleGuide = client.styleGuide;
+  } catch (e) { console.warn('type case', e); }
+  return profile;
+}
+// The case for one type style: an exact label ('H1', 'Button / CTA') or a role ('heading', 'subheading', 'title',
+// 'button', 'label', 'caption', 'quote', 'body'). 'asis' when the rules or the profile aren't there.
+export function typeCaseFor(profile, style) {
+  if (!TC || !profile) return 'asis';
+  const ty = profile.typography || []; const m = profile.typeCase || TC.typeCaseMap(ty); return m[style] || TC.caseFor(ty, style);
+}
+// The text in the case Brand Command sets for that style. Body copy stays as written.
+export function applyTypeCase(text, style, profile) {
+  if (text == null || !TC || !profile) return text;
+  try { return TC.applyCase(String(text), typeCaseFor(profile, style), { guide: TC.guideFor(profile), keep: TC.keepListFor(profile) }); } catch (e) { return text; }
+}
+
 export async function listClients() {
   try {
     const mod = await import('./firebase-sync.js');
@@ -48,12 +81,12 @@ export async function getBrandProfile(clientId) {
       }
       // The saved profile is only rebuilt when Brand Command saves: its images always come from the live client record
       // (with Brand Command's Not usable / Keep marks), newest-added first.
-      try { const cl = (await listClients()).find((x) => x.id === clientId); if (cl) profile.images = liveImages(cl); } catch (e) {}
-      return profile;
+      let cl = null; try { cl = (await listClients()).find((x) => x.id === clientId); if (cl) profile.images = liveImages(cl); } catch (e) {}
+      return withTypeCase(profile, cl);
     }
     const clients = await listClients();
     const client = clients.find((c) => c.id === clientId);
-    return client ? mod.buildBrandProfile(client) : null;
+    return client ? withTypeCase(mod.buildBrandProfile(client), client) : null;
   } catch (e) { return null; }
 }
 
