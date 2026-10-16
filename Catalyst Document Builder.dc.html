@@ -982,6 +982,10 @@
   .po-table table[data-b="outer"] td,.po-table table[data-b="outer"] th{border:0}
   .po-table table[data-b="outer"]{outline:.5pt solid var(--tl,#c5ccd4);outline-offset:-.5pt}
   .po-table table[data-b="none"] td,.po-table table[data-b="none"] th{border:0}
+  .po-table table[data-b="std"] td,.po-table table[data-b="std"] th{border:0;border-bottom:calc(.25pt / var(--pgscale,1)) solid #BFBFBF}
+  .po-table table[data-b="std"] th{border-bottom:calc(.75pt / var(--pgscale,1)) solid currentColor;vertical-align:bottom}
+  .po-table table[data-b="std"] tr:last-child td{border-bottom:0}
+  .po-table table[data-b="std"] td.tot{border-top:calc(.75pt / var(--pgscale,1)) solid currentColor}
   .po-legend{display:flex;gap:.35em .9em;align-content:flex-start;font-family:var(--ff-label);line-height:1.25}
   .po-legend.v{flex-direction:column}.po-legend.h{flex-wrap:wrap}
   .po-legend span{display:inline-flex;align-items:center;gap:.4em;white-space:nowrap}
@@ -1256,6 +1260,7 @@
       <button class="pdf-btn" onClick="{{ toggleDl }}" style="display:inline-flex;align-items:center;gap:7px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg><span>Download Document ▾</span></button>
       <div class="dl-menu" style="{{ dlStyle }}">
         <button class="dl-opt prime" data-cos-keep="" onClick="{{ downloadPrint }}"><b>Download PDF</b></button>
+        <button class="dl-opt prime" data-cos-keep="" onClick="{{ downloadWord }}"><b>Download Word</b></button>
         <button class="dl-opt prime" data-cos-keep="" onClick="{{ downloadPptx }}"><b>Download PPTX</b></button>
         <button class="dl-opt prime" data-cos-keep="" onClick="{{ downloadWebPkg }}"><b>Download Web Page</b></button>
       </div>
@@ -3961,6 +3966,72 @@ class Component extends DCLogic {
       if (!c.ok) throw c.timeout ? new Error('A page took too long to render.') : c.e;
       const url = c.v.toDataURL(fmt === 'jpeg' ? 'image/jpeg' : 'image/png', .92); if (await this.cosBlankImg(url)) throw new Error('A page came out blank.'); return url; }
     finally { bk.remove(); } }
+  // ---- Document production (pilot-dash doc-*.js): vector PDF, Word, Production Reviewer ----
+  // Spec "Professional Document Design and Production Standards": PDFs have live, selectable text in the embedded brand
+  // fonts, links, title, language and tags (no page pictures); Word files use native styles; the Production Reviewer
+  // opens and checks every exported file before it is downloaded. The picture PDF stays only as a fallback.
+  dpPages() { return [...document.querySelectorAll('.book .media:not(.pg-deleted) > .pg')]; }
+  dpTrimSize() { const DW = +(3.5 * (this._pageScale || 1)).toFixed(4), DH = +(4.75 * (this._pageScale || 1) * (this._pgvh || 1)).toFixed(4); return [DW * 72, DH * 72]; }
+  // The page as designed on screen, scaled uniformly onto the exact paper size (never stretched): the screen page is a
+  // little wider than US Letter, so it is fitted to the height and centered, trimming only the outer edge of full-bleed bands.
+  dpTrimOf(pg) { const r = pg.getBoundingClientRect(); const [TW, TH] = this.dpTrimSize(); const A = TW / TH; let w = r.width, h = r.height; if (w / h > A) w = h * A; else h = w / A; const left = r.left + (r.width - w) / 2, top = r.top + (r.height - h) / 2; return { left, top, right: left + w, bottom: top + h, width: w, height: h }; }
+  dpSizeId() { const [w, h] = this.dpTrimSize(); return Math.abs(w - 595.3) < 12 && Math.abs(h - 841.9) < 12 ? 'a4' : 'letter'; }
+  dpObj(el) { const d = el && el.closest && el.closest('.po[data-oid]'); const m = d && d.closest('.media[data-pid]'); if (!d || !m) return null; return (this.poList(m.getAttribute('data-pid')) || []).find(o => o.id === d.getAttribute('data-oid')) || null; }
+  dpRoleOf(el) { if (el.classList && el.classList.contains('po-t')) { const o = this.dpObj(el); return o ? ({ h1: 'H1', label: 'H2', sub: 'H3' }[o.style] || 'P') : 'P'; } return undefined; }
+  dpAltOf(el) { const o = this.dpObj(el); if (!o) return 'Chart'; const rows = (o.rows || []).filter(r => r && r.length); const head = rows[0] || []; return ((o.title ? o.title + '. ' : '') + ({ column: 'Column', bar: 'Bar', line: 'Line', donut: 'Donut', treemap: 'Tree map', number: 'Key figure' }[o.chart] || 'Chart') + ' chart: ' + rows.slice(1, 13).map(r => r[0] + ' ' + r.slice(1).map((v, i) => (head.length > 2 ? head[i + 1] + ' ' : '') + v).join(', ')).join('; ')).slice(0, 600); }
+  async dpInline(url) { try { const r = await fetch(this.teamPilot() + 'api/img', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) }); const d = await r.json().catch(() => ({})); return (r.ok && d.dataUrl) || ''; } catch (e) { return ''; } }
+  // Editor chrome off while exporting (selection, margins, guides), every lazy picture loaded; returns how to put it back.
+  async dpPrepare() {
+    const prev = { margins: this.state.margins, poSel: this.state.poSel, poUnit: this.state.poUnit }; const bookEl = document.querySelector('.book'); if (bookEl) bookEl.classList.add('rz');
+    await new Promise(r => this.setState({ margins: false, poSel: null, poUnit: null }, () => this.cosSleep(300).then(r))); await Promise.race([new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))), this.cosSleep(250)]);
+    document.querySelectorAll('.book img[data-lazy-src]').forEach(im => { const u = im.getAttribute('data-lazy-src'); if (u && im.getAttribute('src') !== u) im.setAttribute('src', u); }); await Promise.all([...document.querySelectorAll('.book img')].filter(im => !im.complete).map(im => new Promise(r => { im.onload = im.onerror = r; setTimeout(r, 3000); })));
+    try { await document.fonts.ready; } catch (e) {}
+    return () => { if (bookEl) bookEl.classList.remove('rz'); this.setState(prev); };
+  }
+  dpSkip(n) { return !!(n.closest && n.closest('.snap-gx, .snap-gy, .no-print, .po-h, .po-sample, .po-imgph, .bleed-guide, .edge-line, .pgdel-btn, .wand-btn, .clean-btn, .pgzoom, .qr-add, .po-rs-tip, .po-ghost, .crop-mark, .reg-mark, .color-bar')); }
+  async vectorPdf(o) {
+    o = o || {}; const P = await this.teamMod('doc-pdf.js'); const restore = await this.dpPrepare(); const pages = this.dpPages(); if (!pages.length) { restore(); throw new Error('There are no pages to export.'); }
+    const unp = P.materializePseudo(pages, { counter: (n, el, pi) => pi + 1, skip: n => this.dpSkip(n) }); const b = this.bcProfile() || {};
+    try { return await P.pdfFromPages(pages, { title: this.state.docName || 'Document', author: b.name || '', subject: ((this.teamTypes().find(x => x[0] === this.teamDocType()) || [])[1] || 'Document') + (b.name ? ' · ' + b.name : ''), keywords: this.teamDocType() || '', lang: 'en-US',
+      pageSize: this.dpTrimSize(), trimOf: pg => this.dpTrimOf(pg), roleOf: el => this.dpRoleOf(el), altOf: el => this.dpAltOf(el), artifactOf: el => !!(el.closest && el.closest('.hdr-clone, .ftr-clone, .hdr, .ftr')), readingOrder: 'columns', skip: n => this.dpSkip(n), inlineImage: u => this.dpInline(u), extra: o.extra || 0, decorate: o.decorate || null, outlineSelector: '.po-t' }); }
+    finally { unp(); restore(); }
+  }
+  // The open document as a structured model (reading order), for Word and for the content checks.
+  async dpModel() { const C = await this.teamMod('doc-canvas.js'); const b = this.bcProfile() || {}; const pages = this.dpPages().map(pg => { const m = pg.closest('.media[data-pid]'); const pid = m && m.getAttribute('data-pid'); const M = pid ? this.poMargins(pid) : null; return { objs: pid ? (this.poList(pid) || []) : [], w: (M && M.pw) || 3.5 * ((this._fit && this._fit.vw) || 1) }; });
+    return C.modelFromCanvas(pages, { title: this.state.docName || '', kind: this.teamDocType() || 'document', provider: b.name || '' }); }
+  async dpReview(x) {
+    const [DS, QA, AS] = await Promise.all([this.teamMod('doc-standards.js'), this.teamMod('doc-qa.js'), this.teamMod('agent-skills.js').catch(() => null)]);
+    const model = await this.dpModel(); const brand = this.bcProfile() || {}; const expectText = QA.expectedText(model);
+    let gate = null; try { gate = AS ? await AS.gateFor('reviewer', { clientId: (this.state.brandLink || {}).clientId || '', app: this.docAppLabel ? this.docAppLabel() : '' }) : null; } catch (e) {}
+    const editorial = DS.editorialChecks(model, { brand, kind: 'document' }).filter(i => !/question-unanswered|next-steps|summary-missing|thin-section/.test(i.rule));
+    const restore = await this.dpPrepare(); let layout = []; try { const pgs = this.dpPages(); const tr = pgs[0] ? this.dpTrimOf(pgs[0]) : null; layout = QA.layoutAudit(pgs, { bodySelector: '.dp-none', headingSelector: '.dp-none', textSelector: '.po-t, td, th', ptPerPx: tr ? this.dpTrimSize()[0] / tr.width : null }); } finally { restore(); }
+    const pdf = x && x.pdf ? await QA.checkPdf(x.pdf.bytes, { expectText, pageSize: this.dpTrimSize(), title: this.state.docName || 'Document' }) : null;
+    const docx = x && x.docx ? await QA.checkDocx(x.docx.bytes, { expectText, title: this.state.docName || 'Document' }) : null;
+    const unsupported = [...QA.PDFUA_UNSUPPORTED, ...((x && x.pdf && x.pdf.report.substitutions) || []).map(s => s.reason)];
+    const r = QA.review({ editorial, layout, pdf, docx, gate, unsupported }); this._dpLast = { at: Date.now(), status: r.status, approvable: r.approvable }; this.setDocMeta && this.setDocMeta({ review: this._dpLast }); return r;
+  }
+  dpSave(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); try { window.Brand && window.Brand.logActivity && window.Brand.logActivity('export', { app: 'documents', format: /\.docx$/.test(name) ? 'docx' : 'pdf', title: this.state.docName || '' }); } catch (e) {} }
+  // Printer's marks (crop marks, registration marks, color bars) drawn as vector around the trim, in points.
+  dpMarks(pdf, b) { const s = this.state; const L = 21.6, g = 9; pdf.setDrawColor(0); pdf.setLineWidth(.43);
+    if (s.crop) [[b.x, b.y], [b.x + b.w, b.y], [b.x, b.y + b.h], [b.x + b.w, b.y + b.h]].forEach(([x, y]) => { const sx = x === b.x ? -1 : 1, sy = y === b.y ? -1 : 1; pdf.line(x + sx * g, y, x + sx * (g + L), y); pdf.line(x, y + sy * g, x, y + sy * (g + L)); });
+    if (s.marks) [[b.pageW / 2, b.y / 2], [b.pageW / 2, b.pageH - b.y / 2], [b.x / 2, b.pageH / 2], [b.pageW - b.x / 2, b.pageH / 2]].forEach(([x, y]) => { pdf.circle(x, y, 6.5); pdf.line(x - 10, y, x + 10, y); pdf.line(x, y - 10, x, y + 10); });
+    if (s.bars) [[0, 255, 255], [255, 0, 255], [255, 255, 0], [0, 0, 0], [64, 64, 64], [128, 128, 128], [191, 191, 191]].forEach((c, k) => { pdf.setFillColor(c[0], c[1], c[2]); pdf.rect(b.x + 72 + k * 15.8, b.pageH - b.y + 10, 14.4, 14.4, 'F'); }); }
+  async dpThumb() { try { await this.loadScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js'); const pg = this.dpPages()[0]; if (!pg || !window.htmlToImage) return ''; const cs = getComputedStyle(pg); return await window.htmlToImage.toJpeg(pg, { quality: .85, pixelRatio: 600 / parseFloat(cs.width), backgroundColor: '#FFFFFF', filter: n => !this.dpSkip(n), style: { zoom: '1', transform: 'none', margin: '0', boxShadow: 'none' } }); } catch (e) { return ''; } }
+  async downloadDocx(ok) {
+    if (!ok && !this.dlGuard('docx')) return;
+    this.setState({ dlOpen: false, dlBusy: 'Building the Word file…' });
+    try { const [DS, P, D, QA] = await Promise.all([this.teamMod('doc-standards.js'), this.teamMod('doc-pdf.js'), this.teamMod('doc-docx.js'), this.teamMod('doc-qa.js')]);
+      const model = await this.dpModel(); const brand = Object.assign({}, this.bcProfile() || {}); const ff = v => String(getComputedStyle(document.querySelector('.app')).getPropertyValue(v) || '').split(',')[0].replace(/['"]/g, '').trim();
+      brand.headingFont = ff('--ff-name') || brand.headingFont; brand.bodyFont = ff('--ff-body') || brand.bodyFont; const S = DS.typeSystem({ brand });
+      const files = {}; for (const f of [...new Set([S.fonts.heading, S.fonts.body])]) for (const w of [400, 700]) { const t = await P.trueTypeFor(f, w, 'normal'); if (t && t.u8) files[f + '|' + w + '|normal'] = t.u8; }
+      const lg = this.bcLogos(); const logo = lg.color ? await P.pictureFor(lg.color, { inlineImage: u => this.dpInline(u) }) : null; if (logo) logo.alt = (brand.name || 'Company') + ' logo';
+      const prim = /^#[0-9a-f]{6}$/i.test(brand.primaryColor || '') ? brand.primaryColor : '#1F2A44'; const F = await this.teamMod('doc-flow.js'); const head = F.passing(prim, '#FFFFFF', 4.5);
+      const dx = await D.docxFromModel(model, { brand, size: this.dpSizeId(), typeSystem: S, colors: { heading: head, accent: head, ctaBg: head, tint: F.mix(prim, '#FFFFFF', .93) }, logo, fontFiles: files, cover: false, author: brand.name || '', subject: model.kind, lang: 'en-US' });
+      this.setState({ dlBusy: 'Checking the Word file…' }); const rev = await this.dpReview({ docx: dx });
+      const go = await QA.showReview(rev, { title: 'Production review: Word file', what: 'Word', downloadLabel: 'Download Word', onlyIfIssues: true });
+      if (go === 'download') this.dpSave(dx.blob, this.docSlug() + '.docx'); }
+    catch (e) { console.warn(e); window.alert('Could not build the Word file.\n\n' + ((e && e.message) || '') ); }
+    finally { this.setState({ dlBusy: null }); } }
   docSlug() { return String(this.state.docName || 'document').trim().replace(/[^A-Za-z0-9 _-]+/g, '').replace(/\s+/g, '-').slice(0, 60) || 'document'; }
   async downloadPptx(ok) {
     if (!ok && !this.dlGuard('pptx')) return;
@@ -3970,9 +4041,13 @@ class Component extends DCLogic {
     catch (e) { console.warn(e); window.alert('Could not build the PowerPoint file.\n\n' + ((e && (e.message || (e.type ? 'An image on the page could not be loaded (' + e.type + ').' : String(e)))) || 'Unknown error') + '\n\nCheck your connection and try again.'); }
     finally { this.setState({ dlBusy: null }); } }
   dlGuard(kind) { if (this.state.saved && this._savedSnap && this._savedSnap === this.snapKey()) return true; if (this._curVT && !this._userEdited) return true; this.setState({ dlOpen: false, dlSave: kind }); return false; }
-  dlRun(kind) { if (kind === 'pdf') this.downloadPdf(true); else if (kind === 'pptx') this.downloadPptx(true); else if (kind === 'web') this.downloadWebPkg(true); }
+  dlRun(kind) { if (kind === 'pdf') this.downloadPdf(true); else if (kind === 'docx') this.downloadDocx(true); else if (kind === 'pptx') this.downloadPptx(true); else if (kind === 'web') this.downloadWebPkg(true); }
   // The document as a PDF Blob (no printer's marks) and its first page as a thumbnail, for hands-off runs.
+  // Hands-off runs: the vector PDF (live text, fonts, tags) and a first-page thumbnail; the picture PDF only if that fails.
   async pdfBlob() {
+    try { const out = await this.vectorPdf(); let notes = []; try { const r = await this.dpReview({ pdf: out }); notes = [...r.blocking, ...r.fix].slice(0, 6).map(i => 'Production review: ' + i.message); } catch (e) {} return { blob: out.blob, thumb: await this.dpThumb(), notes }; }
+    catch (e) { console.warn('vector PDF failed, picture PDF instead', e); return this.pdfBlobRaster(); } }
+  async pdfBlobRaster() {
     await this.loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); const J = window.jspdf && window.jspdf.jsPDF; if (!J) throw new Error('The PDF tool didn’t load.');
     const imgs = await this.rasterPages(1, 'jpeg'); if (!imgs.length) throw new Error('There are no pages to export.');
     const DW = +(3.5 * (this._pageScale || 1)).toFixed(3), DH = +(4.75 * (this._pageScale || 1) * (this._pgvh || 1)).toFixed(3); const OR = DW > DH ? 'landscape' : 'portrait';
@@ -3981,6 +4056,16 @@ class Component extends DCLogic {
     return { blob: doc.output('blob'), thumb: imgs[0].url };
   }
   async downloadPdf(ok) {
+    if (!ok && !this.dlGuard('pdf')) return;
+    this.setState({ dlOpen: false, dlBusy: 'Building PDF\u2026' });
+    try { const s = this.state; const ex = s.crop || s.marks || s.bars ? 36 : 0;
+      const out = await this.vectorPdf({ extra: ex, decorate: ex ? (pdf, pi, b) => this.dpMarks(pdf, b) : null });
+      this.setState({ dlBusy: 'Checking the PDF\u2026' }); const QA = await this.teamMod('doc-qa.js'); const rev = await this.dpReview({ pdf: out });
+      const go = await QA.showReview(rev, { title: 'Production review: PDF', what: 'PDF', downloadLabel: 'Download PDF', onlyIfIssues: true });
+      if (go === 'download') this.dpSave(out.blob, this.docSlug() + '.pdf'); this.setState({ dlBusy: null }); return; }
+    catch (e) { console.warn('vector PDF failed, picture PDF instead', e); window.alert('The PDF with live text could not be made this time (' + ((e && e.message) || 'unknown problem') + '). A picture PDF will be made instead: its text can\u2019t be selected or read by screen readers.'); }
+    return this.downloadPdfRaster(true); }
+  async downloadPdfRaster(ok) {
     if (!ok && !this.dlGuard('pdf')) return;
     this.setState({ dlOpen: false, dlBusy: 'Building PDF…' });
     try { await this.loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); const J = window.jspdf && window.jspdf.jsPDF; if (!J) throw new Error('jspdf');
@@ -4901,7 +4986,7 @@ class Component extends DCLogic {
     const pal = this.brandOnlyColors().slice(0, 14);
     const key = pal.join(','); if (U.sw.dataset.k !== key) { U.sw.dataset.k = key; U.sw.innerHTML = ''; pal.forEach(cv => { const b = document.createElement('button'); b.type = 'button'; b.title = cv; Object.assign(b.style, { width: '20px', height: '20px', borderRadius: '50%', border: '1px solid rgba(8,26,83,.25)', background: cv, cursor: 'pointer', padding: '0' }); b.addEventListener('mousedown', e => e.preventDefault()); b.addEventListener('click', e => { e.preventDefault(); if (this.rteSelMark({ c: cv })) return; this.rteApply({ color: cv }); this.rteSync(); }); U.sw.appendChild(b); }); } }
   rtePos() { const bar = this._rte, T = this._rteT; if (!bar || !T || !T.isConnected) return; bar.style.display = 'flex'; const slot = T.closest('.po[data-oid]') && document.querySelector('.po-tb [data-rte-slot]'); if (slot) { if (bar.parentElement !== slot) slot.appendChild(bar); Object.assign(bar.style, { position: 'static', width: '100%', boxShadow: 'none', border: '0', padding: '0', background: 'transparent' }); return; } if (bar.parentElement !== document.body) document.body.appendChild(bar); Object.assign(bar.style, { position: 'fixed', boxShadow: '0 10px 28px rgba(8,26,83,.22)', border: '1px solid #e0e3ef', padding: '5px', background: '#FFFFFF' }); const zb = document.querySelector('.zoombar'); const zr = zb ? zb.getBoundingClientRect() : { left: 22, bottom: 200, width: 220 }; bar.style.left = Math.round(zr.left) + 'px'; bar.style.top = Math.round(zr.bottom + 8) + 'px'; bar.style.width = '220px'; }
-  poPatch(patch, sel) { if (!this._dataLink) this._userEdited = true; sel = sel || this.state.poSel; if (!sel) return; if (patch && patch.src && patch.cx == null) patch = Object.assign({ cx: 50, cy: 50, cz: 1, ar: 0 }, patch); if (patch && patch.rows) patch = Object.assign({ sample: false }, patch);
+  poPatch(patch, sel) { if (!this._dataLink) this._userEdited = true; sel = sel || this.state.poSel; if (!sel) return; if (patch && !patch.tstyle && ['headFill', 'headInk', 'border', 'stripe', 'stripeFill', 'line'].some(k => k in patch)) patch = Object.assign({ tstyle: 'custom' }, patch); if (patch && patch.src && patch.cx == null) patch = Object.assign({ cx: 50, cy: 50, cz: 1, ar: 0 }, patch); if (patch && patch.rows) patch = Object.assign({ sample: false }, patch);
     const L0 = this.poList(sel.pid); const me = L0.find(o => o.id === sel.id);
     const R = patch && (patch.rows || (patch.dv && patch.dv.chartData && me && me.dv && patch.dv.chartData !== me.dv.chartData ? [patch.dv.chartData.headers || [], ...(patch.dv.chartData.rows || [])] : null));
     const sib = R && me && me.grp && !this._dataLink && me.dataLink !== false ? L0.filter(o => o.id !== me.id && o.grp === me.grp && o.dataLink !== false && (o.type === 'chart' || o.type === 'table' || o.dv)) : [];
@@ -5245,9 +5330,9 @@ class Component extends DCLogic {
           Object.assign(t.style, { fontFamily: o.ff || ('var(--ff-' + ff + ')'), fontWeight: o.fw ? String(o.fw) : 'var(--fw-' + ff + ')', fontStyle: o.italic ? 'italic' : '', textDecoration: o.ul ? 'underline' : '', ...(o.tpad && o.tpad.some(v => +v) ? { padding: o.tpad.map(v => v + 'in').join(' ') } : o.fill ? { padding: (.13 * psz).toFixed(3) + 'in ' + (.18 * psz).toFixed(3) + 'in' } : o.tpad ? { padding: '0' } : {}), ...(o.lh ? { lineHeight: String(o.lh) } : {}), letterSpacing: 'var(--ls-' + ff + ')', fontSize: (o.fs || 10) + 'pt', color: o.color || '#1d2340', textAlign: o.align || 'left', background: o.fill || 'transparent', minHeight: '100%', boxSizing: 'border-box', overflowWrap: 'normal', wordBreak: 'normal', hyphens: 'manual' }); d.appendChild(t); d.style.overflow = 'visible';
           const grow = () => { if (t.clientWidth) { let k = 0; while (k < 12 && t.scrollWidth > t.clientWidth + 1) { t.style.fontSize = (parseFloat(t.style.fontSize) * .94).toFixed(2) + 'pt'; k++; } } const need = t.scrollHeight, have = d.clientHeight; if (have > 0 && need > have + 1) { o.h = +(o.h * need / have).toFixed(3); d.style.height = o.h + 'in'; } }; requestAnimationFrame(grow); t.addEventListener('input', () => requestAnimationFrame(grow)); t.addEventListener('blur', () => requestAnimationFrame(grow)); }
         if (o.type === 'table') { if (!o.bw) { o.bw = o.w; o.bh = o.h; } const tk = Math.max(0.2, Math.min(o.w / o.bw, o.h / o.bh)); const tb = document.createElement('table'); tb.style.setProperty('--tl', o.line || '#c5ccd4'); tb.style.fontSize = ((o.fs || 7) * tk).toFixed(2) + 'pt'; if (o.ff) tb.style.fontFamily = o.ff; if (o.fw) tb.style.fontWeight = String(o.fw); tb.style.width = '100%'; tb.style.height = '100%'; tb.style.tableLayout = 'fixed'; tb.style.color = o.color || '#1d2340';
-          tb.dataset.b = o.border || 'all'; const pad = { tight: '.14em .3em', normal: '.28em .45em', roomy: '.45em .6em' }[o.pad || 'normal'];
-          const isNum = v => /^[\s$€£(+−-]*\d[\d,.\s]*%?\)?\s*$/.test(String(v || ''));
-          (o.rows || []).forEach((r, ri) => { const tr = document.createElement('tr'); const head = o.head !== false && ri === 0; r.forEach((c, ci) => { const td = document.createElement(head ? 'th' : 'td'); td.textContent = c; td.style.padding = pad; td.style.overflow = 'hidden'; td.style.overflowWrap = 'normal'; td.style.wordBreak = 'normal'; td.style.hyphens = 'manual'; if (o.lastBold && ci === r.length - 1 && !head) td.style.fontWeight = '700'; const al = o.lastRight && ci === r.length - 1 ? 'right' : o.talign === 'num' ? (ci > 0 && (head || isNum(c)) ? 'right' : 'left') : (o.talign || 'left'); td.style.textAlign = al; if (head) { td.style.background = o.headFill || '#081A53'; td.style.color = o.headInk || '#fff'; } else if (o.stripe && ri % 2 === 0) td.style.background = o.stripeFill || 'rgba(0,0,0,.045)'; tr.appendChild(td); }); tb.appendChild(tr); }); d.appendChild(tb); requestAnimationFrame(() => { const over = () => [...tb.querySelectorAll('td,th')].some(c => c.scrollWidth > c.clientWidth + 1); let k = 0; while (k < 10 && tb.offsetWidth && over()) { tb.style.fontSize = (parseFloat(tb.style.fontSize) * .93).toFixed(2) + 'pt'; k++; } if (k) tb.style.height = 'auto'; }); }
+          const std = !o.tstyle; tb.dataset.b = std ? 'std' : (o.border || 'all'); if (std) tb.style.fontVariantNumeric = 'tabular-nums lining-nums'; const pad = { tight: '.14em .3em', normal: '.28em .45em', roomy: '.45em .6em' }[o.pad || 'normal']; const rowsN = (o.rows || []).length; const totalRow = std && rowsN > 2 && /^total\b/i.test(String(((o.rows || [])[rowsN - 1] || [])[0] || '').trim());
+          const isNum = v => /^[\s$€£(+−-]*\d[\d,.\s]*(%|[KMB]|x|×|bps|pts?)?\)?\s*$/i.test(String(v || ''));
+          (o.rows || []).forEach((r, ri) => { const tr = document.createElement('tr'); const head = o.head !== false && ri === 0; r.forEach((c, ci) => { const td = document.createElement(head ? 'th' : 'td'); td.textContent = c; td.style.padding = pad; td.style.overflow = 'hidden'; td.style.overflowWrap = 'normal'; td.style.wordBreak = 'normal'; td.style.hyphens = 'manual'; if (o.lastBold && ci === r.length - 1 && !head) td.style.fontWeight = '700'; const al = o.lastRight && ci === r.length - 1 ? 'right' : (std || o.talign === 'num') ? (ci > 0 && (head ? (o.rows || []).slice(1).some(rr => isNum(rr[ci])) : isNum(c)) ? 'right' : 'left') : (o.talign || 'left'); td.style.textAlign = al; if (std) { if (head) { td.style.fontWeight = '700'; td.style.color = o.color || '#1d2340'; } if (totalRow && ri === rowsN - 1) { td.style.fontWeight = '700'; td.classList.add('tot'); } } else if (head) { td.style.background = o.headFill || '#081A53'; td.style.color = o.headInk || '#fff'; } else if (o.stripe && ri % 2 === 0) td.style.background = o.stripeFill || 'rgba(0,0,0,.045)'; tr.appendChild(td); }); tb.appendChild(tr); }); d.appendChild(tb); requestAnimationFrame(() => { const over = () => [...tb.querySelectorAll('td,th')].some(c => c.scrollWidth > c.clientWidth + 1); let k = 0; while (k < 10 && tb.offsetWidth && over()) { tb.style.fontSize = (parseFloat(tb.style.fontSize) * .93).toFixed(2) + 'pt'; k++; } if (k) tb.style.height = 'auto'; }); }
         if (o.type === 'legend') { const c = list.find(x => x.id === o.of); const rows = ((c && c.rows) || o.rows || []).slice(1).filter(r => r && r.length); const pal = (this.dvPalettes()[(c && c.pal) || o.pal || 'brand'] || this.dvPalettes().brand).c; const box = document.createElement('div'); box.className = 'po-legend ' + (o.dir || 'v'); Object.assign(box.style, { fontSize: (o.fs || 7) + 'pt', color: o.color || '#1d2340', width: '100%', height: '100%' }); rows.forEach((r, i) => { const s = document.createElement('span'); const sw = document.createElement('i'); sw.style.background = pal[i % pal.length]; s.appendChild(sw); s.appendChild(document.createTextNode(String(r[0] || ''))); box.appendChild(s); }); d.appendChild(box); }
         if (o.type === 'chart') d.innerHTML = this.chartSvg(o, o.w * 96, o.h * 96);
         if (o.type === 'chart' || (o.sample && o.type === 'table')) { const ov = document.createElement('div'); ov.className = 'po-sample no-print'; const CT = [['column', 'Column'], ['bar', 'Bar'], ['line', 'Line'], ['donut', 'Donut'], ['treemap', 'Tree Map'], ['number', 'Big Number']]; const BT = this.dvTypes().map(x => x.key);
@@ -6729,7 +6814,7 @@ class Component extends DCLogic {
       poBorder: (o && o.border) || 'all', poOnBorder: e => this.poPatch({ border: e.target.value }),
       poTAlign: (o && o.talign) || 'left', poOnTAlign: e => this.poPatch({ talign: e.target.value }),
       poTPad: (o && o.pad) || 'normal', poOnTPad: e => this.poPatch({ pad: e.target.value }),
-      poOnTPreset: e => { const v = presets[e.target.value]; e.target.value = ''; if (v) this.poPatch(v); },
+      poOnTPreset: e => { const k = e.target.value; const v = presets[k]; e.target.value = ''; if (v) this.poPatch(Object.assign({ tstyle: k }, v)); },
     };
   }
   bcClean(n) { return String(n || '').split(',')[0].replace(/['"]/g, '').trim(); }
@@ -7232,6 +7317,9 @@ class Component extends DCLogic {
   docAppLabel() { return 'Fact Sheet Builder'; }
   // Approved switch: approved documents go to the client's Brand Command knowledge base (we decide brand-wide or campaign, and ask when unsure).
   async docApprove(v, on) {
+    // Production Reviewer: a document with items that must be fixed (or missing information) isn't approved.
+    if (on) { try { let r = null; if (v && v.t === this._curVT) r = await this.dpReview(); const last = r || (v && v.docMeta && v.docMeta.review) || null;
+      if (last && last.approvable === false) { if (r) { const QA = await this.teamMod('doc-qa.js'); await QA.showReview(r, { title: 'Production review: approval', what: 'document' }); } this.setState({ apToast: 'Not approved yet: the production review found items to fix first.' }); clearTimeout(this._apT); this._apT = setTimeout(() => this.setState({ apToast: '' }), 5000); return; } } catch (e) { console.warn('review before approval', e); } }
     const b = this.state.brandLink || {}; this.setState({ apToast: on ? 'Approving\u2026' : 'Updating\u2026' }); clearTimeout(this._apT);
     let msg = ''; try { const m = await this.docMetaMod(); msg = await m.setApproved(v, on, { app: this.docAppLabel(), clientId: b.clientId || '' }); } catch (e) { console.warn('approve failed', e); msg = 'Couldn\u2019t update Brand Command. Try again in a moment.'; }
     this.setState({ versions: this.loadVersions(), apToast: msg }); this._apT = setTimeout(() => this.setState({ apToast: '' }), 4500);
@@ -7654,7 +7742,7 @@ class Component extends DCLogic {
       dlStyle: s.dlOpen ? 'display:block' : 'display:none',
       cropOn: s.crop, marksOn: s.marks, barsOn: s.bars,
       downloadPptx: () => this.downloadPptx(), downloadWebPkg: () => this.downloadWebPkg(), dlBusyOn: !!s.dlBusy, dlBusyText: s.dlBusy || '',
-      downloadPrint: () => this.downloadPdf(),
+      downloadPrint: () => this.downloadPdf(), downloadWord: () => this.downloadDocx(),
       downloadWeb: () => this.setState({ dlOpen: false, bleed: false, crop: false, marks: false, bars: false, edges: false, margins: false }, () => { this.updatePageCfg(); setTimeout(() => window.print(), 140); }),
       panelStyle: `display:flex;top:${(s.chromeB || 160) + 20 + (!s.projectOpen ? 0 : (s.hfH || 46) + 10) + (s.pmH || 42) + 10}px;max-height:max(46px, calc(100vh - ${(s.chromeB || 160) + 20 + (!s.projectOpen ? 0 : (s.hfH || 46) + 10) + (s.pmH || 42) + 26}px))`,
       panelHeadClick: () => { if (this._dragMoved) { this._dragMoved = false; return; } this.setState(st => st.panelMin ? Object.assign({ pmPanelMin: true, hfMin: true, ftMin: true, panelMin: true, acMin: true, aiMin: true }, { panelMin: false }) : { panelMin: true }, () => this.fitPreview()); },
