@@ -4258,7 +4258,7 @@ class Component extends DCLogic {
   async aiWrite(brief, all) {
     
     const P = this.poAll(); const items = []; const ph = /enter |placeholder|xx|lorem|one or two|short |describe|add a |your |name, title|company name|benefit|feature|highlight|summari|explain|headline|title|insert|\[|\u2026/i;
-    Object.keys(P).forEach(pid => (P[pid] || []).forEach(o => { if (o.type !== 'text') return; const t = String(o.text || '').trim(); if (!t || t.length < 2) return; if (!all && !ph.test(t)) return; if (/^\s*(important\s+)?disclosures?\s*$/i.test(t) || o.disc) return; items.push({ id: o.id, pid, style: o.style || 'body', text: t.slice(0, 400), maxChars: Math.max(12, Math.round(t.length * 1.25)) }); }));
+    Object.keys(P).forEach(pid => (P[pid] || []).forEach(o => { if (o.type !== 'text') return; const t = String(o.text || '').trim(); if (!t || t.length < 2) return; if (!all && !ph.test(t)) return; if (/^\s*(important\s+)?disclosures?\s*$/i.test(t) || o.disc) return; items.push({ id: o.id, pid, style: o.style || 'body', text: t.slice(0, 2000), maxChars: Math.max(12, Math.round(t.length * 1.25)) }); }));
     if (!items.length) return 0; const p = this.bcProfile() || {}; const ws = p.writingSystem || {}; const voice = ['description', 'positioning', 'mission', 'personality', 'approvedClaims', 'complianceRules'].map(k => ws[k] && ws[k].text ? k + ': ' + String(ws[k].text).slice(0, 500) : '').filter(Boolean).join('\n');
     const out = {}; for (let i = 0; i < items.length; i += 40) { const chunk = items.slice(i, i + 40);
       const prompt = 'You write copy for a professional marketing / financial document. Brief: ' + brief + '\nBrand: ' + (p.name || 'the firm') + (voice ? '\nBrand voice and rules:\n' + voice : '') + '\nRewrite each placeholder below with real, specific, compliant copy that fits its role (style: h1=headline, sub=subheading, eyebrow=short uppercase label, label=short label, caption=small note, body=paragraph). Keep each within maxChars. Keep numbers as realistic placeholders like XX% where data is unknown. Do not promise returns. Return ONLY JSON: {"<id>":"<new text>", ...}.\n' + JSON.stringify(chunk.map(({ id, style, text, maxChars }) => ({ id, style, text, maxChars })));
@@ -4304,7 +4304,7 @@ class Component extends DCLogic {
   teamFields(all) {
     const P = this.poAll(); const lib = this._teamLib || { secs: {}, ph: new Set() }; const secs = lib.secs; const items = []; const ph = /enter |placeholder|xx|lorem|one or two|short |describe|add a |your |name, title|company name|benefit|feature|highlight|summari|explain|headline|title|insert|\[|…/i;
     const flat = t => t.replace(/\s+/g, ' ').toLowerCase();
-    Object.keys(P).forEach((pid, pi) => (P[pid] || []).forEach(o => { if (o.type !== 'text') return; const t = String(o.text || '').replace(/<[^>]+>/g, ' ').replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim(); if (!t || t.length < 2) return; if (!all && !ph.test(t) && !lib.ph.has(flat(t))) return; if (/^\s*(important\s+)?disclosures?\s*$/i.test(t) || o.disc || o.locked) return; items.push({ id: o.id, pid, page: pi + 1, section: (o.fromLib && secs[o.fromLib] && secs[o.fromLib].label) || o.fromLib || '', style: o.style || 'body', text: t.slice(0, 400), maxChars: Math.max(12, Math.round(t.length * 1.25)) }); }));
+    Object.keys(P).forEach((pid, pi) => (P[pid] || []).forEach(o => { if (o.type !== 'text') return; const t = String(o.text || '').replace(/<[^>]+>/g, ' ').replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim(); if (!t || t.length < 2) return; if (!all && !ph.test(t) && !lib.ph.has(flat(t))) return; if (/^\s*(important\s+)?disclosures?\s*$/i.test(t) || o.disc || o.locked) return; items.push({ id: o.id, pid, page: pi + 1, section: (o.fromLib && secs[o.fromLib] && secs[o.fromLib].label) || o.fromLib || '', style: o.style || 'body', text: t.slice(0, 2000), maxChars: Math.max(12, Math.round(t.length * 1.25)) }); }));
     // Text tables (capabilities, use cases, features): each placeholder cell is a field. Number cells stay with "Upload Document for Data".
     const isNum = t => /^[\s$€£¥%.,:\-–—+×x\d/()]*$/i.test(t) || /^x+(\s*(%|×|x|wks?|hrs?|yrs?|mo|days?))?$/i.test(t);
     Object.keys(P).forEach((pid, pi) => (P[pid] || []).forEach(o => { if (o.type !== 'table' || !Array.isArray(o.rows) || o.locked) return;
@@ -4515,8 +4515,10 @@ class Component extends DCLogic {
     const GAP_SEC = .3 * PS, GAP_HEAD = .12 * PS, GAP_ITEM = .1 * PS, SAFE = .32 * PS, PADH = .18 * PS, PADV = .13 * PS;
     let P = JSON.parse(JSON.stringify(this.poAll())); pids = pids.filter(pid => Array.isArray(P[pid]));
     const plain = t => String(t || '').replace(/<[^>]+>/g, ' ');
-    const PH = /\[(?:client to verify|insert|add |enter |todo)[^\]]*\]|\[[A-Z][A-Za-z /&-]{1,40}\]|\bX{2,}(?:[.,]X+)*%?(?![a-z])|\bX\.XX\b|\benter (?:a |an |the |your )?(?:value|description|metric|result|objective|introduction|summary|text|consideration|measure|problem|principle|action|milestone|source)\b|lorem ipsum|\bMM\/DD\/YYYY\b|\bXX\/XX\/XXXX\b|\b20XX\b|\bmonth (?:DD, )?YYYY\b|\bfull name\b|\bname, title\b|\bcompany name\b|\btitle here\b|\bsample data\b|replace with (?:your|the customer)/i;
-    const isPh = t => PH.test(plain(t));
+    const PH = /\[(?:client to verify|insert|add |enter |todo)[^\]]*\]|\[[A-Z][A-Za-z /&-]{1,40}\]|\bX{2,}(?:[.,]X+)*%?(?![a-z])|\bX\.XX\b|\benter (?:a |an |the |your )?(?:value|description|metric|result|objective|introduction|summary|text|consideration|measure|problem|principle|action|milestone|source)\b|lorem ipsum|\bMM\/DD\/YYYY\b|\bXX\/XX\/XXXX\b|\b20XX\b|\bmonth (?:DD, )?YYYY\b|\bfull name\b|\bname, title\b|\bcompany name\b|\btitle here\b|\bsample data\b|replace with (?:your|the customer)|paste your|add citation|source, publication|methodology note|\bweek x\b|\bx[–-]x years\b|\bMM\/DD(?:\/YY)?\b|enter terms|\btitle here\b/i;
+    const PHX = /^(?:short explanation|short belief statement|customer name|product \/ service used|related client challenge|what we did|measured outcome|highlight (?:one|two|three|four)|capability (?:one|two|three|four)|use case (?:one|two|three)|problem and solution in one line|item (?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)|data point)\.?$/i;
+    const discT = (((this.bcProfile() || {}).writingSystem || {}).complianceRules || {}).text || ((this.bcDisclosures() || [])[0] || {}).text || '';
+    const isPh = t => PH.test(plain(t)) || PHX.test(plain(t).trim());
     const thin = o => o.type === 'color' && (o.h < .03 || o.w < .03);
     const ovX = (a, b) => Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
     // text is judged by its first line, since a box may have grown to fit longer copy
@@ -4532,6 +4534,7 @@ class Component extends DCLogic {
     const B = mode(bodies, o => (plain(o.text).length > 40 ? 3 : 1)) || +this.tsGet('body', 'fs') || 8;
     const C = Math.max(+(B * .8).toFixed(2), mode(all.filter(o => o.type === 'text' && o.style === 'caption' && +o.fs > 0)) || 0);
     pids.forEach(pid => P[pid].forEach(o => {
+      if (o.type === 'text' && discT && /paste your approved disclosure/i.test(o.text || '')) { o.text = discT; delete o.marks; }
       if (o.type === 'text') { const t2 = unbullet(o.text || ''); if (t2 !== o.text) { o.text = t2; delete o.marks; }
         const cap = o.style === 'caption' && P[pid].some(v => (v.type === 'image' || v.type === 'chart') && ovX(v, o) > .05 && o.y >= v.y + v.h - .05 && o.y - (v.y + v.h) < .25);
         if (o.italic && !cap) o.italic = false;
