@@ -7382,7 +7382,7 @@ class Component extends DCLogic {
   // Approved switch: approved documents go to the client's Brand Command knowledge base (we decide brand-wide or campaign, and ask when unsure).
   async docApprove(v, on) {
     // Production Reviewer: a document with items that must be fixed (or missing information) isn't approved.
-    if (on) { try { let r = null; if (v && v.t === this._curVT) r = await this.dpReview(); const last = r || (v && v.docMeta && v.docMeta.review) || null;
+    if (on) { try { let r = null; if (v && v.t === this._curVT) r = this.flowOn() ? (await this.flowExport('pdf')).review : await this.dpReview(); const last = r || (v && v.docMeta && v.docMeta.review) || null;
       if (last && last.approvable === false) { if (r) { const QA = await this.teamMod('doc-qa.js'); await QA.showReview(r, { title: 'Production review: approval', what: 'document' }); } this.setState({ apToast: 'Not approved yet: the production review found items to fix first.' }); clearTimeout(this._apT); this._apT = setTimeout(() => this.setState({ apToast: '' }), 5000); return; } } catch (e) { console.warn('review before approval', e); } }
     const b = this.state.brandLink || {}; this.setState({ apToast: on ? 'Approving\u2026' : 'Updating\u2026' }); clearTimeout(this._apT);
     let msg = ''; try { const m = await this.docMetaMod(); msg = await m.setApproved(v, on, { app: this.docAppLabel(), clientId: b.clientId || '' }); } catch (e) { console.warn('approve failed', e); msg = 'Couldn\u2019t update Brand Command. Try again in a moment.'; }
