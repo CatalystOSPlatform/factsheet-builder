@@ -4151,7 +4151,7 @@ class Component extends DCLogic {
       if (noPh) {} else if (n === 1 || CP) { const gp = CP ? .06 : .2; x = cx + s + gp; tw = colW - s - gp; } else y += s + .04;
       const pad = .02, bx0 = x, by0 = y, bw0 = tw, bi = out.length; y += pad;
       const add = (text, st, f, o2) => { if (!text) return; const h = +est(text, f, tw).toFixed(3); out.push(Object.assign({ id: id(), grp: pg2, tgrp: grp, tm: i, type: 'text', x: +x.toFixed(3), y: +y.toFixed(3), w: +tw.toFixed(3), h, text, style: st, fs: f, color: ink, align: 'left', fill: '' }, o2 || {})); y += h + .01; };
-      add(p.name || 'Name', 'label', +(fs * 1.15).toFixed(1), { fw: 800, bold: true, color: prim }); add(p.title, 'body', fs); add(p.cert, 'caption', +(fs * .9).toFixed(1));
+      add((p.name || 'Name') + (p.cert ? ', ' + p.cert : ''), 'label', +(fs * 1.15).toFixed(1), { fw: 800, bold: true, color: prim }); add(p.title, 'body', fs); // credentials sit with the name, not on a line of their own
       const bl = (p.bullets || []).filter(Boolean).slice(0, 4); if (bl.length) { y += .03; add(bl.join('\n'), 'body', +(fs * .92).toFixed(1)); }
       y += pad; out.splice(bi, 0, { id: id(), grp: pg2, tgrp: grp, tm: i, type: 'color', hbox: 1, x: +bx0.toFixed(3), y: +by0.toFixed(3), w: +bw0.toFixed(3), h: +(y - by0).toFixed(3), fill: hlFill, opacity: 100, radius: 0 });
       bottom = Math.max(bottom, y, top + (noPh ? 0 : s)); }); };
@@ -4513,7 +4513,7 @@ class Component extends DCLogic {
     const live = () => [...document.querySelectorAll('.book .media:not(.pg-deleted)')].filter(m => m.querySelector(':scope > .pg')).map(m => m.dataset.pid);
     let pids = live(); if (!pids.length) return 0; const M0 = this.poMargins(pids[0]); if (!M0) return 0;
     const PS = M0.pw / 8.5; // one inch of the printed page, in page units
-    const GAP_SEC = .3 * PS, GAP_HEAD = .12 * PS, GAP_ITEM = .1 * PS, SAFE = .32 * PS, PADH = .18 * PS, PADV = .13 * PS;
+    const GAP_SEC = .3 * PS, GAP_HEAD = .12 * PS, GAP_ITEM = .1 * PS, SAFE = .2 * PS, PADH = .18 * PS, PADV = .13 * PS;
     let P = JSON.parse(JSON.stringify(this.poAll())); pids = pids.filter(pid => Array.isArray(P[pid]));
     const plain = t => String(t || '').replace(/<[^>]+>/g, ' ');
     const PH = /\[(?:client to verify|insert|add |enter |todo)[^\]]*\]|\[[A-Z][A-Za-z /&-]{1,40}\]|\bX{2,}(?:[.,]X+)*%?(?![a-z])|\bX\.XX\b|\benter (?:a |an |the |your )?(?:value|description|metric|result|objective|introduction|summary|text|consideration|measure|problem|principle|action|milestone|source)\b|lorem ipsum|\bMM\/DD\/YYYY\b|\bXX\/XX\/XXXX\b|\b20XX\b|\bmonth (?:DD, )?YYYY\b|\bfull name\b|\bname, title\b|\bcompany name\b|\btitle here\b|\bsample data\b|replace with (?:your|the customer)|paste your|add citation|source, publication|methodology note|\bweek x\b|\bx[–-]x years\b|\bMM\/DD(?:\/YY)?\b|enter terms|\btitle here\b/i;
@@ -4639,26 +4639,28 @@ class Component extends DCLogic {
     const backfill = async () => {
       for (let k = 1; k < pids.length; k++) { const prev = pids[k - 1], cur = pids[k]; if (!(P[cur] || []).length || !(P[prev] || []).length) continue;
         const roots = build(cur, P[cur]); if (!roots.length) continue; const key = r => r.grp || r.o.id;
-        const first = roots.slice().sort((a, b) => a.y0 - b.y0 || a.x - b.x)[0]; const sec = roots.filter(r => key(r) === key(first));
+        const srt = roots.slice().sort((a, b) => a.y0 - b.y0 || a.x - b.x); const heads = srt.filter((r, i) => r.y0 - srt[0].y0 < .06 && srt.findIndex(q => key(q) === key(r)) === i); // every section that starts the page, left to right
+        for (const first of heads) { const sec = roots.filter(r => key(r) === key(first));
         if (!first.grp) roots.forEach(r => { if (!r.grp && r !== first && r.y0 >= first.y0 + first.h - .01 && r.y0 - (first.y0 + first.h) < .12 && ovX(r, first) > .05) sec.push(r); }); // a photo keeps its caption
-        if (sec.some(r => r.kids.length)) continue;
+        const hasKids = sec.some(r => r.kids.length); // card rows move only into a slot at least as wide, so they keep their size
         const objs = []; const add = it => { objs.push(it.o); it.rides.forEach(q => objs.push(q.o)); it.kids.forEach(add); }; sec.forEach(add);
         const sx0 = Math.min(...objs.map(o => o.x)), sx1 = Math.max(...objs.map(o => o.x + o.w)), sy0 = Math.min(...objs.map(o => o.y));
-        const M = this.poMargins(prev) || M0; const L0 = M.l, R0 = M.pw - M.r; const LIM = ftrTop(prev) - SAFE; const top = content(prev).top;
+        const isDisc = roots.every(r => key(r) === key(first)) && objs.some(o => o.type === 'text' && /^\s*(important\s+)?disclosures?\b/i.test(o.text || '')); // a disclosure left alone on a page may use the footer's breathing room and the full width to join the page before
+        const M = this.poMargins(prev) || M0; const L0 = M.l, R0 = M.pw - M.r; const LIM = ftrTop(prev) - (isDisc ? .08 * PS : SAFE); const top = content(prev).top;
         const pr = build(prev, P[prev]); const cols = [[L0, R0]];
         pr.forEach(r => { const a = r.sx, b = r.sx + r.sw; if (b - a < .7 * (R0 - L0) && !cols.some(c => Math.abs(c[0] - a) < .05 && Math.abs(c[1] - b) < .05)) cols.push([a, b]); });
         const cand = cols.map(([a, b]) => { const hits = pr.filter(r => ovX({ x: r.sx, w: r.sw }, { x: a, w: b - a }) > .02); const bot = hits.length ? Math.max(...hits.map(r => r.y0 + r.h)) + GAP_SEC : top; return { a, b, y: bot, room: LIM - bot }; })
-          .filter(c => c.b - c.a >= Math.min(sx1 - sx0, 3.2 * PS) - .01 && c.room > .15).sort((p, q) => q.room - p.room);
+          .filter(c => c.b - c.a >= (hasKids ? sx1 - sx0 : Math.min(sx1 - sx0, 3.2 * PS)) - .01 && c.room > .06).sort((p, q) => (isDisc ? (q.b - q.a) - (p.b - p.a) : 0) || q.room - p.room);
         for (const c of cand) {
           const snap = objs.map(o => ({ o, x: o.x, y: o.y, w: o.w, h: o.h, bw: o.bw, bh: o.bh })); const k2 = Math.min(1, (c.b - c.a) / Math.max(.1, sx1 - sx0));
-          objs.forEach(o => { const nx = c.a + (o.x - sx0) * k2; let nw; if (o.type === 'chart' || o.type === 'image') { nw = o.w * k2; o.h = +(o.h * k2).toFixed(3); } else nw = Math.min(o.w, c.b - nx);
+          objs.forEach(o => { const nx = c.a + (o.x - sx0) * k2; let nw; if (o.type === 'chart' || o.type === 'image') { nw = o.w * k2; o.h = +(o.h * k2).toFixed(3); } else nw = isDisc && o.type === 'text' ? c.b - nx : Math.min(o.w, c.b - nx); // a disclosure runs the full width of its new spot
             o.x = +nx.toFixed(3); o.w = +Math.max(.15, nw).toFixed(3); if (o.type === 'table') o.bw = o.w; o.y = +(c.y + (o.y - sy0)).toFixed(3); });
           const ids = new Set(objs.map(o => o.id)); const moveTo = (from, to) => { P = Object.assign({}, P, { [from]: P[from].filter(o => !ids.has(o.id)), [to]: P[to].concat(objs) }); };
           moveTo(cur, prev); await new Promise(r => this.setState({ pageObjs: P, saved: false }, r)); await wait(150); measure();
           const rr = build(prev, P[prev]); rr.forEach(size); equal(rr); const d = stack(rr, top, false, () => top);
           if (d.every(i => i.ny + i.h <= LIM + .005)) return true;
           snap.forEach(q => Object.assign(q.o, { x: q.x, y: q.y, w: q.w, h: q.h, bw: q.bw, bh: q.bh })); P = Object.assign({}, P, { [prev]: P[prev].filter(o => !ids.has(o.id)), [cur]: P[cur].concat(objs) });
-          await new Promise(r => this.setState({ pageObjs: P, saved: false }, r)); await wait(60); measure(); } }
+          await new Promise(r => this.setState({ pageObjs: P, saved: false }, r)); await wait(60); measure(); } } }
       return false; };
     for (let n = 0; n < 12 && await backfill(); n++) await flowAll();
     // pages left empty go away
@@ -5202,7 +5204,7 @@ class Component extends DCLogic {
         if (o.type === 'table') { if (!o.bw) { o.bw = o.w; o.bh = o.h; } const tk = Math.max(0.2, Math.min(o.w / o.bw, o.h / o.bh)); const tb = document.createElement('table'); tb.style.setProperty('--tl', o.line || '#c5ccd4'); tb.style.fontSize = ((o.fs || 7) * tk).toFixed(2) + 'pt'; if (o.ff) tb.style.fontFamily = o.ff; if (o.fw) tb.style.fontWeight = String(o.fw); tb.style.width = '100%'; tb.style.height = '100%'; tb.style.tableLayout = 'fixed'; tb.style.color = o.color || '#1d2340';
           tb.dataset.b = o.border || 'all'; const pad = { tight: '.14em .3em', normal: '.28em .45em', roomy: '.45em .6em' }[o.pad || 'normal'];
           const isNum = v => /^[\s$€£(+−-]*\d[\d,.\s]*%?\)?\s*$/.test(String(v || ''));
-          (o.rows || []).forEach((r, ri) => { const tr = document.createElement('tr'); const head = o.head !== false && ri === 0; r.forEach((c, ci) => { const td = document.createElement(head ? 'th' : 'td'); td.textContent = c; td.style.padding = pad; td.style.overflow = 'hidden'; td.style.overflowWrap = 'normal'; td.style.wordBreak = 'normal'; td.style.hyphens = 'manual'; if (o.lastBold && ci === r.length - 1 && !head) td.style.fontWeight = '700'; const al = o.lastRight && ci === r.length - 1 ? 'right' : o.talign === 'num' ? (ci > 0 && (head || isNum(c)) ? 'right' : 'left') : (o.talign || 'left'); td.style.textAlign = al; if (head) { td.style.background = o.headFill || '#081A53'; td.style.color = o.headInk || '#fff'; } else if (o.stripe && ri % 2 === 0) td.style.background = o.stripeFill || 'rgba(0,0,0,.045)'; tr.appendChild(td); }); tb.appendChild(tr); }); d.appendChild(tb); requestAnimationFrame(() => { const over = () => [...tb.querySelectorAll('td,th')].some(c => c.scrollWidth > c.clientWidth + 1); let k = 0; while (k < 10 && tb.offsetWidth && over()) { tb.style.fontSize = (parseFloat(tb.style.fontSize) * .93).toFixed(2) + 'pt'; k++; } }); }
+          (o.rows || []).forEach((r, ri) => { const tr = document.createElement('tr'); const head = o.head !== false && ri === 0; r.forEach((c, ci) => { const td = document.createElement(head ? 'th' : 'td'); td.textContent = c; td.style.padding = pad; td.style.overflow = 'hidden'; td.style.overflowWrap = 'normal'; td.style.wordBreak = 'normal'; td.style.hyphens = 'manual'; if (o.lastBold && ci === r.length - 1 && !head) td.style.fontWeight = '700'; const al = o.lastRight && ci === r.length - 1 ? 'right' : o.talign === 'num' ? (ci > 0 && (head || isNum(c)) ? 'right' : 'left') : (o.talign || 'left'); td.style.textAlign = al; if (head) { td.style.background = o.headFill || '#081A53'; td.style.color = o.headInk || '#fff'; } else if (o.stripe && ri % 2 === 0) td.style.background = o.stripeFill || 'rgba(0,0,0,.045)'; tr.appendChild(td); }); tb.appendChild(tr); }); d.appendChild(tb); requestAnimationFrame(() => { const over = () => [...tb.querySelectorAll('td,th')].some(c => c.scrollWidth > c.clientWidth + 1); let k = 0; while (k < 10 && tb.offsetWidth && over()) { tb.style.fontSize = (parseFloat(tb.style.fontSize) * .93).toFixed(2) + 'pt'; k++; } if (k) tb.style.height = 'auto'; }); }
         if (o.type === 'legend') { const c = list.find(x => x.id === o.of); const rows = ((c && c.rows) || o.rows || []).slice(1).filter(r => r && r.length); const pal = (this.dvPalettes()[(c && c.pal) || o.pal || 'brand'] || this.dvPalettes().brand).c; const box = document.createElement('div'); box.className = 'po-legend ' + (o.dir || 'v'); Object.assign(box.style, { fontSize: (o.fs || 7) + 'pt', color: o.color || '#1d2340', width: '100%', height: '100%' }); rows.forEach((r, i) => { const s = document.createElement('span'); const sw = document.createElement('i'); sw.style.background = pal[i % pal.length]; s.appendChild(sw); s.appendChild(document.createTextNode(String(r[0] || ''))); box.appendChild(s); }); d.appendChild(box); }
         if (o.type === 'chart') d.innerHTML = this.chartSvg(o, o.w * 96, o.h * 96);
         if (o.type === 'chart' || (o.sample && o.type === 'table')) { const ov = document.createElement('div'); ov.className = 'po-sample no-print'; const CT = [['column', 'Column'], ['bar', 'Bar'], ['line', 'Line'], ['donut', 'Donut'], ['treemap', 'Tree Map'], ['number', 'Big Number']]; const BT = this.dvTypes().map(x => x.key);
