@@ -4004,7 +4004,7 @@ class Component extends DCLogic {
     const model = await this.dpModel(); const brand = this.bcProfile() || {}; const expectText = QA.expectedText(model);
     let gate = null; try { gate = AS ? await AS.gateFor('reviewer', { clientId: (this.state.brandLink || {}).clientId || '', app: this.docAppLabel ? this.docAppLabel() : '' }) : null; } catch (e) {}
     const editorial = DS.editorialChecks(model, { brand, kind: 'document' }).filter(i => !/question-unanswered|next-steps|summary-missing|thin-section/.test(i.rule));
-    const restore = await this.dpPrepare(); let layout = []; try { const pgs = this.dpPages(); const tr = pgs[0] ? this.dpTrimOf(pgs[0]) : null; layout = QA.layoutAudit(pgs, { bodySelector: '.dp-none', headingSelector: '.dp-none', textSelector: '.po-t, td, th', ptPerPx: tr ? this.dpTrimSize()[0] / tr.width : null }); } finally { restore(); }
+    const restore = await this.dpPrepare(); let layout = []; try { const pgs = this.dpPages(); const tr = pgs[0] ? this.dpTrimOf(pgs[0]) : null; layout = QA.layoutAudit(pgs, { bodySelector: '.dp-none', headingSelector: '.dp-none', textSelector: '.po-t, td, th', ptPerPx: tr ? this.dpTrimSize()[0] / tr.width : null }); const L = this.bcLogos(); layout = layout.concat(await QA.imageAudit(pgs, { ptPerPx: tr ? this.dpTrimSize()[0] / tr.width : null, logos: { color: L.color || '', mono: [L.white].filter(Boolean) } })); } finally { restore(); }
     const pdf = x && x.pdf ? await QA.checkPdf(x.pdf.bytes, { expectText, pageSize: this.dpTrimSize(), title: this.state.docName || 'Document' }) : null;
     const docx = x && x.docx ? await QA.checkDocx(x.docx.bytes, { expectText, title: this.state.docName || 'Document' }) : null;
     const unsupported = [...QA.PDFUA_UNSUPPORTED, ...((x && x.pdf && x.pdf.report.substitutions) || []).map(s => s.reason)];
@@ -4040,15 +4040,26 @@ class Component extends DCLogic {
   // Stored with the document in docMeta.flow; while it is on, the canvas pages are hidden (kept, not deleted).
   flowOn() { const f = (this.state.docMeta || {}).flow; return !!(f && f.model); }
   flowBrand() { const p = Object.assign({}, this.bcProfile() || {}); return p; }
-  flowAssets() { const p = this.bcProfile() || {}; const L = this.bcLogos(); const img = (p.images || []).find(i => i && i.src && !/logo/i.test(i.name || '')); return { logo: L.color || '', logoWhite: L.white || '', coverImage: img ? img.src : '' }; }
+  // Logos: the horizontal full-color logo for white areas and the white one for the brand band (brand-logo.js pickLogo).
+  // Cover pictures: every Brand Command picture, in Brand Command's order; the long-form layer places only one that is
+  // sharp at the cover's printed size (200 ppi) and queues the rest for a high-resolution version (flowQueueHires).
+  async flowAssets() { const p = this.bcProfile() || {}; const L = this.bcLogos(); let logo = L.color || '', logoWhite = L.white || '';
+    try { const BL = await this.teamMod('brand-logo.js'); const c = BL.pickLogo(p, { bg: '#FFFFFF' }); if (c && c.url && c.mode !== 'white') logo = c.url; const prim = /^#[0-9a-f]{6}$/i.test(p.primaryColor || '') ? p.primaryColor : '#1F2A44'; const w = BL.pickLogo(p, { bg: prim }); logoWhite = w && w.url && w.mode === 'white' ? w.url : ''; } catch (e) {}
+    const imgs = (p.images || []).filter(i => i && i.src && !/logo/i.test(i.name || '')).map(i => ({ src: i.src, name: i.name || '' }));
+    return { logo, logoWhite, coverImage: imgs[0] ? imgs[0].src : '', coverImages: imgs }; }
+  // A Brand Command picture too small for where a document prints it: ask Brand Command for a high-resolution version
+  // (image-quality.js; photos of people wait for a face check; the original is never changed). Once per picture.
+  flowQueueHires(list) { if (this.isDemo()) return; const cid = (this.state.brandLink || {}).clientId || this.cosCtx().clientId; if (!cid) return; this._hiresAsked = this._hiresAsked || new Set();
+    (list || []).forEach(x => { const key = x.name || x.src; if (!x.size || this._hiresAsked.has(key)) return; this._hiresAsked.add(key); const url = /^https?:/.test(x.src || '') ? x.src : '';
+      this.teamMod('brand-notices.js').then(N => N.notify(cid, { what: 'A photo is too small for a document cover', detail: x.why || '', area: 'Images', app: this.docAppLabel ? this.docAppLabel() : 'Documents', request: { kind: 'hires-print', url, name: x.name || '', w: x.size[0], h: x.size[1], need: x.needMin || null, where: 'cover' } })).catch(() => {}); }); }
   async flowIndustry() { if (this._flowInd !== undefined) return this._flowInd; try { const T = await this.teamMod('industry-taxonomy.js'); const p = this.bcProfile() || {}; const ws = p.writingSystem || {}; const d = T.detect({ name: p.name || '', industry: p.industry || '', text: [(ws.description || {}).text, (ws.positioning || {}).text].filter(Boolean).join(' ') }); this._flowInd = d || {}; } catch (e) { this._flowInd = {}; } return this._flowInd; }
   flowHost() { let h = document.getElementById('cos-flow'); const book = document.querySelector('.book'); if (!h && book && book.parentElement) { h = document.createElement('div'); h.id = 'cos-flow'; book.parentElement.insertBefore(h, book); } return h; }
   async flowMount() {
     if (!document.getElementById('cos-flow-css')) { const st = document.createElement('style'); st.id = 'cos-flow-css'; st.textContent = 'body.cos-flow .book{display:none!important}body:not(.cos-flow) #cos-flow{display:none}#cos-flow{min-height:60vh}'; document.head.appendChild(st); }
     const host = this.flowHost(); if (!host) return; document.body.classList.add('cos-flow');
-    const [LF, TY] = await Promise.all([this.teamMod('doc-proposal.js'), this.teamMod('typography.js').catch(() => null)]); const ind = await this.flowIndustry(); const a = this.flowAssets();
+    const [LF, TY] = await Promise.all([this.teamMod('doc-proposal.js'), this.teamMod('typography.js').catch(() => null)]); const ind = await this.flowIndustry(); const a = await this.flowAssets();
     this._flowAt = (this.state.docMeta.flow || {}).at;
-    this._flowView = LF.mount(host, { state: this.state.docMeta.flow, brand: this.flowBrand(), industryId: ind.industryId || '', leadingFn: TY && TY.leadingFor, logo: a.logo, logoWhite: a.logoWhite, coverImage: a.coverImage, insets: () => this.flowInsets(),
+    this._flowView = LF.mount(host, { state: this.state.docMeta.flow, brand: this.flowBrand(), industryId: ind.industryId || '', leadingFn: TY && TY.leadingFor, logo: a.logo, logoWhite: a.logoWhite, coverImages: a.coverImages, onLowRes: (l) => this.flowQueueHires(l), insets: () => this.flowInsets(),
       onChange: (st) => { this._flowAt = st.at; this.setDocMeta({ flow: st }); this._userEdited = true; }, onReview: () => this.flowReview() });
   }
   // Room taken by the app's own floating panels at the left and right edges (the long-form pages sit between them).
@@ -4061,22 +4072,24 @@ class Component extends DCLogic {
     if (on && (!this._flowView || !document.getElementById('cos-flow'))) { this._flowView = null; this.flowMount(); }
     else if (on && this._flowView && (this.state.docMeta.flow || {}).at !== this._flowAt) { this._flowAt = this.state.docMeta.flow.at; this._flowView.update(this.state.docMeta.flow, this.flowBrand()); }
     else if (!on && this._flowView) this.flowUnmount(); }, 700); }
-  async flowStart(brief) { const LF = await this.teamMod('doc-proposal.js'); const st = LF.skeleton({ brief: this._cosBriefFull || brief || '', brand: this.flowBrand() }); this.setDocMeta({ flow: st, type: 'proposal' }); this.flowWatch(); await this.cosSleep(50); if (!this._flowView) await this.flowMount(); }
+  // kind: 'proposal', 'case-study', 'white-paper', 'guide' or 'report'. New documents open in the default look (Option A).
+  async flowStart(brief, kind) { const LF = await this.teamMod('doc-proposal.js'); const st = LF.skeleton({ brief: this._cosBriefFull || brief || '', brand: this.flowBrand(), kind: kind || 'proposal' }); this.setDocMeta({ flow: st, type: st.kind || 'proposal' }); this.flowWatch(); await this.cosSleep(50); if (!this._flowView) await this.flowMount(); }
   async flowCreate(mode) {
     const LF = await this.teamMod('doc-proposal.js'); const brand = this.flowBrand(); const ind = await this.flowIndustry(); let skill = '';
-    try { const S = await this.teamMod('doc-skills.js'); const sk = await S.skillFor('proposal', ind.industryLabel || brand.industry || ''); skill = (sk && sk.text) || ''; } catch (e) {}
+    const cur0 = this.state.docMeta.flow || {}; const kind = cur0.kind || 'proposal'; const noun = kind === 'proposal' ? 'proposal' : kind.replace(/-/g, ' ');
+    try { const S = await this.teamMod('doc-skills.js'); const sk = await S.skillFor(kind, ind.industryLabel || brand.industry || ''); skill = (sk && sk.text) || ''; } catch (e) {}
     const tc = this.state.teamCamps; const ids = (this.state.docMeta && this.state.docMeta.campaignIds) || []; const camp = tc && tc.list ? tc.list.find(x => ids.includes(x.id)) : null;
     const campaign = camp ? [camp.name, camp.goal, camp.audience, camp.keyMessage, camp.offer, camp.cta, camp.brief].filter(Boolean).join('. ') : '';
     const cur = this.state.docMeta.flow; const brief = this._cosBriefFull || this._cosBrief || (cur && cur.brief) || '';
     let notes = [];
-    if (mode !== 'design') { this.setState({ aiMsg: 'Planning and writing the proposal…' }); const r = await LF.create({ ask: (sys, user) => this.teamAsk(sys, user, 8000), brand, brief, campaign, industry: ind.industryLabel || '', skill, state: cur, progress: (t) => { try { window.CatalystCreate && window.CatalystCreate.progress(t); } catch (e) {} } }); notes = r.notes; this.setDocMeta({ flow: r.state, type: 'proposal' }); if (r.state.model.title && !/DATA NEEDED/.test(r.state.model.title)) this.setState({ docName: r.state.model.title }); }
+    if (mode !== 'design') { this.setState({ aiMsg: 'Planning and writing the ' + noun + '…' }); const r = await LF.create({ ask: (sys, user) => this.teamAsk(sys, user, 8000), brand, brief, campaign, industry: ind.industryLabel || '', skill, state: cur, kind, progress: (t) => { try { window.CatalystCreate && window.CatalystCreate.progress(t); } catch (e) {} } }); notes = r.notes; this.setDocMeta({ flow: r.state, type: r.state.kind || kind }); if (r.state.model.title && !/DATA NEEDED/.test(r.state.model.title)) this.setState({ docName: r.state.model.title }); }
     await this.cosSleep(900); try { const QA = await this.teamMod('doc-qa.js'); const fx = QA.autoFix(this.state.docMeta.flow.model, { brand }); if (fx.fixes.length) this.setDocMeta({ flow: Object.assign({}, this.state.docMeta.flow, { model: fx.model, at: Date.now() }) }); } catch (e) {}
     this.setState({ aiMsg: '' }); return { notes: notes.slice(0, 12) };
   }
   async flowExport(kind, silent) {
-    const LF = await this.teamMod('doc-proposal.js'); const TY = await this.teamMod('typography.js').catch(() => null); const ind = await this.flowIndustry(); const brand = this.flowBrand(); const a = this.flowAssets();
+    const LF = await this.teamMod('doc-proposal.js'); const TY = await this.teamMod('typography.js').catch(() => null); const ind = await this.flowIndustry(); const brand = this.flowBrand(); const a = await this.flowAssets();
     const QA = await this.teamMod('doc-qa.js'); const fx = QA.autoFix(this.state.docMeta.flow.model, { brand }); let st = this.state.docMeta.flow; if (fx.fixes.length) { st = Object.assign({}, st, { model: fx.model, at: Date.now() }); this.setDocMeta({ flow: st }); }
-    const o = { brand, industryId: ind.industryId || '', leadingFn: TY && TY.leadingFor, logo: a.logo, logoWhite: a.logoWhite, coverImage: a.coverImage, inlineImage: u => this.dpInline(u) };
+    const o = { brand, industryId: ind.industryId || '', leadingFn: TY && TY.leadingFor, logo: a.logo, logoWhite: a.logoWhite, coverImages: a.coverImages, inlineImage: u => this.dpInline(u) };
     const out = kind === 'docx' ? await LF.exportDocx(st, o) : await LF.exportPdf(st, o);
     let gate = null; try { const AS = await this.teamMod('agent-skills.js'); gate = await AS.gateFor('reviewer', { clientId: (this.state.brandLink || {}).clientId || '', app: this.docAppLabel ? this.docAppLabel() : '' }); } catch (e) {}
     const rv = await LF.review(st, { brand, pages: this._flowView ? this._flowView.pages : [], pdf: kind === 'docx' ? null : out, docx: kind === 'docx' ? out : null, gate });
@@ -4089,7 +4102,7 @@ class Component extends DCLogic {
       if (go === 'download') this.dpSave(x.out.blob, this.docSlug() + (kind === 'docx' ? '.docx' : '.pdf')); }
     catch (e) { console.warn(e); window.alert('Could not build the ' + (kind === 'docx' ? 'Word file' : 'PDF') + '.\n\n' + ((e && e.message) || '')); }
     finally { this.setState({ dlBusy: null }); } }
-  async flowReview() { this.setState({ dlBusy: 'Checking the proposal…' }); try { const x = await this.flowExport('pdf'); this.setState({ dlBusy: null }); const go = await x.QA.showReview(x.review, { title: 'Production review: proposal', what: 'PDF', downloadLabel: 'Download PDF' }); if (go === 'download') this.dpSave(x.out.blob, this.docSlug() + '.pdf'); } catch (e) { console.warn(e); } finally { this.setState({ dlBusy: null }); } }
+  async flowReview() { const k = ((this.state.docMeta || {}).flow || {}).kind || 'proposal'; const noun = k.replace(/-/g, ' '); this.setState({ dlBusy: 'Checking the ' + noun + '…' }); try { const x = await this.flowExport('pdf'); this.setState({ dlBusy: null }); const go = await x.QA.showReview(x.review, { title: 'Production review: ' + noun, what: 'PDF', downloadLabel: 'Download PDF' }); if (go === 'download') this.dpSave(x.out.blob, this.docSlug() + '.pdf'); } catch (e) { console.warn(e); } finally { this.setState({ dlBusy: null }); } }
   docSlug() { return String(this.state.docName || 'document').trim().replace(/[^A-Za-z0-9 _-]+/g, '').replace(/\s+/g, '-').slice(0, 60) || 'document'; }
   async downloadPptx(ok) {
     if (!ok && !this.dlGuard('pptx')) return;
@@ -4439,8 +4452,8 @@ class Component extends DCLogic {
     if (r && r.status !== 403) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'We couldn’t reach the writing service (HTTP ' + r.status + ').'); }
     return this.aiComplete(system + '\n\n' + user);
   }
-  teamTypes() { return [['sell-sheet', 'Sell sheet'], ['case-study', 'Case study'], ['white-paper', 'White paper'], ['proposal', 'Proposal'], ['fact-sheet', 'Fact sheet'], ['other', 'Other document']]; }
-  teamGuessType(hint) { const s = String(hint || '').toLowerCase(); if (/case[- ]?stud/.test(s)) return 'case-study'; if (/white[- ]?paper/.test(s)) return 'white-paper'; if (/proposal|\bsow\b|rfp/.test(s)) return 'proposal'; if (/sell[- ]?sheet|one[- ]?pager/.test(s)) return 'sell-sheet'; if (/fact[- ]?sheet|\bfs-|^fs|v3-|quant|qual/.test(s)) return 'fact-sheet'; return ''; }
+  teamTypes() { return [['sell-sheet', 'Sell sheet'], ['case-study', 'Case study'], ['white-paper', 'White paper'], ['proposal', 'Proposal'], ['guide', 'Guide'], ['report', 'Report'], ['fact-sheet', 'Fact sheet'], ['other', 'Other document']]; }
+  teamGuessType(hint) { const s = String(hint || '').toLowerCase(); if (/case[- ]?stud/.test(s)) return 'case-study'; if (/white[- ]?paper/.test(s)) return 'white-paper'; if (/proposal|\bsow\b|rfp/.test(s)) return 'proposal'; if (/\bguide\b|how[- ]to|handbook/.test(s)) return 'guide'; if (/\breport\b/.test(s)) return 'report'; if (/sell[- ]?sheet|one[- ]?pager/.test(s)) return 'sell-sheet'; if (/fact[- ]?sheet|\bfs-|^fs|v3-|quant|qual/.test(s)) return 'fact-sheet'; return ''; }
   teamDocType() { const m = this.state.docMeta || {}; if (m.type) return m.type; const P = this.poAll(); const libs = []; Object.keys(P).forEach(pid => (P[pid] || []).forEach(o => { if (o.fromLib) libs.push(o.fromLib); })); return this.teamGuessType(m.tpl) || this.teamGuessType(this.state.docName) || this.teamGuessType(libs.join(' ')) || 'fact-sheet'; }
   setDocMeta(patch) { this.setState(st => ({ docMeta: Object.assign({}, st.docMeta || {}, patch), saved: false })); }
   async teamLoadCamps(force) {
@@ -4911,7 +4924,7 @@ class Component extends DCLogic {
     if (kind === 'fact-sheet') { const b = String(brief || '').toLowerCase(); const keys = ((this.state.fsLibData && this.state.fsLibData.templates) || []).map(t => t.key);
       const pick = /qualitative|story|narrative/.test(b) ? 'fs-qual' : /quantitative|performance|returns|numbers/.test(b) ? 'fs-quant' : 'fs-hybrid';
       return !keys.length || keys.includes(pick) ? pick : (keys.find(k => /^fs-/.test(k)) || 'fs-quant'); }
-    return { 'case-study': 'case-study', 'sell-sheet': 'sell-sheet', 'white-paper': 'white-paper', proposal: 'proposal' }[kind] || '';
+    return { 'case-study': 'case-study', 'sell-sheet': 'sell-sheet', 'white-paper': 'white-paper', proposal: 'proposal', guide: 'white-paper', report: 'white-paper' }[kind] || '';
   }
   // Ready when the page has loaded, the person is signed in and the client's Brand Command is loaded.
   cosAutoReady() {
@@ -4940,7 +4953,7 @@ class Component extends DCLogic {
     await wait(1500); // header and footer settle
     this.setState(st => ({ docName: String(p.title || '').trim() || st.docName || 'Untitled document', docMeta: Object.assign({}, st.docMeta || {}, { type: p.kind, at: Date.now() }, p.campaign ? { campaignIds: [p.campaign] } : {}) }));
     await wait(50); await this.teamLoadCamps(true);
-    if (p.kind === 'proposal') await this.flowStart(this._cosBrief);
+    if (['proposal', 'case-study', 'white-paper', 'guide', 'report'].includes(p.kind)) await this.flowStart(this._cosBrief, p.kind); // multi-page documents: long-form layer, default look (Option A)
   }
   // Saves exactly like Save Document (a new saved version, its thumbnail, the database copy and the Saved Files entry).
   // Hands-off runs usually happen in a background tab, where the browser runs timers about once a minute and draws no
@@ -5646,7 +5659,7 @@ class Component extends DCLogic {
     const needSave = !!this.state.projectOpen && !untouchedTpl && (this.isDirty() || !this.inGallery()); if (needSave) this.saveAll('auto');
     this.setState(st => ({ header: Object.assign({}, st.header || {}, { userKeys: [] }), footer: Object.assign({}, st.footer || {}, { userKeys: [] }) }));
     this.setState({ sysTpl: !!t, blankChosen: false, tplView: false, newOpen: false, npKind: t ? 'template' : 'blank', npTpl: t ? t.key : null, npSize: (t && t.size) || 'letter', npOrient: 'port', npPages: t ? t.pages.length : 2, npW: 5.5, npH: 8.5, npName: t ? ((t.group ? t.group + ' \u2014 ' : '') + t.name) : '' },
-      () => setTimeout(() => { this.startNewProject(); if (t) setTimeout(() => this.applyTplHF(t), 900); if (tplKey === 'proposal' && !this.cosAuto()) setTimeout(() => this.flowStart(''), 1200); if (!t) setTimeout(() => { this.setState({ galEmpty: true }); this.fsLib().then(m => this.setState({ fsLibData: { cats: m.CATEGORIES, sections: m.SECTIONS, templates: m.TEMPLATES || [] } })).catch(() => {}); }, 700); }, needSave ? 350 : 0));
+      () => setTimeout(() => { this.startNewProject(); if (t) setTimeout(() => this.applyTplHF(t), 900); { const lf = { proposal: 'proposal', 'case-study': 'case-study', 'white-paper': 'white-paper' }[tplKey]; if (lf && !this.cosAuto()) setTimeout(() => this.flowStart('', lf), 1200); } if (!t) setTimeout(() => { this.setState({ galEmpty: true }); this.fsLib().then(m => this.setState({ fsLibData: { cats: m.CATEGORIES, sections: m.SECTIONS, templates: m.TEMPLATES || [] } })).catch(() => {}); }, 700); }, needSave ? 350 : 0));
   }
   async vgUploadText(e) {
     const files = [...((e && e.target && e.target.files) || [])]; if (e && e.target) e.target.value = ''; if (!files.length) return;
