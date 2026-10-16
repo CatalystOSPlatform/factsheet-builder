@@ -4143,18 +4143,18 @@ class Component extends DCLogic {
     const hl = mem.filter(x => x.type === 'text' && /^\s*highlights?\s*$/i.test(x.text || '')).sort((a, b) => a.x - b.x);
     return imgs.slice(0, 4).map((im, i) => { const cx = im.x + im.w / 2; const inCol = t => t.x + t.w / 2 >= im.x - .05 && t.x + t.w / 2 <= im.x + im.w + .05; const nextTop = Math.min(im.y + im.h + .6, ...imgs.filter(q => q !== im && q.y > im.y + im.h - .02 && q.x < im.x + im.w && q.x + q.w > im.x).map(q => q.y), ...hl.map(h => h.y)); const under = txt.filter(t => inCol(t) && t.y >= im.y + im.h - .02 && t.y < nextTop - .01 && !/^\s*highlights?\s*$/i.test(t.text || '')).sort((a, b) => a.y - b.y);
       const nm = String((under[0] || {}).text || 'Name'); const m = nm.match(/^(.*?),\s*([A-Z][A-Za-z®]{1,6}(?:\s*,\s*[A-Z][A-Za-z®]{1,6})*)$/); const h = hl[i]; const body = h ? txt.find(t => t !== h && t.y > h.y && t.y < h.y + .8 && Math.abs(t.x - h.x) < .3) : null;
-      return { name: m ? m[1] : nm, cert: m ? m[2] : '', title: String((under[1] || {}).text || 'Title'), bullets: body ? String(body.text).split('\n').map(s => s.replace(/^[•\-\s]+/, '').trim()).filter(Boolean).slice(0, 4) : ['XX years of experience', 'Enter a highlight'], photo: im.src || '' }; }); }
-  teamBuild(T, people, auto) { const { pid, grp, mem } = T; const n = Math.max(1, Math.min(4, people.length)); people = people.slice(0, n);
+      return { name: m ? m[1] : nm, cert: m ? m[2] : '', title: String((under[1] || {}).text || 'Title'), bullets: body ? String(body.text).split('\n').map(s => s.replace(/^[•\-\s]+/, '').trim()).filter(Boolean).slice(0, 4) : ['XX years of experience', 'Enter a highlight'], photo: (im.src && !new Set((((this.bcProfile() || {}).images) || []).map(x => x && (x.src || x.url))).has(im.src)) ? im.src : '' }; }); } // a brand scene photo is never a person's headshot
+  teamBuild(T, people, auto) { const { pid, grp, mem } = T; if (this.cosAuto()) people = people.filter(p => !/client to verify/i.test(p.name || '')); if (!people.length) return; const n = Math.max(1, Math.min(4, people.length)); people = people.slice(0, n);
     const imgs = mem.filter(x => x.type === 'image' && !x.dv); const fy = imgs.length ? Math.min(...imgs.map(x => x.y)) : Math.min(...mem.map(x => x.y));
     const keep = mem.filter(x => x.tm == null && x.y + x.h <= fy + .02 && !(x.type === 'image' && !x.dv)); const drop = mem.filter(x => !keep.includes(x));
-    const M = this.poMargins(pid) || { l: .5, r: .5, pw: 8.5 }; const X = keep.length ? Math.min(...keep.map(x => x.x)) : Math.min(...mem.map(x => x.x)); const W = Math.max(.8, Math.min(M.pw - M.r, Math.max(...mem.map(x => x.x + x.w))) - X); // stay in the section's own column
+    const M = this.poMargins(pid) || { l: .5, r: .5, pw: 8.5 }; const X = keep.length ? Math.min(...keep.map(x => x.x)) : Math.min(...mem.map(x => x.x)); const midX = (M.l + M.pw - M.r) / 2; const rightX = Math.max(...mem.map(x => x.x + x.w)); const W = Math.max(.8, (X >= midX - .05 || rightX > midX + .05 ? M.pw - M.r : midX - .125) - X); // the section's own column, full column width
     const top = keep.length ? Math.max(...keep.map(x => x.y + x.h)) + .12 : fy; const oldB = Math.max(...mem.map(x => x.y + x.h));
     const hd = keep.find(x => x.type === 'text'); const ink = (drop.find(x => x.type === 'text' && x.color) || {}).color || '#3a4159'; const hlFill = (mem.find(x => x.hbox) || {}).fill || (mem.find(x => x.type === 'color' && x.h > .3 && x.fill && !/^#?(fff|ffffff)$/i.test(String(x.fill).replace('#', ''))) || {}).fill || '#F1F3F8'; const prim = (hd && hd.color) || '#081A53';
     const fs0 = +Math.max(5, ((drop.find(x => x.type === 'text') || {}).fs || 7)).toFixed(1); const est = (s, f, w) => String(s || '').split('\n').reduce((a, ln) => a + Math.max(1, Math.ceil(ln.length * f * .52 / 72 / Math.max(.3, w - .08))), 0) * f * 1.25 / 72 + .015;
-    const id = () => 'tm' + Math.random().toString(36).slice(2, 9); const gap = .22; const colW = (W - gap * (n - 1)) / n; let out = [], bottom = top;
+    const id = () => 'tm' + Math.random().toString(36).slice(2, 9); const gap = .22; const isFS = this.teamDocType() === 'fact-sheet'; const allNoPh = !isFS && this.cosAuto() && people.every(p => !p.photo); const PR = isFS ? n : allNoPh ? (W > 2.4 ? Math.min(n, 2) : 1) : Math.min(n, 2); /* documents: two per row; fact sheets keep the approved one-row leadership */ const colW = (W - gap * (PR - 1)) / PR; /* team cards two per row */ let out = [], bottom = top;
     const others = this.poList(pid).filter(x => (x.tgrp || x.grp) !== grp && !x.free && x.y >= oldB - .02); const belowB = others.length ? Math.max(...others.map(x => x.y + x.h)) : oldB; const pageB = (M.ph || 11) - (M.b ?? .5); const limit = oldB + Math.max(0, pageB - belowB);
-    const lay = (F, CP) => { out = []; bottom = top; const fs = +(fs0 * 1.2 * Math.max(.7, F)).toFixed(1);
-    people.forEach((p, i) => { const s0 = CP ? Math.min(colW * .4, .8) : n === 1 ? Math.min(1.5, colW * .38) : Math.min(colW, 1.7); const s = CP ? Math.max(.3, s0 * F) : Math.max(.35, s0 * F); const cx = X + i * (colW + gap); let x = cx, y = top, tw = colW;
+    const lay = (F, CP) => { out = []; bottom = top; let rt = top; const fs = +(fs0 * 1.2 * Math.max(.7, F)).toFixed(1);
+    people.forEach((p, i) => { const s0 = CP ? Math.min(colW * .4, .8) : n === 1 ? Math.min(1.5, colW * .38) : Math.min(colW, 1.7); const s = CP ? Math.max(.3, s0 * F) : Math.max(.35, s0 * F); if (i && i % PR === 0) rt = bottom + gap; const cx = X + (i % PR) * (colW + gap); let x = cx, y = rt, tw = colW;
       const pg2 = grp + '_p' + i; const noPh = !p.photo && this.cosAuto(); // hands-off: no empty headshot frame (it would be removed and leave a gap)
       if (!noPh) out.push({ id: id(), grp: pg2, tgrp: grp, tm: i, type: 'image', x: +x.toFixed(3), y: +y.toFixed(3), w: +s.toFixed(3), h: +s.toFixed(3), src: p.photo || '', fit: 'cover', radius: 0, bg: '#EEF0F5', noph: !!p.photo, ppl: p, tmv: 4 });
       if (noPh) {} else if (n === 1 || CP) { const gp = CP ? .06 : .2; x = cx + s + gp; tw = colW - s - gp; } else y += s + .04;
@@ -4162,13 +4162,13 @@ class Component extends DCLogic {
       const add = (text, st, f, o2) => { if (!text) return; const h = +est(text, f, tw).toFixed(3); out.push(Object.assign({ id: id(), grp: pg2, tgrp: grp, tm: i, type: 'text', x: +x.toFixed(3), y: +y.toFixed(3), w: +tw.toFixed(3), h, text, style: st, fs: f, color: ink, align: 'left', fill: '' }, o2 || {})); y += h + .01; };
       add((p.name || 'Name') + (p.cert ? ', ' + p.cert : ''), 'label', +(fs * 1.15).toFixed(1), { fw: 800, bold: true, color: prim }); add(p.title, 'body', fs); // credentials sit with the name, not on a line of their own
       const bl = (p.bullets || []).filter(Boolean).slice(0, 4); if (bl.length) { y += .03; add(bl.join('\n'), 'body', +(fs * .92).toFixed(1)); }
-      y += pad; out.splice(bi, 0, { id: id(), grp: pg2, tgrp: grp, tm: i, type: 'color', hbox: 1, x: +bx0.toFixed(3), y: +by0.toFixed(3), w: +bw0.toFixed(3), h: +(y - by0).toFixed(3), fill: hlFill, opacity: 100, radius: 0 });
-      bottom = Math.max(bottom, y, top + (noPh ? 0 : s)); }); };
+      y += pad; if (!allNoPh) out.splice(bi, 0, { id: id(), grp: pg2, tgrp: grp, tm: i, type: 'color', hbox: 1, x: +bx0.toFixed(3), y: +by0.toFixed(3), w: +bw0.toFixed(3), h: +(y - by0).toFixed(3), fill: hlFill, opacity: 100, radius: 0 });
+      bottom = Math.max(bottom, y, rt + (noPh ? 0 : s)); }); };
     let F = 1; lay(F); while (bottom > limit + .005 && F > .2) { F = +(F - .05).toFixed(2); lay(F); }
     if (bottom > limit + .005 && n > 1 && colW > 1.6) { F = 1; lay(F, true); while (bottom > limit + .005 && F > .45) { F = +(F - .05).toFixed(2); lay(F, true); } }
     const dy = bottom - oldB; const ids = new Set(drop.map(x => x.id));
     const kp = new Set(keep.map(x => x.id)); const L = this.poList(pid).filter(x => !ids.has(x.id)).map(x => kp.has(x.id) ? Object.assign({}, x, { tgrp: grp }) : (x.tgrp || x.grp) !== grp && x.y >= oldB - .02 && Math.abs(dy) > .01 ? Object.assign({}, x, { y: +(x.y + dy).toFixed(3) }) : x);
-    if (!auto) this.histRecord && this.histRecord(); this.poSetList(pid, this.fitPage(pid, [...L, ...out], x => (x.tgrp || x.grp) === grp)); if (!auto) this.setState({ poSel: { pid, id: out[0].id }, poUnit: out[0].grp }); clearTimeout(this._tmFixT); this._tmFixT = setTimeout(() => this.teamFix(pid, grp), 80); }
+    if (!auto) this.histRecord && this.histRecord(); this.poSetList(pid, this.cosAuto() ? [...L, ...out] : this.fitPage(pid, [...L, ...out], x => (x.tgrp || x.grp) === grp)); /* hands-off: the layout pass moves what doesn't fit to the next page instead of squeezing the cards */ if (!auto) this.setState({ poSel: { pid, id: out[0].id }, poUnit: out[0].grp }); clearTimeout(this._tmFixT); this._tmFixT = setTimeout(() => this.teamFix(pid, grp), 80); }
   // After mount: measure each person's real text heights, re-stack name → title → cert → bullets and fit the highlight box.
   teamFix(pid, grp) { this.autoClean(); const pg = document.querySelector('.book .media[data-pid="' + pid + '"] > .pg'); if (!pg) return; const k = 1 / (this.poRatio(pg) * 96); const L = this.poList(pid); const mem = L.filter(x => x.tgrp === grp && x.tm != null); if (!mem.length) return; const upd = new Map();
     const pad = .02; const per = [...new Set(mem.map(x => x.tm))].map(i => { const P = mem.filter(x => x.tm === i); const im = P.find(x => x.type === 'image'); const bx = P.find(x => x.hbox); const tx = P.filter(x => x.type === 'text').sort((a, b) => a.y - b.y); if (!im || !bx) return null;
@@ -4437,11 +4437,11 @@ class Component extends DCLogic {
       + '- Images: fill every empty image frame. Use a brand image ("image": an IMAGES id) when one fits; when none fits, describe a new photo to make ("generate": a short art-direction prompt: subject, setting, mood, light, brand colors; no text, no logos, no recognizable real people). You may add new image frames ("add" with type "image" and "generate") where a photo would strengthen the story.\n'
       + '- Charts: suggest charts, graphs or graphics that would strengthen the story ("suggestions"). Only add a chart ("add" with type "chart" and "rows") when every number comes from FACTS.\n'
       + 'HOUSE STYLE (from the agency’s reference fact sheet; leave the page header alone):\n'
-      + '- Section headings become solid color bars: give the heading text box a dark brand "fill" with white text, the full width of its column, alternating the darkest and the second brand color between columns.\n'
+      + '- Section headings are type only: every section heading has the same size, weight and color, and NEVER sits in a filled box or color bar. Separate sections with spacing and an optional thin rule.\n'
       + '- The main headline is big and bold (28–40 pt) over two lines; the second line can sit in the second brand color. The subhead stays small and quiet.\n'
       + '- Benefits, steps and features sit on light tinted cards ("block" with the lightest brand color behind them); one card per item, equal heights, even gutters. Use a thin accent-color "block" as a left edge on a highlighted card or a testimonial.\n'
-      + '- Results and key numbers go in a full-width dark band ("block") with large white numbers (24–36 pt) and short labels under each.\n'
-      + '- The call to action is a full-width brand-color band with a large white heading.\n'
+      + '- Results and key numbers go in a row of equal-height key-figure blocks with large numbers and short labels under each.\n'
+      + '- The call to action is a section like the others (type-only heading, body text). Colored blocks are only for a real key figure, a pull quote taken from this document, an approved quote, a Brand Command image or a chart from real data.\n'
       + '- Align everything to a two-column grid with the same left edges, the same gutters and the same space between sections. Charts use the brand colors.\n'
       + '- NOTHING MAY OVERLAP: no text box may touch or cover another text box, table, chart or image, and no section may run into the next. Leave at least 0.06 page units between elements. Blocks are backgrounds and may sit behind text.\n'
       + '- Type inside a color bar, card or panel never sits near its edges (the layout pass adds the padding). No italics except a caption under an image or chart. Body text is left-aligned and every body paragraph keeps the same size. Never add bullet characters.\n'
@@ -4462,7 +4462,7 @@ class Component extends DCLogic {
       if (c.box) { const b = fitBox(c.box, o.page); if (b) Object.assign(x, b, o.type === 'table' ? { bw: b.w, bh: b.h } : {}); }
       if (o.type === 'text') { const fs = num(c.fs, 6, 60), fw = num(c.fw, 300, 900); if (fw) x.fw = Math.round(fw / 100) * 100; const full = ((P[Object.keys(P).find(pid => (P[pid] || []).some(q => q.id === o.id))] || []).find(q => q.id === o.id) || {}).text || o.text;
         if (fs || x.w || x.h) x.fs = fitFs(full, fs || o.fs || 10, x.w || o.box[2], x.h || o.box[3], x.fw || o.fw); }
-      if ((o.type === 'text' || o.type === 'color') && ok(c.fill)) x.fill = ok(c.fill);
+      if ((o.type === 'color' || (o.type === 'text' && !(['label', 'sub'].includes(o.style) && String(o.text || '').length < 60))) && ok(c.fill)) x.fill = ok(c.fill); // headings are never boxed
       if (o.type === 'text' && ok(c.color)) x.color = ok(c.color);
       if (o.type === 'table') ['headFill', 'headInk', 'stripeFill'].forEach(k => { if (ok(c[k])) x[k] = ok(c[k]); });
       if (o.type === 'image' && c.image) { const im = imgs.find(i => i.id === c.image); if (im) Object.assign(x, { src: im.src, cx: 50, cy: 50, cz: 1, ar: 0 }); }
@@ -4470,7 +4470,7 @@ class Component extends DCLogic {
       if (Object.keys(x).length) ch[c.id] = x; });
     const nid = () => 'dz' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); const adds = {}; let nAdd = 0;
     (res.add || []).slice(0, 12).forEach(a => { if (!a || !pidOf[a.page]) return; const b = fitBox(a.box, a.page); if (!b) return; let o = null;
-      if (a.type === 'text' && a.text && String(a.text).length <= 160 && numsOk(a.text)) o = Object.assign({ id: nid(), type: 'text', text: String(a.text), fs: fitFs(a.text, num(a.fs, 6, 60) || 24, b.w, b.h, num(a.fw, 300, 900) || 800), fw: Math.round((num(a.fw, 300, 900) || 800) / 100) * 100, color: ok(a.color) || C[0] || '#1d2340', align: ['left', 'center', 'right'].includes(a.align) ? a.align : 'left', designer: true }, ok(a.fill) ? { fill: ok(a.fill) } : {}, b);
+      if (a.type === 'text' && a.text && String(a.text).length <= 160 && numsOk(a.text) && (String(a.text).match(/[A-Za-z]{3,}/g) || []).length >= 2) o = /* a figure always comes with its label, never a bare number */ Object.assign({ id: nid(), type: 'text', text: String(a.text), fs: fitFs(a.text, num(a.fs, 6, 60) || 24, b.w, b.h, num(a.fw, 300, 900) || 800), fw: Math.round((num(a.fw, 300, 900) || 800) / 100) * 100, color: ok(a.color) || C[0] || '#1d2340', align: ['left', 'center', 'right'].includes(a.align) ? a.align : 'left', designer: true }, ok(a.fill) ? { fill: ok(a.fill) } : {}, b);
       else if (a.type === 'image' && typeof a.generate === 'string' && a.generate.trim()) { o = Object.assign({ id: nid(), type: 'image', src: '', fit: 'cover', designer: true }, b); gens.push({ id: o.id, prompt: a.generate.trim(), w: b.w, h: b.h }); }
       else if (a.type === 'chart' && Array.isArray(a.rows) && a.rows.length >= 2 && a.rows.every(Array.isArray) && a.rows.slice(1).every(r => r.slice(1).every(v => numsOk(v)))) o = Object.assign({ id: nid(), type: 'chart', chart: ['column', 'bar', 'line', 'pie', 'donut'].includes(a.chart) ? a.chart : 'column', rows: a.rows.map(r => r.map(v => String(v ?? ''))), pal: 'brand', style: 'label', fs: 7, title: cap(a.title, 60), labels: true, designer: true }, b);
       else if (a.type === 'block' && ok(a.fill)) { o = Object.assign({ id: nid(), type: 'color', fill: ok(a.fill), designer: true, behind: true }, b); }
@@ -4527,6 +4527,7 @@ class Component extends DCLogic {
     const plain = t => String(t || '').replace(/<[^>]+>/g, ' ');
     const PH = /\[(?:client to verify|insert|add |enter |todo)[^\]]*\]|\[[A-Z][A-Za-z /&-]{1,40}\]|\bX{2,}(?:[.,]X+)*%?(?![a-z])|\bX\.XX\b|\benter (?:a |an |the |your )?(?:value|description|metric|result|objective|introduction|summary|text|consideration|measure|problem|principle|action|milestone|source)\b|lorem ipsum|\bMM\/DD\/YYYY\b|\bXX\/XX\/XXXX\b|\b20XX\b|\bmonth (?:DD, )?YYYY\b|\bfull name\b|\bname, title\b|\bcompany name\b|\btitle here\b|\bsample data\b|replace with (?:your|the customer)|paste your|add citation|source, publication|methodology note|\bweek x\b|\bx[–-]x years\b|\bMM\/DD(?:\/YY)?\b|enter terms|\btitle here\b/i;
     const PHX = /^(?:short explanation|short belief statement|customer name|product \/ service used|related client challenge|what we did|measured outcome|highlight (?:one|two|three|four)|capability (?:one|two|three|four)|use case (?:one|two|three)|problem and solution in one line|item (?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)|data point)\.?$/i;
+    const bcImgs = (((this.bcProfile() || {}).images) || []).map(x => x && (x.src || x.url)).filter(Boolean); let bcImgN = 0;
     const discT = (((this.bcProfile() || {}).writingSystem || {}).complianceRules || {}).text || ((this.bcDisclosures() || [])[0] || {}).text || '';
     const isPh = t => PH.test(plain(t)) || PHX.test(plain(t).trim());
     const thin = o => o.type === 'color' && (o.h < .03 || o.w < .03);
@@ -4545,14 +4546,24 @@ class Component extends DCLogic {
     const C = Math.max(+(B * .8).toFixed(2), mode(all.filter(o => o.type === 'text' && o.style === 'caption' && +o.fs > 0)) || 0);
     pids.forEach(pid => P[pid].forEach(o => {
       if (o.type === 'text' && discT && /paste your approved disclosure/i.test(o.text || '')) { o.text = discT; delete o.marks; }
+      if (o.type === 'image' && !o.src && o.tm == null && !o.hs && bcImgs.length && o.w >= .45 * M0.pw) { o.src = bcImgs[(bcImgN++) % bcImgs.length]; o.fit = 'cover'; } // an empty frame gets a Brand Command image, never stays blank
       if (o.type === 'text') { const t2 = unbullet(o.text || ''); if (t2 !== o.text) { o.text = t2; delete o.marks; }
         const cap = o.style === 'caption' && P[pid].some(v => (v.type === 'image' || v.type === 'chart') && ovX(v, o) > .05 && o.y >= v.y + v.h - .05 && o.y - (v.y + v.h) < .25);
         if (o.italic && !cap) o.italic = false;
-        if (o.style === 'body' && !o.fill) { const long = Math.max(1, ...plain(o.text).split(/\s+/).map(w => w.length)); const fit = (o.w - .02) * 72 / (long * .56); o.fs = +Math.min(B, Math.max(fit, .75 * B)).toFixed(2); o.lh = 1.45; } // one body size, unless a word would not fit a narrow card
+        if (o.style === 'body') { const bx = boxOf(o, P[pid], pid); const stat = bx && bx.type === 'color' && P[pid].some(q => q !== o && q.type === 'text' && boxOf(q, P[pid], pid) === bx && /^[\s$€£\d.,%x×+\-–/]+[A-Za-z]{0,4}$/.test(plain(q.text).trim())); o.fs = stat ? C : B; o.lh = stat ? 1.3 : 1.45; } // one body size throughout; the label under a key figure uses the caption style
         if (o.style === 'caption' && !o.fill) o.fs = C;
         if (!o.fill && (o.align === 'justify' || (o.align === 'center' && +o.fs < 1.3 * B))) o.align = 'left'; }
       if (o.type === 'table') { const nc = Math.max(1, ...(o.rows || []).map(r => (r || []).length)); const long = Math.max(1, ...(o.rows || []).flat().join(' ').split(/\s+/).map(w => w.length)); o.fs = +Math.min(B, Math.max(.8 * B, (o.w / nc - .12) * 72 / (long * .66))).toFixed(2); o.bw = o.w; o.bh = o.h; if (Array.isArray(o.rows)) o.rows = o.rows.map(r => (r || []).map(c => { const u = unbullet(c); return u === c ? c : u.replace(/\n/g, ' '); })); }
     }));
+    // 1a. In a team or leadership section, a small photo frame holding a Brand Command scene photo is not a headshot: remove it.
+    { const scenes = new Set(bcImgs); pids.forEach(pid => { const L = P[pid]; const g2h = {}; L.forEach(o => { if (o.type === 'text' && o.grp && /team|leader|people|advisor|meet the|our planners/i.test(plain(o.text)) && plain(o.text).length < 40) g2h[o.grp] = 1; });
+      P[pid] = L.filter(o => !(o.type === 'image' && o.src && scenes.has(o.src) && (o.tm != null || o.hs || (o.grp && g2h[String(o.grp).replace(/_p\d+$/, '')]) || (o.tgrp && g2h[o.tgrp])) && o.w < 1.6)); }); }
+    // 1b. Section headings are type only: one size, weight and color, never a filled box (Erika's rule).
+    { const prof = this.bcProfile() || {}; const hc = this.aa(prof.primaryColor || '#1d2340', '#ffffff', 4.5); const heads = [];
+      pids.forEach(pid => { const L = P[pid]; const byG = {}; L.forEach(o => { if (o.type === 'text' && o.grp) (byG[o.grp] = byG[o.grp] || []).push(o); });
+        Object.values(byG).forEach(ts => { const t0 = ts.slice().sort((a, b) => a.y - b.y || a.x - b.x)[0]; const bx = t0 && boxOf(t0, L, pid); if (t0 && ['label', 'sub'].includes(t0.style) && plain(t0.text).trim().length < 60 && !/\n/.test(t0.text || '') && !/^[\s$€£\d.,%x×+\-–/]+$/.test(plain(t0.text)) && !(bx && bx.type === 'color') && !t0.pull) heads.push(t0); }); });
+      if (heads.length) { const n = {}; heads.forEach(h => { const k = (+h.fs || 0).toFixed(2); n[k] = (n[k] || 0) + 1; }); const HS = +Object.keys(n).sort((a, b) => n[b] - n[a] || b - a)[0]; const nw = {}; heads.forEach(h => { const k = String(h.fw || 700); nw[k] = (nw[k] || 0) + 1; }); const HW = +Object.keys(nw).sort((a, b) => nw[b] - nw[a] || b - a)[0];
+        heads.forEach(h => { { const Lh = P[pids.find(pid => P[pid].includes(h))] || []; const mem = Lh.filter(o => o !== h && o.grp === h.grp && !(o.type === 'color' && (o.h < .03 || o.w < .03))); const above = mem.filter(o => o.y < h.y - .01).sort((a, b) => a.y - b.y); if (above.length) { let y = Math.max(h.y + h.h, ...mem.filter(o => o.y >= h.y - .01).map(o => o.y)) + .005; above.forEach(o => { o.y = +y.toFixed(3); y += .002; }); } } /* nothing in a section sits above its heading */ h.fill = ''; h.color = hc; h.fs = HS; h.fw = HW; h.italic = false; h.align = 'left'; h.tpad = [0, 0, 0, 0]; delete h.marks; const L = P[pids.find(pid => P[pid].includes(h))] || []; const midX = (M0.l + M0.pw - M0.r) / 2; const cap = h.x + h.w <= midX + .05 ? midX - .1 : M0.pw - M0.r; const right = Math.min(cap, Math.max(h.x + h.w, ...L.filter(o => o.grp === h.grp && o !== h && o.x < cap).map(o => o.x + o.w))); h.w = +Math.max(h.w, right - h.x).toFixed(3); }); } } // a heading spans its section, so it never wraps early
     // 2. Hands-off: nothing with placeholder or sample data stays in a finished document.
     let removed = 0;
     if (strict) pids.forEach(pid => { let L = P[pid]; const gone = new Set(); const hit = new Set();
@@ -4566,6 +4577,7 @@ class Component extends DCLogic {
           const nc = Math.max(0, ...rows.map(r => r.length)); const keep = []; for (let c = 0; c < nc; c++) if (c === 0 || rows.slice(hd).some(r => String(r[c] || '').trim() && !isPh(r[c]))) keep.push(c);
           rows = rows.map(r => keep.map(c => r[c] ?? ''));
           if (rows.length <= hd || keep.length < 2 || rows.some(r => r.some(c => isPh(c)))) drop(o); else o.rows = rows; } });
+      L.filter(o => o.tm != null && o.type === 'text' && gone.has(o)).forEach(o => L.filter(q => q.grp === o.grp).forEach(drop)); // a team member goes as a whole when their name or title goes
       // a card (a filled box holding text) goes as a whole when any of its text goes
       L.filter(c => c.type === 'color' && !thin(c)).forEach(c => { const kids = L.filter(o => o.type === 'text' && boxOf(o, L, pid) === c); if (kids.length && kids.some(k => gone.has(k))) { drop(c); kids.forEach(drop); } });
       L.filter(o => o.type === 'legend' && gone.has(L.find(c => c.id === o.of))).forEach(drop);
@@ -4580,7 +4592,7 @@ class Component extends DCLogic {
         if (L.some(o => o.grp === g && gone.has(o) && ['table', 'chart', 'image'].includes(o.type)) && !hasViz) vis.filter(o => o.type === 'text' && o.style === 'caption').forEach(drop);
         const head = o => o.type === 'text' && (o.fill || ['label', 'sub'].includes(o.style)) && plain(o.text).trim().length < 60 && !/\n/.test(o.text || '');
         const rest = L.filter(o => o.grp === g && !gone.has(o));
-        if (L.some(o => o.grp === g && gone.has(o) && o.type !== 'image') && !rest.some(o => !thin(o) && !head(o) && !(o.type === 'color' && !L.some(t => t.type === 'text' && !gone.has(t) && boxOf(t, L, pid) === o)))) rest.forEach(drop); });
+        if (L.some(o => o.grp === g && gone.has(o) && o.type !== 'image') && !rest.some(o => !thin(o) && !head(o) && !(o.type === 'text' && o.style === 'caption') && !(o.type === 'color' && !L.some(t => t.type === 'text' && !gone.has(t) && boxOf(t, L, pid) === o)))) rest.forEach(drop); });
       removed += gone.size; P[pid] = L.filter(o => !gone.has(o)); });
     // 3. Padding inside filled boxes: text keeps clear of the left and right edges (top and bottom are set in step 5).
     pids.forEach(pid => { const L = P[pid]; L.forEach(o => { if (o.type !== 'text') return; const c = boxOf(o, L, pid); if (!c || c.type !== 'color') return;
@@ -4618,7 +4630,7 @@ class Component extends DCLogic {
     const size = it => { if (!it.kids.length) return; it.kids.forEach(size); const o = it.o; const pad = o.type === 'color' ? PADV : 0;
       const top = it.y0 + pad; const done = stack(it.kids, top, it.h < .3 * (M0.ph - M0.t - M0.b), k => (o.type === 'color' ? top : Math.max(top, k.y0))); done.forEach(k => shift(k, k.ny - k.y0));
       const bot = Math.max(...done.map(k => k.y0 + k.h)) + pad - it.y0; it.h = o.type === 'color' ? bot : Math.max(it.h, bot); };
-    const equal = items => { const g = {}; items.filter(i => i.o.type === 'color' && i.kids.length).forEach(i => { const k = (i.grp || '-') + Math.round(i.y0 * 25) + ':' + Math.round(i.o.h * 25); (g[k] = g[k] || []).push(i); }); Object.values(g).forEach(a => { if (a.length < 2) return; const h = Math.max(...a.map(i => i.h)); a.forEach(i => { i.h = h; }); }); };
+    const equal = items => { const g = {}; items.filter(i => i.o.type === 'color' && i.kids.length).forEach(i => { const k = (i.o.tgrp || i.grp || '-') + Math.round(i.y0 * 25); /* every block in a row takes the tallest height */ (g[k] = g[k] || []).push(i); }); Object.values(g).forEach(a => { if (a.length < 2) return; const h = Math.max(...a.map(i => i.h)); a.forEach(i => { i.h = h; }); }); };
     const headIt = i => i.bar || (i.o.type === 'text' && ['label', 'sub', 'eyebrow'].includes(i.o.style) && plain(i.o.text).trim().length < 60 && !/\n/.test(i.o.text || ''));
     const flowAll = async () => { const placed = {}; let carry = [];
     for (let pi = 0; pi < pids.length || carry.length; pi++) {
@@ -4647,7 +4659,7 @@ class Component extends DCLogic {
     // (either column, keeping the footer gap) when it fits there. Card rows stay where they are.
     const backfill = async () => {
       for (let k = 1; k < pids.length; k++) { const prev = pids[k - 1], cur = pids[k]; if (!(P[cur] || []).length || !(P[prev] || []).length) continue;
-        const roots = build(cur, P[cur]); if (!roots.length) continue; const key = r => r.grp || r.o.id;
+        const roots = build(cur, P[cur]); if (!roots.length) continue; const key = r => r.o.tgrp || r.grp || r.o.id; /* a team moves as one section */
         const srt = roots.slice().sort((a, b) => a.y0 - b.y0 || a.x - b.x); const heads = srt.filter((r, i) => r.y0 - srt[0].y0 < .06 && srt.findIndex(q => key(q) === key(r)) === i); // every section that starts the page, left to right
         for (const first of heads) { const sec = roots.filter(r => key(r) === key(first));
         if (!first.grp) roots.forEach(r => { if (!r.grp && r !== first && r.y0 >= first.y0 + first.h - .01 && r.y0 - (first.y0 + first.h) < .12 && ovX(r, first) > .05) sec.push(r); }); // a photo keeps its caption
@@ -4655,7 +4667,7 @@ class Component extends DCLogic {
         const objs = []; const add = it => { objs.push(it.o); it.rides.forEach(q => objs.push(q.o)); it.kids.forEach(add); }; sec.forEach(add);
         const sx0 = Math.min(...objs.map(o => o.x)), sx1 = Math.max(...objs.map(o => o.x + o.w)), sy0 = Math.min(...objs.map(o => o.y));
         const isDisc = roots.every(r => key(r) === key(first)) && objs.some(o => o.type === 'text' && /^\s*(important\s+)?disclosures?\b/i.test(o.text || '')); // a disclosure left alone on a page may use the footer's breathing room and the full width to join the page before
-        const M = this.poMargins(prev) || M0; const L0 = M.l, R0 = M.pw - M.r; const LIM = ftrTop(prev) - (isDisc ? .08 * PS : SAFE); const top = content(prev).top;
+        const M = this.poMargins(prev) || M0; const L0 = M.l, R0 = M.pw - M.r; const LIM = ftrTop(prev) - SAFE; const top = content(prev).top;
         const pr = build(prev, P[prev]); const cols = [[L0, R0]];
         pr.forEach(r => { const a = r.sx, b = r.sx + r.sw; if (b - a < .7 * (R0 - L0) && !cols.some(c => Math.abs(c[0] - a) < .05 && Math.abs(c[1] - b) < .05)) cols.push([a, b]); });
         const cand = cols.map(([a, b]) => { const hits = pr.filter(r => ovX({ x: r.sx, w: r.sw }, { x: a, w: b - a }) > .02); const bot = hits.length ? Math.max(...hits.map(r => r.y0 + r.h)) + GAP_SEC : top; return { a, b, y: bot, room: LIM - bot }; })
@@ -4672,6 +4684,28 @@ class Component extends DCLogic {
           await new Promise(r => this.setState({ pageObjs: P, saved: false }, r)); await wait(60); measure(); } } }
       return false; };
     for (let n = 0; n < 12 && await backfill(); n++) await flowAll();
+    // 7. No empty areas: a column that ends well above its neighbor gets a pull quote taken from this document's own text, sized so both
+    // columns end together (Erika's rule: fill only with real content, never filler or invented copy).
+    { const prim = ((this.bcProfile() || {}).primaryColor) || '#081A53'; const tint = this.hexMix(prim, '#ffffff', .9); const ink = this.aa(prim, tint, 4.5); const used = new Set(); const sents = []; const srcPg = {};
+      pids.forEach(pid => (P[pid] || []).forEach(o => { if (o.type === 'text' && o.style === 'body' && !o.fill && !o.pull) plain(o.text).split(/(?<=[.!?])\s+|\n/).map(s => s.trim()).filter(s => s.length >= 40 && s.length <= 150 && /[.!?]$/.test(s) && !isPh(s)).forEach(s => { sents.push(s); srcPg[s] = pid; }); }));
+      (P[pids[0]] || []).concat(...pids.map(p => P[p] || [])).forEach(o => { if (o.pull) used.add(plain(o.text)); });
+      let added = 0; let curPid = ''; const nid = () => 'o' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); const imgs = (((this.bcProfile() || {}).images) || []).map(x => x && (x.src || x.url)).filter(Boolean);
+      const pullAt = (L, x0, y0, w, h) => { const s = sents.find(t => !used.has(t) && srcPg[t] !== curPid) || sents.find(t => !used.has(t)); /* a pull quote comes from another page when it can */ if (!s) return false; let fs = Math.min(B * 1.6, B + 6); const est = f => (Math.ceil(s.length * f * .56 / 72 / Math.max(.3, w - 2 * PADH)) + .5) * f * 1.35 / 72 + 2 * PADV; while (fs > B && est(fs) > h) fs -= .25; if (est(fs) > h) return false; used.add(s);
+        const gid = 'gfill' + Date.now().toString(36) + added++; const th = Math.max(.1, est(fs) - 2 * PADV);
+        L.push({ id: nid(), type: 'color', grp: gid, fillBlock: 1, x: +x0.toFixed(3), y: +y0.toFixed(3), w: +w.toFixed(3), h: +h.toFixed(3), fill: tint, opacity: 100, radius: 0 });
+        L.push({ id: nid(), type: 'text', grp: gid, pull: 1, x: +(x0 + PADH).toFixed(3), y: +(y0 + Math.max(PADV, (h - th) / 2)).toFixed(3), w: +(w - 2 * PADH).toFixed(3), h: +th.toFixed(3), text: s, style: 'sub', fs: +fs.toFixed(2), fw: 600, color: ink, align: 'left', fill: '' }); return true; };
+      for (const pid of pids) { curPid = pid; const L = P[pid]; if (!L || !L.length) continue; const M = this.poMargins(pid) || M0; const IW = M.pw - M.l - M.r, mid = M.l + IW / 2; const g = .25, xR = M.l + (IW - g) / 2 + g;
+        const roots = build(pid, L).filter(r => !(r.o.type === 'color' && r.o.fillBlock)); const half = roots.filter(r => r.sw < .7 * IW); const left = half.filter(r => r.sx + r.sw <= mid + .05), right = half.filter(r => r.sx >= mid - .05);
+        const bot = a => Math.max(...a.map(r => r.y0 + r.h)); const topOf = a => Math.min(...a.map(r => r.y0)); const fullIn = (a, b) => roots.some(r => r.sw >= .7 * IW && r.y0 < b - .01 && r.y0 + r.h > a + .01);
+        // one column used, the other empty beside it: a pull quote of the same height fills the empty column
+        if (left.length && !right.length && !fullIn(topOf(left), bot(left)) && bot(left) - topOf(left) >= .55 * PS) { pullAt(L, xR, topOf(left), M.l + IW - xR, bot(left) - topOf(left)); }
+        else if (right.length && !left.length && !fullIn(topOf(right), bot(right)) && bot(right) - topOf(right) >= .55 * PS) { pullAt(L, M.l, topOf(right), (IW - g) / 2, bot(right) - topOf(right)); }
+        else if (left.length && right.length) { const bl = bot(left), br = bot(right); const lo = Math.min(bl, br), hi = Math.max(bl, br);
+          if (hi - lo >= .6 * PS && !roots.some(r => r.sw >= .7 * IW && r.y0 > lo - .01 && r.y0 < hi)) { const short = bl < br ? left : right; const x0 = Math.min(...short.map(r => r.sx)), w = Math.max(...short.map(r => r.sx + r.sw)) - x0; const y0 = lo + GAP_SEC, h = hi - y0; if (h >= .55 * PS && w >= 1.2 * PS) pullAt(L, x0, y0, w, h); } }
+        // the last page ending high: a Brand Command image fills the space (never a stock or generated image)
+        if (pid === pids[pids.length - 1] && pids.length > 1 && imgs.length) { const all = build(pid, L); const end = Math.max(...all.map(r => r.y0 + r.h)); const LIMp = ftrTop(pid) - SAFE; const room = LIMp - end - GAP_SEC; const body = LIMp - content(pid).top;
+          if (room > .3 * body) { const h = Math.min(room, 4.5 * PS); const y0 = end + GAP_SEC; L.push({ id: nid(), type: 'image', grp: 'gfillimg' + added++, fillBlock: 1, x: +M.l.toFixed(3), y: +y0.toFixed(3), w: +IW.toFixed(3), h: +h.toFixed(3), src: imgs[(added) % imgs.length], fit: 'cover', radius: 0, noph: true }); } } }
+      if (added) { await new Promise(r => this.setState({ pageObjs: P, saved: false }, r)); await wait(120); } }
     // pages left empty go away
     const empty = pids.filter((pid, i) => i > 0 && !(P[pid] || []).length);
     if (empty.length) { await new Promise(r => this.setState(st => ({ deletedPages: [...(st.deletedPages || []), ...empty], saved: false }), r)); await wait(150); pids = pids.filter(pid => !empty.includes(pid)); }
@@ -6718,7 +6752,7 @@ class Component extends DCLogic {
   }
   hdrDefault() { return { template: 'none', logo: '', logoRev: '', organizationName: 'Organization Name', documentTitle: 'Strategy / Fund / Fact Sheet Name', documentSubtitle: 'Institutional Share Class', period: 'Q2 2026', tagline: 'Proven success. *Strategic growth.* Real returns.', eyebrow: '', disclosureLine: 'For institutional use only', heroImage: '', colors: this.hdrBrand(), fontH: '', fontB: '',
     posMode: 'center', x: 50, y: 50, overlay: 'medium', height: 'auto', align: 'left', titleSize: 20, logoSize: 36, mode: 'every',
-    options: { showLogo: true, showOrganizationName: true, showTitle: true, showSubtitle: true, showPeriod: true, showTagline: true, showHeroImage: true, showDisclosure: false, showWatermark: true, showRule: true } }; }
+    options: { showLogo: true, showOrganizationName: true, showTitle: true, showSubtitle: true, showPeriod: true, showTagline: true, showHeroImage: true, showDisclosure: false, showWatermark: false, showRule: true } }; }
   hdr() { const d = this.hdrDefault(); const s = Object.assign({}, this.state.header || {}); const bl = this.bcLogos(); if (s.logoPick) s.logo = s.logoPick; else if (bl.color) s.logo = bl.color; if (bl.white) s.logoRev = bl.white; return Object.assign(d, s, { options: Object.assign({}, d.options, s.options || {}), colors: Object.assign({}, d.colors, s.colors || {}) }); }
   hfLockKeys(cur, patch) { const L = new Set(cur.userKeys || []); Object.keys(patch || {}).forEach(k => { if (k === 'userKeys') return; const v = patch[k]; if ((k === 'colors' || k === 'options' || k === 'slots' || k === 'pieces') && v && typeof v === 'object' && !Array.isArray(v)) { Object.keys(v).forEach(sk => { if (JSON.stringify(v[sk]) !== JSON.stringify((cur[k] || {})[sk])) L.add(k + '.' + sk); }); } else L.add(k); }); return [...L]; }
   hfDropLocked(cur, patch) { const L = new Set(cur.userKeys || []); if (!L.size) return patch; const out = {}; Object.keys(patch || {}).forEach(k => { const v = patch[k]; if (L.has(k)) return; if ((k === 'colors' || k === 'options' || k === 'slots' || k === 'pieces') && v && typeof v === 'object' && !Array.isArray(v)) { const m = Object.assign({}, v); Object.keys(m).forEach(sk => { if (L.has(k + '.' + sk)) m[sk] = (cur[k] || {})[sk]; }); out[k] = m; } else out[k] = v; }); return out; }
